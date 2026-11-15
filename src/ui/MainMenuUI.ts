@@ -1,4 +1,6 @@
 import { GAME_CONFIG } from '../config/gameConfig';
+import { CATALOG } from '../data/catalog';
+import { openGuide } from './GuidePanel';
 import type { SaveSummary } from '../systems/SaveSystem';
 import { installMode, onInstallModeChange, promptInstall } from '../pwa/pwa';
 import { formatRupiah } from '../utils/formatting';
@@ -65,6 +67,12 @@ export class MainMenuUI implements UIComponent {
       attrs: { type: 'button' },
       onClick: () => actions.onAudioSettings(),
     });
+    const guide = el('button', {
+      className: 'btn btn-secondary btn-guide',
+      attrs: { type: 'button', title: 'Info lengkap: cara main, event, cuaca, lokasi, pelanggan, menu, upgrade, bank, pencapaian' },
+      children: [el('span', { text: '📖', attrs: { 'aria-hidden': 'true' } }), el('span', { text: 'Panduan & Info' })],
+      onClick: () => openGuide(this.ui, { catalog: CATALOG, centered: true }),
+    });
     const about = el('button', {
       className: 'btn btn-secondary',
       text: 'Tentang game',
@@ -91,7 +99,7 @@ export class MainMenuUI implements UIComponent {
         el('p', { className: 'menu-footer', text: `v${GAME_CONFIG.version} · ${GAME_CONFIG.stage}` }),
       ],
     });
-    this.minorActions.append(fullscreen, sound, about);
+    this.minorActions.append(guide, fullscreen, sound, about);
     ui.layers.screen.append(this.root);
     this.renderSaveButtons();
     this.renderInstallButton();

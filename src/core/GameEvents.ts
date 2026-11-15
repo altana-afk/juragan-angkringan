@@ -13,7 +13,7 @@ export interface StateChange {
 }
 
 /** Daftar seluruh event lintas modul beserta tipe payload-nya. */
-export type PanelId = 'shop' | 'kitchen' | 'promo' | 'stats' | 'upgrade' | 'storage' | 'bank' | 'achievements' | 'event' | 'location';
+export type PanelId = 'shop' | 'kitchen' | 'promo' | 'stats' | 'upgrade' | 'storage' | 'bank' | 'achievements' | 'event' | 'location' | 'guide';
 
 export interface GameEvents {
   'state:changed': StateChange;

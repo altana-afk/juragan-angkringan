@@ -1,6 +1,6 @@
 import { effectsOf } from './UpgradeSystem';
 import type { GameState } from '../core/GameState';
-import type { Catalog, RecipeDef, UnlockCondition } from '../data/catalog';
+import type { Catalog, RecipeCategory, RecipeDef, UnlockCondition } from '../data/catalog';
 import { formatRupiah } from '../utils/formatting';
 import { unitCostOn } from './EconomySystem';
 import { totalQty } from './InventorySystem';
@@ -86,6 +86,30 @@ export function describeUnlock(condition: UnlockCondition): string {
     case 'level':
       return `Butuh level usaha ${condition.min} (upgrade gerobak)`;
   }
+}
+
+/** Urutan kategori di daftar menu: makanan dulu (makanan, gorengan, sate & bakaran), minuman paling akhir. */
+export const MENU_CATEGORY_ORDER: readonly RecipeCategory[] = ['makanan', 'gorengan', 'sate', 'minuman'];
+
+export const isDrink = (recipe: RecipeDef): boolean => recipe.category === 'minuman';
+
+/**
+ * Urutan daftar menu untuk UI: yang sudah terbuka di atas, yang masih terkunci di bawah.
+ * Di dalam tiap kelompok: makanan dulu baru minuman (lalu urutan katalog, supaya stabil).
+ */
+export function sortRecipesForMenu(recipes: readonly RecipeDef[], unlocked: Iterable<string>): RecipeDef[] {
+  const open = new Set(unlocked);
+  const rank = (r: RecipeDef): number => MENU_CATEGORY_ORDER.indexOf(r.category);
+  return recipes
+    .map((recipe, index) => ({ recipe, index }))
+    .sort(
+      (a, b) =>
+        Number(!open.has(a.recipe.id)) - Number(!open.has(b.recipe.id)) ||
+        Number(isDrink(a.recipe)) - Number(isDrink(b.recipe)) ||
+        rank(a.recipe) - rank(b.recipe) ||
+        a.index - b.index,
+    )
+    .map((x) => x.recipe);
 }
 
 export function isRecipeUnlocked(state: Readonly<GameState>, recipeId: string): boolean {

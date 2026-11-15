@@ -305,6 +305,21 @@ Target: *satu siklus permainan dapat berjalan secara utuh.*
   (`/juragan-angkringan/`) OK, emulasi iPhone 13 & Pixel 7 landscape tanpa error, iframe tidak mendaftarkan SW,
   alur update di menu & saat bermain sesuai.
 
+## Pembaruan 0.11.0 — Panduan & Info, urutan menu
+
+- **Tombol "Panduan & Info"** di menu utama, di menu jeda (☰ / Esc), dan pintasan **H** saat bermain.
+  Isinya 10 tab yang dibaca langsung dari data game (selalu sesuai aturan terbaru):
+  cara main & angka penting (popularitas, loyalitas, kepuasan, stok, bangkrut), **semua event** (lokasi, tanggal,
+  efek, pesanan borongan), **cuaca** (peluang, efek pengunjung & menu hangat/dingin, upgrade penangkal),
+  **lokasi** (sewa, biaya pindah, jam ramai, ramai per hari), **tipe pelanggan**, **menu** (bahan, syarat buka,
+  harga wajar), **upgrade** (syarat & efek), **bank & promosi**, **pencapaian**, dan **kontrol**.
+  Saat dibuka di dalam permainan, panel menandai event & cuaca hari ini, lokasimu, menu yang sudah terbuka,
+  upgrade yang terpasang, dan pencapaian yang sudah didapat.
+- **Urutan menu di Persiapan**: menu yang sudah terbuka di atas, yang masih terkunci di bawah; di tiap kelompok
+  makanan (makanan → gorengan → sate & bakaran) dulu, baru minuman. Ada judul kelompok "Makanan", "Minuman",
+  dan "Masih terkunci".
+- 171 test (25 file) lulus, e2e desktop & ponsel LULUS.
+
 ## Status akhir
 
 Ketujuh stage dari dokumen desain selesai. Ide lanjutan: lebih banyak peta/lokasi, event acak harian

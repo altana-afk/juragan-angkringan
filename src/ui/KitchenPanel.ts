@@ -4,7 +4,7 @@ import type { RecipeDef } from '../data/catalog';
 import { maxPortionsPerOrder } from '../systems/CookingSystem';
 import { PRICE_RULES, priceBounds, priceVerdict, salePriceOf } from '../systems/PricingSystem';
 import { nearestExpiry, totalQty } from '../systems/InventorySystem';
-import { aggregateRequirements, describeUnlock, estimatedPortionCost, findShortages, maxPortions, type CookOrder } from '../systems/RecipeSystem';
+import { aggregateRequirements, describeUnlock, estimatedPortionCost, findShortages, isDrink, maxPortions, sortRecipesForMenu, type CookOrder } from '../systems/RecipeSystem';
 import { formatRupiah } from '../utils/formatting';
 import { el, setText } from './dom';
 import { itemIcon, stepper } from './itemIcon';
@@ -105,7 +105,9 @@ export class KitchenPanel {
 
   private renderMenu(state: Readonly<GameState>): void {
     const day = state.calendar.day;
-    const cards = this.ctx.catalog.recipes.map((recipe) => {
+    // Terbuka di atas, terkunci di bawah; makanan dulu baru minuman.
+    const sorted = sortRecipesForMenu(this.ctx.catalog.recipes, state.unlockedRecipes);
+    const card = (recipe: RecipeDef): HTMLElement => {
       const unlocked = state.unlockedRecipes.includes(recipe.id);
       const cost = estimatedPortionCost(this.ctx.catalog, recipe, day);
       const price = salePriceOf(state, recipe);
@@ -143,8 +145,16 @@ export class KitchenPanel {
           button,
         ],
       });
-    });
-    this.menuEl.replaceChildren(...cards);
+    };
+    const open = sorted.filter((r) => state.unlockedRecipes.includes(r.id));
+    const locked = sorted.filter((r) => !state.unlockedRecipes.includes(r.id));
+    const group = (title: string, list: RecipeDef[], extra = ''): HTMLElement[] =>
+      list.length ? [el('div', { className: `recipe-group-title${extra}`, text: `${title} · ${list.length}` }), ...list.map(card)] : [];
+    this.menuEl.replaceChildren(
+      ...group('Makanan', open.filter((r) => !isDrink(r))),
+      ...group('Minuman', open.filter(isDrink)),
+      ...group('🔒 Masih terkunci', locked, ' is-locked'),
+    );
   }
 
   /** Pengatur harga jual: ±Rp500, batas 50–200% harga wajar, dengan penilaian harga. */

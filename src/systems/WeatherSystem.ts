@@ -19,17 +19,21 @@ export const WEATHER_EFFECTS: Readonly<Record<WeatherKind, WeatherEffect>> = {
   panas: { arrival: 1.05, warm: 0.7, cold: 1.75, label: 'Panas terik', hint: 'Minuman dingin laris, minuman hangat kurang laku.' },
 };
 
-const WEIGHTS: readonly { item: WeatherKind; weight: number }[] = [
+/** Peluang dasar tiap cuaca (bobot, total 100). */
+export const WEATHER_WEIGHTS: readonly { item: WeatherKind; weight: number }[] = [
   { item: 'cerah', weight: 45 },
   { item: 'berawan', weight: 25 },
   { item: 'hujan', weight: 20 },
   { item: 'panas', weight: 10 },
 ];
 
+/** Peluang tambahan hujan berlanjut jika kemarin hujan. */
+export const RAIN_STREAK_CHANCE = 0.35;
+
 /** Cuaca hari tertentu (deterministik per hari; Hari 1 selalu cerah). Hujan cenderung beruntun. */
 export function weatherForDay(day: number, yesterday: WeatherKind): WeatherKind {
   if (day <= 1) return 'cerah';
   const rng = new SeededRandom(`cuaca-${day}`);
-  if (yesterday === 'hujan' && rng.chance(0.35)) return 'hujan';
-  return rng.weightedPick(WEIGHTS);
+  if (yesterday === 'hujan' && rng.chance(RAIN_STREAK_CHANCE)) return 'hujan';
+  return rng.weightedPick(WEATHER_WEIGHTS);
 }

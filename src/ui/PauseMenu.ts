@@ -61,6 +61,13 @@ export class PauseMenu implements UIComponent {
           },
         },
         {
+          label: 'Panduan & Info',
+          onClick: () => {
+            this.ctx.bus.emit('ui:open-panel', { panel: 'guide' });
+            return false;
+          },
+        },
+        {
           label: 'Pencapaian',
           onClick: () => {
             showAchievements(this.ctx, this.ui);

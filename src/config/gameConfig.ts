@@ -7,8 +7,8 @@ export const GAME_CONFIG = {
   /** Nama sementara proyek — cukup ubah di sini untuk mengganti judul di seluruh game. */
   title: 'Juragan Angkringan',
   subtitle: 'Simulator',
-  version: '0.10.0',
-  stage: 'Pasar Malam, Menu & Upgrade Baru',
+  version: '0.11.0',
+  stage: 'Panduan & Info',
   backgroundColor: '#140f1f',
 
   /** Tanggal kalender untuk Hari 1 (bulan 1–12). 6 Juli 2026 jatuh pada hari Senin. */

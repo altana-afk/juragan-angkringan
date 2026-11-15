@@ -3,6 +3,7 @@ import type { PanelId } from '../core/GameEvents';
 import { BankPanel } from '../ui/BankPanel';
 import { showAchievements } from '../ui/AchievementsPanel';
 import { showEventInfo } from '../ui/EventInfo';
+import { openGuide } from '../ui/GuidePanel';
 import { StockBoard } from '../ui/StockBoard';
 import { StoragePanel } from '../ui/StoragePanel';
 import { TutorialCoach } from '../ui/TutorialCoach';
@@ -110,6 +111,11 @@ export class AngkringanScene extends Phaser.Scene {
         }
         if (panel === 'event') {
           if (!ui.hasOpenModal()) showEventInfo(this.ctx, ui);
+          return;
+        }
+        // Panduan boleh dibuka di atas menu jeda / panel lain.
+        if (panel === 'guide') {
+          openGuide(ui, { catalog: this.ctx.catalog, state: this.ctx.store.get() });
           return;
         }
         if (ui.hasOpenModal()) return;
