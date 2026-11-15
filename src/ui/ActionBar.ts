@@ -94,6 +94,7 @@ export class ActionBar implements UIComponent {
     else if (key === 'u' && this.phase === 'persiapan') this.ctx.bus.emit('ui:open-panel', { panel: 'upgrade' });
     else if (key === 's' && this.phase === 'persiapan') this.ctx.bus.emit('ui:open-panel', { panel: 'stats' });
     else if (key === 'h' && !this.ctx.store.get().bankrupt) this.ctx.bus.emit('ui:open-panel', { panel: 'guide' });
+    else if (key === 'n' && !this.ctx.store.get().bankrupt) this.ctx.bus.emit('ui:open-panel', { panel: 'story' });
     else if (key === 'enter' && this.phase === 'persiapan' && target?.tagName !== 'BUTTON') this.ctx.bus.emit('sales:start-request');
     else return;
     event.preventDefault();

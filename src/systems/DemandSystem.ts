@@ -25,6 +25,8 @@ export interface CustomerPlan {
   /** Daftar porsi yang diinginkan (boleh berulang untuk rombongan). */
   readonly wants: readonly string[];
   readonly paletteIndex: number;
+  /** Pelanggan bernama (cerita), jika ada. */
+  readonly namedId?: string;
 }
 
 /** Kurva keramaian per jam: puncak sekitar jam makan malam, sepi menjelang tutup (rata-rata ≈ 1). */
@@ -143,7 +145,7 @@ export function planCustomer(
   minutes: number,
   mods: DemandModifiers = NO_MODIFIERS,
 ): CustomerPlan {
-  const type = pickCustomerType(rng, types, minutes, state.player.popularity, mods);
+  const type = types.length === 1 ? (types[0] as CustomerTypeDef) : pickCustomerType(rng, types, minutes, state.player.popularity, mods);
   const fx = effectsOf(state);
   const partySize = rng.int(type.party[0], type.party[1]);
   // Anggaran di data = per orang; total rombongan = per orang × jumlah orang.
@@ -199,5 +201,35 @@ export function planCustomer(
     patience: Math.max(3, type.patience + fx.patience + (mods.patienceDelta ?? 0)),
     wants,
     paletteIndex: rng.int(0, type.palettes.length - 1),
+  };
+}
+
+/**
+ * Rencana pelanggan bernama (cerita): satu orang, memakai selera tipe dasarnya,
+ * sedikit lebih sabar, dan selalu mencari salah satu menu favorit yang sudah terbuka.
+ */
+export function planNamedCustomer(
+  rng: SeededRandom,
+  named: { readonly id: string; readonly name: string; readonly favorites: readonly string[] },
+  baseType: CustomerTypeDef,
+  state: Readonly<GameState>,
+  catalog: Catalog,
+  minutes: number,
+  mods: DemandModifiers = NO_MODIFIERS,
+): CustomerPlan {
+  const plan = planCustomer(rng, [{ ...baseType, party: [1, 1] }], state, catalog, minutes, mods);
+  const fav = named.favorites.find((id) => state.unlockedRecipes.includes(id));
+  const wants = fav && !plan.wants.includes(fav) ? [fav, ...plan.wants] : [...plan.wants];
+  const extra = fav ? catalog.recipe(fav).salePrice : 0;
+  return {
+    ...plan,
+    typeId: `named_${named.id}`,
+    name: named.name,
+    partySize: 1,
+    budget: plan.budget + Math.ceil(extra / 500) * 500,
+    patience: plan.patience + 15,
+    wants,
+    paletteIndex: 0,
+    namedId: named.id,
   };
 }

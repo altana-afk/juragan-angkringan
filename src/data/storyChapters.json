@@ -1,0 +1,67 @@
+{
+  "chapters": [
+    {
+      "id": 1,
+      "title": "Wedang Jahe",
+      "recipeId": "wedang_jahe",
+      "recipeNote": "Jahe dibakar dulu di bara arang sampai harum, baru digeprek. Gula jawa secukupnya, jangan pelit.",
+      "memory": "Malam pertama gerobak ini buka, hujan turun deras. Tidak ada satu pembeli pun. Kardi membuat wedang jahe dua gelas, satu untuknya, satu untukku. Kami minum di bawah terpal sambil tertawa karena dagangan tidak laku. Kata Kardi, \"Besok pasti ada yang datang.\" Besoknya memang ada. Satu orang. Itu cukup.",
+      "condition": "Terbuka sejak hari pertama"
+    },
+    {
+      "id": 2,
+      "title": "Tahu Bacem",
+      "recipeId": null,
+      "recipeNote": "Rebus tahu dengan air kelapa, gula jawa, bawang, ketumbar, lengkuas, dan daun salam sampai airnya habis. Baru digoreng sebentar. Sabar, jangan dibesarkan apinya.",
+      "memory": "Kardi tidak pernah sabar menunggu bacem. Setiap lima menit dia membuka panci. Aku pukul tangannya pakai sendok kayu. Bacem itu seperti orang, kataku, harus diberi waktu supaya bumbunya masuk ke dalam. Dia tertawa, tapi sejak itu dia tidak membuka panci lagi.",
+      "condition": "Hari ke-8 dan kabar \"Gerobak Mbah Kardi kosong\" sudah dibaca"
+    },
+    {
+      "id": 3,
+      "title": "Pisang Goreng",
+      "recipeId": "pisang_goreng",
+      "recipeNote": "Pisang kepok yang sudah matang tapi masih keras. Adonan tepung jangan terlalu kental, tambah sedikit kapur sirih supaya renyah.",
+      "memory": "Pembeli pertama kami di gang ini seorang anak kecil, uangnya cuma lima ratus rupiah. Kardi memberinya dua pisang goreng. Anak itu datang lagi besoknya bersama ibunya, lalu bersama tetangganya. Kardi bilang, rezeki itu tidak dihitung dari pisang yang kita jual, tapi dari orang yang kembali.",
+      "condition": "Hari ke-15 dan sudah pernah mengobrol dengan Pak Gito"
+    },
+    {
+      "id": 4,
+      "title": "Nasi Kucing",
+      "recipeId": "nasi_kucing",
+      "recipeNote": "Nasi sekepal, sambal teri, sepotong tempe. Bungkus daun pisang. Harganya harus tetap bisa dibeli oleh siapa saja.",
+      "memory": "Malam ketika aku sakit dan tidak bisa bangun, Kardi berjualan sendirian. Pulangnya dia membawa sisa nasi kucing, lalu membaginya ke rumah-rumah yang lampunya masih menyala. Dia tidak pernah bilang ke siapa-siapa. Aku tahu karena tetangga datang mengucapkan terima kasih padaku, dan aku pura-pura tahu.",
+      "condition": "Hari ke-32, kabar penggusuran sudah dibaca, dan pernah belanja bahan saat berjualan di Pinggir Pasar"
+    },
+    {
+      "id": 5,
+      "title": "Sambal Sri (halaman robek)",
+      "recipeId": null,
+      "recipeNote": "Cabai rawit merah dan cabai keriting, bawang merah, bawang putih, terasi bakar, gula jawa, garam. Ulek kasar, jangan halus. Takarannya...",
+      "memory": "Bagian bawah halaman ini robek. Yang tersisa hanya tulisan miring di pinggir: \"Kardi selalu bilang terlalu pedas. Padahal dia selalu nambah.\"",
+      "condition": "Hari ke-38, Bab 4 sudah terbuka, dan kabar halaman robek sudah dibaca"
+    },
+    {
+      "id": 6,
+      "title": "Sambal Sri",
+      "recipeId": "sego_sambal_sri",
+      "recipeNote": "Takaran terakhir: cabai rawit sepuluh, cabai keriting lima, bawang merah enam, bawang putih tiga, terasi seujung jari, gula jawa sejempol. Ulek sambil menyanyi supaya tangannya tidak capek.",
+      "memory": "Untuk Kardi, jangan berhenti. Kalau suatu hari aku tidak ada, buat sambal ini untuk orang-orang di gang. Mereka bukan pembeli, mereka keluarga yang belum pulang.",
+      "condition": "Hari ke-42, Bab 5 sudah terbuka, dan hubungan dengan Bu Surti minimal tahap 2. Membuka menu Sego Sambal Sri"
+    },
+    {
+      "id": 7,
+      "title": "Halaman Terakhir",
+      "recipeId": null,
+      "recipeNote": "",
+      "memory": "",
+      "condition": "Terbuka setelah cerita mencapai akhir"
+    }
+  ],
+  "lastPage": {
+    "lengkap": "Di halaman terakhir, ada tulisan Kardi sendiri, gemetar dan miring: \"Sri, aku berhenti membuat sambalmu karena setiap kali menumbuk cabai aku menangis. Sekarang ada anak muda yang membuatnya lagi. Aku mendengar dari Surti, rasanya hampir sama. Hampir. Tidak apa-apa. Yang penting gang ini ingat kamu.\"",
+    "gotong_royong": "Di halaman terakhir, Kardi menulis daftar nama warga yang datang membantu gerobak bertahun-tahun lalu. Di bawahnya ada ruang kosong. Kamu menambahkan nama-nama warga yang datang pagi itu.",
+    "warisan": "Di halaman terakhir, ada foto lama: Kardi muda, Sri, dan seorang anak kecil yang memegang gelas kopi. Di belakangnya tertulis: \"Bayu, umur enam tahun. Katanya nanti mau jualan kopi.\"",
+    "bertahan": "Di halaman terakhir, Kardi menulis: \"Gerobak itu kecil, tapi bisa menampung banyak cerita.\" Kamu menyelipkan kuitansi sewa di sana, sebagai bab baru.",
+    "kota": "Di halaman terakhir, hanya ada satu kalimat dari Sri: \"Di mana pun gerobak ini berdiri, semoga yang makan pulang dengan kenyang.\" Kamu menutup buku itu pelan-pelan."
+  }
+}

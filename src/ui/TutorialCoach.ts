@@ -13,6 +13,11 @@ export class TutorialCoach implements UIComponent {
   private readonly counter = el('span', { className: 'coach-counter' });
   private readonly off: () => void;
   private hinted: HTMLElement | null = null;
+  /** Petunjuk sekali "ketuk gelembung" (cerita), tampil di atas tutorial biasa. */
+  private storyHint = false;
+  private readonly skip: HTMLElement;
+  private readonly ok: HTMLElement;
+  private readonly offHint: () => void;
 
   constructor(private readonly ctx: GameContext, parent: HTMLElement) {
     this.root = el('aside', {
@@ -21,13 +26,25 @@ export class TutorialCoach implements UIComponent {
       children: [
         el('div', { className: 'coach-head', children: [this.counter, this.title] }),
         this.text,
-        el('button', {
+        (this.skip = el('button', {
           className: 'link-btn coach-skip',
           text: 'Lewati tutorial',
           attrs: { type: 'button' },
           onClick: () => this.ctx.actions.updateTutorial(true),
-        }),
+        })),
+        (this.ok = el('button', {
+          className: 'link-btn coach-skip',
+          text: 'Mengerti',
+          attrs: { type: 'button' },
+          onClick: () => this.hideStoryHint(),
+        })),
       ],
+    });
+    this.offHint = ctx.bus.on('story:hint', ({ show }) => {
+      if (show && !this.ctx.store.get().story.flags.bubbleHint) {
+        this.storyHint = true;
+        this.render();
+      } else if (!show && this.storyHint) this.hideStoryHint();
     });
     parent.append(this.root);
     this.off = ctx.bus.on('state:changed', ({ reason }) => {
@@ -40,8 +57,25 @@ export class TutorialCoach implements UIComponent {
     });
   }
 
+  private hideStoryHint(): void {
+    this.storyHint = false;
+    if (!this.ctx.store.get().story.flags.bubbleHint) this.ctx.actions.markStoryFlag('bubbleHint');
+    this.render();
+  }
+
   private render(): void {
     const s = this.ctx.store.get();
+    this.ok.hidden = !this.storyHint;
+    this.skip.hidden = this.storyHint;
+    if (this.storyHint) {
+      this.root.classList.add('is-visible', 'is-story');
+      this.setHint(null);
+      setText(this.counter, '💬');
+      setText(this.title, 'Ada yang mau bercerita');
+      setText(this.text, 'Ketuk gelembung "..." di atas pelanggan bernama untuk mendengar kabar kampung. Waktu berhenti selama kalian mengobrol.');
+      return;
+    }
+    this.root.classList.remove('is-story');
     const step = TUTORIAL_STEPS[s.tutorial];
     const active = s.tutorial < TUTORIAL_DONE && step !== undefined && !s.bankrupt;
     this.root.classList.toggle('is-visible', active);
@@ -67,6 +101,7 @@ export class TutorialCoach implements UIComponent {
 
   destroy(): void {
     this.off();
+    this.offHint();
     this.setHint(null);
     this.root.remove();
   }

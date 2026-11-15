@@ -212,6 +212,16 @@ function tabPanduan(): HTMLElement[] {
         'Lanjut ke hari berikutnya — cuaca dan event baru muncul.',
       ],
     }),
+    card({
+      icon: '📰',
+      title: 'Kabar Kampung & Buku Dapur Kardi',
+      lines: [
+        'Pelanggan bernama (Pak Gito, Bu Surti, Mas Bayu, dan lainnya) kadang mampir saat berjualan. Ketuk gelembung "..." di atas mereka untuk mengobrol — waktu berhenti selama dialog.',
+        'Kabar yang terlewat tetap masuk log di tombol Kabar Kampung (pojok kanan atas, atau tombol N). Setelah 5 hari tidak dibaca, kabar menjadi ringkasan "didengar dari warga".',
+        'Layani mereka dengan baik, sediakan menu favoritnya, dan ajak mengobrol agar makin dekat (tahap 0–3). Kedekatan membuka cerita pribadi dan pilihan di akhir.',
+        'Bab Buku Dapur Kardi terbuka seiring cerita. Cerita tidak pernah menghalangi belanja, memasak, atau berjualan.',
+      ],
+    }),
     h('Angka penting'),
     card({
       icon: '⭐',
@@ -491,6 +501,8 @@ function tabKontrol(): HTMLElement[] {
         ['K', 'Bank (persiapan)'],
         ['S', 'Statistik (persiapan)'],
         ['H', 'Panduan & Info (ini)'],
+        ['N', 'Kabar Kampung (cerita)'],
+        ['Enter / Spasi (saat dialog)', 'Lanjut obrolan'],
         ['Enter', 'Mulai berjualan'],
         ['Spasi · 1 · 2 · 3', 'Jeda · kecepatan waktu'],
         ['Esc', 'Menu jeda / tutup panel'],

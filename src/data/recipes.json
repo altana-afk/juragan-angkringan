@@ -732,6 +732,33 @@
         "color": "#e9b44a",
         "accent": "#5a341e"
       }
+    },
+    {
+      "id": "sego_sambal_sri",
+      "name": "Sego Sambal Sri",
+      "category": "makanan",
+      "salePrice": 8000,
+      "ingredients": {
+        "beras": 1,
+        "cabai": 2,
+        "bawang": 1,
+        "tempe": 1
+      },
+      "unlock": {
+        "type": "story",
+        "chapter": 6
+      },
+      "shelfLifeDays": 0,
+      "tags": [
+        "spesial",
+        "mengenyangkan",
+        "hangat"
+      ],
+      "icon": {
+        "shape": "sack",
+        "color": "#c9532e",
+        "accent": "#6d9440"
+      }
     }
   ]
 }

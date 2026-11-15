@@ -36,7 +36,9 @@ export type UnlockCondition =
   | { readonly type: 'start' }
   | { readonly type: 'popularity'; readonly min: number }
   | { readonly type: 'money'; readonly min: number }
-  | { readonly type: 'level'; readonly min: number };
+  | { readonly type: 'level'; readonly min: number }
+  /** Terbuka dari bab Buku Dapur Kardi (cerita). */
+  | { readonly type: 'story'; readonly chapter: number };
 
 export type RecipeCategory = 'makanan' | 'gorengan' | 'sate' | 'minuman';
 
@@ -88,6 +90,7 @@ function parseUnlock(raw: unknown, where: string): UnlockCondition {
   if ((raw.type === 'popularity' || raw.type === 'money' || raw.type === 'level') && typeof raw.min === 'number' && raw.min >= 0) {
     return { type: raw.type, min: raw.min };
   }
+  if (raw.type === 'story' && typeof raw.chapter === 'number' && Number.isInteger(raw.chapter) && raw.chapter > 0) return { type: 'story', chapter: raw.chapter };
   return fail(`${where}: syarat unlock tidak valid`);
 }
 

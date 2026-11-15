@@ -40,6 +40,10 @@ async def flow(browser, name, viewport, mobile):
     await click('text=Mulai Bermain'); await page.wait_for_selector('.action-bar'); await page.wait_for_timeout(900)
     base = await page.evaluate(PROBE)
     checks['tutorial_tampil'] = await page.is_visible('.tutorial-coach.is-visible')
+    # Kabar Kampung (cerita): panel bisa dibuka dari HUD dan ditutup
+    await click('.hud-story'); await page.wait_for_selector('.sheet-story')
+    checks['kabar_kampung'] = await page.locator('.sheet-story [data-tab]').count() >= 3
+    await page.keyboard.press('Escape'); await page.wait_for_timeout(300)
 
     await click('.action-btn:has-text("Belanja")'); await page.wait_for_selector('.sheet-shop')
     for ing, n in [('Beras', 2), ('Telur', 1), ('Minyak goreng', 1), ('Bawang', 1), ('Cabai', 2), ('Kecap', 1),

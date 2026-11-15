@@ -24,15 +24,34 @@ interface BubbleView {
   key: string | null;
 }
 
+/** Gelembung obrolan pelanggan bernama: 'news' = ada kabar (berkedip), 'chat' = obrolan ringan. */
+export type TalkMark = 'news' | 'chat' | null;
+
+export interface TalkHooks {
+  /** Jenis gelembung "..." untuk rombongan ini (null = tidak ada). */
+  mark(group: Group): TalkMark;
+  /** Pemain mengetuk gelembung. */
+  onTap(group: Group): void;
+}
+
+interface TalkView {
+  bubble: Phaser.GameObjects.Image;
+  dots: Phaser.GameObjects.Image;
+  name: Phaser.GameObjects.Text;
+  mark: TalkMark;
+}
+
 /** Menampilkan rombongan pelanggan dari SalesSimulation: sprite, animasi, gelembung, efek. */
 export class CustomerLayer {
   private readonly members = new Map<string, MemberView>();
   private readonly bubbles = new Map<number, BubbleView>();
+  private readonly talks = new Map<number, TalkView>();
   private elapsed = 0;
 
   constructor(
     private readonly scene: Phaser.Scene,
     private readonly map: MapData,
+    private readonly talkHooks: TalkHooks | null = null,
   ) {}
 
   private worldPos(x: number, y: number): { x: number; y: number } {
@@ -54,6 +73,7 @@ export class CustomerLayer {
         this.syncMember(group, m);
       }
       this.syncBubble(group);
+      this.syncTalk(group);
     }
     for (const [id, view] of this.members) {
       if (!alive.has(id)) {
@@ -68,6 +88,70 @@ export class CustomerLayer {
         this.bubbles.delete(id);
       }
     }
+    for (const [id, view] of this.talks) {
+      if (!aliveGroups.has(id)) this.destroyTalk(id, view);
+    }
+  }
+
+  /** Gelembung "..." + label nama di atas pelanggan bernama; bisa diketuk. */
+  private syncTalk(group: Group): void {
+    if (!group.named || !this.talkHooks) return;
+    const leader = group.members.find((m) => !m.gone);
+    const mark = leader && group.state !== 'leaving' ? this.talkHooks.mark(group) : null;
+    let view = this.talks.get(group.id);
+    if (!view) {
+      const bubble = this.scene.add.image(0, 0, BUBBLE_KEY);
+      applyAnchor(bubble, BUBBLE_KEY);
+      const dots = this.scene.add.image(0, 0, emoteKey('talk'));
+      const name = this.scene.add
+        .text(0, 0, group.plan.name, { fontFamily: 'system-ui, sans-serif', fontSize: '7px', fontStyle: 'bold', color: '#8fe8ff', stroke: '#1b1220', strokeThickness: 3, resolution: 4 })
+        .setOrigin(0.5, 0);
+      // Area ketuk lebih besar dari gambarnya supaya mudah di layar sentuh.
+      bubble.setInteractive(new Phaser.Geom.Rectangle(-6, -6, 36, 36), Phaser.Geom.Rectangle.Contains);
+      if (bubble.input) bubble.input.cursor = 'pointer';
+      bubble.on(Phaser.Input.Events.GAMEOBJECT_POINTER_UP, (pointer: Phaser.Input.Pointer) => {
+        if (pointer.getDistance() < 12 && view?.mark) this.talkHooks?.onTap(group);
+      });
+      view = { bubble, dots, name, mark: null };
+      this.talks.set(group.id, view);
+    }
+    if (view.mark !== mark) {
+      view.mark = mark;
+      if (mark) {
+        view.bubble.setScale(0.4);
+        view.dots.setScale(0.4);
+        this.scene.tweens.add({ targets: [view.bubble, view.dots], scale: 1, duration: 240, ease: 'Back.easeOut' });
+      }
+    }
+    if (!leader) return;
+    const p = this.worldPos(leader.x, leader.y);
+    const lift = leader.sitting && leader.seat ? (this.seatSupport(leader.seat)?.lift ?? 0) : 0;
+    const head = p.y - lift - (leader.sitting ? 20 : 23);
+    // Nama di bawah kaki agar tidak tertutup gelembung.
+    view.name.setPosition(p.x, p.y - lift + 1).setDepth(DEPTH.cables - 8);
+    const visible = mark !== null;
+    // Kabar baru: berkedip. Obrolan ringan: diam.
+    const blink = mark === 'news' ? 0.55 + 0.45 * Math.abs(Math.sin(this.elapsed / 260)) : 1;
+    const bx = p.x + 12;
+    const by = head - 2 + Math.round(Math.sin(this.elapsed / 320 + group.id) * 0.8);
+    view.bubble.setVisible(visible).setPosition(bx, by).setAlpha(blink).setDepth(DEPTH.cables - 7);
+    view.dots.setVisible(visible).setPosition(bx, by - 12).setAlpha(blink).setDepth(DEPTH.cables - 6);
+    if (view.bubble.input) view.bubble.input.enabled = visible;
+  }
+
+  private destroyTalk(id: number, view: TalkView): void {
+    view.bubble.destroy();
+    view.dots.destroy();
+    view.name.destroy();
+    this.talks.delete(id);
+  }
+
+  /** Posisi layar (piksel kanvas) gelembung obrolan, untuk uji & petunjuk. */
+  talkScreenPositions(): { groupId: number; x: number; y: number }[] {
+    const cam = this.scene.cameras.main;
+    return [...this.talks.entries()]
+      .filter(([, v]) => v.bubble.visible)
+      .map(([groupId, v]) => ({ groupId, x: (v.bubble.x - cam.worldView.x) * cam.zoom, y: (v.bubble.y - 12 - cam.worldView.y) * cam.zoom }));
   }
 
   private syncMember(group: Group, m: Member): void {
@@ -222,6 +306,7 @@ export class CustomerLayer {
     }
     this.members.clear();
     this.bubbles.clear();
+    for (const [id, v] of [...this.talks]) this.destroyTalk(id, v);
   }
 }
 

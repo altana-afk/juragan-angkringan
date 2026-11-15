@@ -9,7 +9,9 @@ import type { Point } from '../iso/IsoMath';
 import type { CustomerAnchors, SeatAnchor } from '../world/MapData';
 import { SeededRandom } from '../utils/random';
 import { activeAdEffect } from './AdvertisingSystem';
-import { arrivalChancePerMinute, planCustomer, type CustomerPlan, type DemandModifiers } from './DemandSystem';
+import { arrivalChancePerMinute, planCustomer, planNamedCustomer, type CustomerPlan, type DemandModifiers } from './DemandSystem';
+import { namedById } from '../data/story';
+import type { NamedVisit } from './StorySystem';
 import type { OrderOutcome } from './SalesSystem';
 
 /**
@@ -52,10 +54,13 @@ export interface Group {
   /** Produk yang sedang dinikmati (ikon gelembung). */
   showing: string | null;
   exitPath: Point[];
+  /** Kunjungan pelanggan bernama (cerita), jika ada. */
+  readonly named: NamedVisit | null;
 }
 
 export type SimEvent =
   | { type: 'arrive'; group: Group }
+  | { type: 'named-arrive'; group: Group; visit: NamedVisit }
   | { type: 'order'; group: Group; outcome: OrderOutcome }
   | { type: 'walk-away'; group: Group; reason: 'full' | 'impatient' | 'closing' }
   | { type: 'pay'; group: Group; amount: number }
@@ -95,15 +100,18 @@ export class SalesSimulation {
   private nextGroupId = 1;
   private readonly occupied = new Set<string>();
   private queueOrder: number[] = [];
+  private namedQueue: NamedVisit[];
 
   constructor(
     private readonly anchors: CustomerAnchors,
     private readonly catalog: Catalog,
     private readonly types: readonly CustomerTypeDef[],
     private readonly hooks: SimHooks,
-    options: { seed: string; startMinutes: number },
+    options: { seed: string; startMinutes: number; namedVisits?: readonly NamedVisit[] },
   ) {
     this.rng = new SeededRandom(options.seed);
+    // Kunjungan yang jamnya sudah lewat (game dimuat di tengah hari) dilewati.
+    this.namedQueue = (options.namedVisits ?? []).filter((v) => v.minute > options.startMinutes).sort((a, b) => a.minute - b.minute);
     this.clock = options.startMinutes;
     this.lastWholeMinute = Math.floor(options.startMinutes);
   }
@@ -151,6 +159,10 @@ export class SalesSimulation {
       if (this.closedAt === null) {
         this.hooks.setClock(this.lastWholeMinute);
         const state = this.hooks.getState();
+        while (this.namedQueue.length && (this.namedQueue[0] as NamedVisit).minute <= this.lastWholeMinute && this.lastWholeMinute < close) {
+          const visit = this.namedQueue.shift() as NamedVisit;
+          events.push({ type: 'named-arrive', group: this.spawn(visit), visit });
+        }
         if (this.lastWholeMinute < close && this.rng.chance(arrivalChancePerMinute(this.lastWholeMinute, state.player.popularity, modifiersOf(state)))) {
           events.push({ type: 'arrive', group: this.spawn() });
         }
@@ -180,9 +192,9 @@ export class SalesSimulation {
     }
   }
 
-  private spawn(): Group {
+  private spawn(visit: NamedVisit | null = null): Group {
     const state = this.hooks.getState();
-    const plan = planCustomer(this.rng, this.types, state, this.catalog, this.lastWholeMinute, modifiersOf(state));
+    const plan = visit ? this.namedPlan(visit, state) : planCustomer(this.rng, this.types, state, this.catalog, this.lastWholeMinute, modifiersOf(state));
     const route = this.rng.pick(this.anchors.spawns);
     const id = this.nextGroupId++;
     const members: Member[] = [];
@@ -207,9 +219,16 @@ export class SalesSimulation {
     const group: Group = {
       id, plan, members, state: 'arriving', waitStart: 0, timer: 0, outcome: null, emote: null, showing: null,
       exitPath: [this.anchors.lotEntry, ...[...exit.path].reverse()],
+      named: visit,
     };
     this.groups.push(group);
     return group;
+  }
+
+  private namedPlan(visit: NamedVisit, state: Readonly<GameState>): CustomerPlan {
+    const def = namedById(visit.who);
+    const base = this.types.find((t) => t.id === def.baseType) ?? (this.types[0] as CustomerTypeDef);
+    return planNamedCustomer(this.rng, def, base, state, this.catalog, this.lastWholeMinute, modifiersOf(state));
   }
 
   private freeSeats(count: number): SeatAnchor[] | null {

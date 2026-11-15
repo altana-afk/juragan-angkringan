@@ -3,6 +3,7 @@ import { BALANCE_CONFIG } from '../config/balanceConfig';
 import { ECONOMY_CONFIG } from '../config/economyConfig';
 import { GAME_CONFIG } from '../config/gameConfig';
 import { CATALOG, type Catalog } from '../data/catalog';
+import type { ChoiceId, EndingId, RelationStage } from '../data/story';
 
 export type WeatherKind = 'cerah' | 'berawan' | 'hujan' | 'panas';
 
@@ -201,6 +202,67 @@ export interface LifetimeStats {
   perfectDays: number;
 }
 
+/** Status satu kabar kampung yang sudah sampai ke pemain. */
+export type NewsStatus = 'belum_dibaca' | 'dibaca' | 'diringkas';
+
+export interface NewsRecord {
+  status: NewsStatus;
+  /** Hari kalender kabar diterima (pembicara mampir / masuk log). */
+  receivedDay: number;
+}
+
+export interface RelationState {
+  /** Poin kedekatan (pelayanan baik, menu favorit, mengobrol). */
+  points: number;
+  /** Tahap hubungan 0–3 (tidak turun, kecuali karena pilihan cerita). */
+  stage: RelationStage;
+  /** Berapa kali sudah mengobrol. */
+  talks: number;
+  /** Hari kalender terakhir mengobrol (maks. satu obrolan per hari). */
+  lastTalkDay: number;
+  /** Hari kalender terakhir mampir. */
+  lastVisitDay: number;
+}
+
+/** Cerita "Kabar Kampung & Buku Dapur Kardi". */
+export interface StoryState {
+  /** Hari kalender saat cerita dimulai (hari cerita 1). Save lama mulai dari hari saat diperbarui. */
+  startDay: number;
+  news: Record<string, NewsRecord>;
+  relations: Record<string, RelationState>;
+  /** Bab buku resep yang terbuka: nomor bab → hari kalender dibuka. */
+  chapters: Record<number, number>;
+  /** Bab yang sudah dibaca pemain (untuk tanda "baru"). */
+  chaptersSeen: number[];
+  flags: {
+    /** Pernah belanja bahan saat berjualan di Pinggir Pasar. */
+    pasar: boolean;
+    /** Petunjuk "ketuk gelembung" sudah ditampilkan. */
+    bubbleHint: boolean;
+  };
+  choice: ChoiceId | null;
+  /** Hari kalender saat memilih keputusan. */
+  choiceDay: number;
+  ending: EndingId | null;
+  /** Layar akhir cerita sudah ditampilkan. */
+  endingSeen: boolean;
+}
+
+export function createStoryState(startDay = 1): StoryState {
+  return {
+    startDay,
+    news: {},
+    relations: {},
+    chapters: { 1: startDay },
+    chaptersSeen: [],
+    flags: { pasar: false, bubbleHint: false },
+    choice: null,
+    choiceDay: 0,
+    ending: null,
+    endingSeen: false,
+  };
+}
+
 export interface GameSettings {
   musicVolume: number;
   sfxVolume: number;
@@ -241,6 +303,8 @@ export interface GameState {
   achievements: Record<string, number>;
   /** Riwayat harian (maks. HISTORY_LIMIT hari terakhir). */
   history: HistoryEntry[];
+  /** Cerita kampung (kabar, hubungan, buku resep). */
+  story: StoryState;
 }
 
 export const HISTORY_LIMIT = 60;
@@ -288,6 +352,7 @@ export function createInitialState(catalog: Catalog = CATALOG): GameState {
     event: null,
     bank: createEmptyBank(),
     achievements: {},
+    story: createStoryState(1),
   };
 }
 
@@ -343,6 +408,10 @@ export function validateState(state: GameState, catalog: Catalog = CATALOG): voi
   for (const [id, price] of Object.entries(state.prices ?? {})) {
     if (!catalog.hasRecipe(id)) throw new Error(`Harga untuk resep tidak dikenal: ${id}`);
     if (!Number.isInteger(price) || price <= 0) throw new Error(`Harga ${id} tidak valid: ${price}`);
+  }
+  if (!state.story || typeof state.story.news !== 'object' || !Number.isInteger(state.story.startDay)) throw new Error('Data cerita hilang');
+  for (const [id, r] of Object.entries(state.story.relations)) {
+    if (!Number.isFinite(r.points) || r.points < 0 || ![0, 1, 2, 3].includes(r.stage)) throw new Error(`Hubungan ${id} tidak valid`);
   }
   for (const id of state.unlockedRecipes) {
     if (!catalog.hasRecipe(id)) throw new Error(`Resep terbuka tidak dikenal: ${id}`);

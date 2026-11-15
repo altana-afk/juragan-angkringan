@@ -10,6 +10,19 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: readonly ChangelogEntry[] = [
   {
+    version: '0.12.0',
+    title: 'Kabar Kampung & Buku Dapur Kardi',
+    items: [
+      'Cerita baru di Gang Melati: gerobak Mbah Kardi, Buku Dapur tulisan Sri, dan rencana ruko Pak Hendra yang mengancam ujung gang.',
+      'Pelanggan bernama: Pak Gito, Bu Surti, Mas Bayu, dan Pak Hendra. Ketuk gelembung "..." di atas mereka untuk mengobrol. Waktu berhenti selama dialog.',
+      'Tombol Kabar Kampung di pojok kanan atas (atau tombol N): log kabar, Buku Dapur Kardi (7 bab), kedekatan dengan warga, dan keputusan.',
+      'Kedekatan naik kalau kamu melayani dengan baik, menyediakan menu favorit, dan mau mengobrol. Kedekatan membuka cerita pribadi.',
+      'Empat pilihan di akhir cerita dengan akhir yang berbeda, plus menu rahasia Sego Sambal Sri.',
+      'Kabar yang terlewat tidak hilang: setelah 5 hari kamu mendengarnya dari warga. Cerita tidak pernah menghalangi berjualan.',
+      'Save lama tetap aman: cerita dimulai dari hari saat kamu memperbarui.',
+    ],
+  },
+  {
     version: '0.11.1',
     title: 'Catatan Pembaruan',
     items: [

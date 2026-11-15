@@ -9,6 +9,34 @@ import { formatRupiah } from '../utils/formatting';
 import { el } from './dom';
 import { itemIcon } from './itemIcon';
 import type { UIManager } from './UIManager';
+import { decisionAvailable, unreadImportant, unreadNews } from '../systems/StorySystem';
+import type { GameState } from '../core/GameState';
+
+/** Pengingat kabar kampung di laporan harian (kabar penting yang belum dibaca / keputusan menunggu). */
+export function storyReminder(ctx: GameContext, state: Readonly<GameState>): HTMLElement | null {
+  const important = unreadImportant(state);
+  const unread = unreadNews(state).length;
+  const decide = decisionAvailable(state);
+  if (!important.length && !decide && !unread) return null;
+  const text = decide
+    ? 'Pak Hendra menunggu keputusanmu tentang gerobak. Buka Kabar Kampung → Keputusan.'
+    : important.length
+      ? `Ada kabar penting yang belum kamu dengar: "${important.map((n) => n.title).join('", "')}". Cerita belum bisa berlanjut sebelum kabar ini didengar.`
+      : `${unread} kabar kampung belum dibaca.`;
+  return el('div', {
+    className: `story-reminder${important.length || decide ? ' is-important' : ''}`,
+    children: [
+      el('span', { text: '📰', attrs: { 'aria-hidden': 'true' } }),
+      el('p', { text }),
+      el('button', {
+        className: 'btn btn-secondary btn-sm',
+        text: 'Buka Kabar Kampung',
+        attrs: { type: 'button' },
+        onClick: () => ctx.bus.emit('ui:open-panel', { panel: 'story', tab: decide ? 'keputusan' : 'kabar' }),
+      }),
+    ],
+  });
+}
 
 /** Laporan keuangan harian setelah angkringan tutup, dengan tombol lanjut ke hari berikutnya. */
 export function showDaySummary(ctx: GameContext, ui: UIManager): void {
@@ -28,7 +56,7 @@ export function showDaySummary(ctx: GameContext, ui: UIManager): void {
     title: `Laporan Hari ${report.day}`,
     className: 'sheet sheet-report',
     dismissible: false,
-    body: renderReport(ctx, report),
+    body: el('div', { children: [storyReminder(ctx, state), renderReport(ctx, report)] }),
     actions: [
       {
         label: `Lanjutkan ke Hari ${report.day + 1}`,

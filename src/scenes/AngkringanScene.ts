@@ -4,6 +4,10 @@ import { BankPanel } from '../ui/BankPanel';
 import { showAchievements } from '../ui/AchievementsPanel';
 import { showEventInfo } from '../ui/EventInfo';
 import { openGuide } from '../ui/GuidePanel';
+import { openStoryPanel, type StoryTab } from '../ui/StoryPanel';
+import { openDialogue } from '../ui/DialoguePanel';
+import { CHAPTERS, endingById, namedById } from '../data/story';
+import type { StoryNotice } from '../systems/GameActions';
 import { StockBoard } from '../ui/StockBoard';
 import { StoragePanel } from '../ui/StoragePanel';
 import { TutorialCoach } from '../ui/TutorialCoach';
@@ -102,8 +106,15 @@ export class AngkringanScene extends Phaser.Scene {
         if (this.scene.isPaused()) this.scene.resume();
       }),
       bus.on('game:return-to-menu', () => this.returnToMenu()),
-      bus.on('ui:open-panel', ({ panel }) => {
+      bus.on('story:notice', (notice) => this.onStoryNotice(notice)),
+      bus.on('ui:open-panel', ({ panel, tab }) => {
         const phase = this.ctx.store.get().phase;
+        // Kabar Kampung boleh dibuka di atas menu jeda / ringkasan hari.
+        if (panel === 'story') {
+          if (document.querySelector('.sheet-story')) return;
+          openStoryPanel(this.ctx, ui, (tab as StoryTab | undefined) ?? 'kabar');
+          return;
+        }
         // Gudang boleh dibuka di atas panel lain (mis. dari Belanja saat gudang penuh).
         if (panel === 'storage') {
           if (phase !== 'evaluasi') storage.open();
@@ -142,7 +153,10 @@ export class AngkringanScene extends Phaser.Scene {
         this.time.delayedCall(0, () => this.scene.restart({ rebuilt: rebuiltView, reopen: opts?.reopen, moved: !opts?.reopen }));
       }),
       bus.on('state:changed', ({ state: next, prev }) => {
-        if (next.calendar.day > prev.calendar.day && !next.bankrupt) showDayCard(ui, next);
+        if (next.calendar.day > prev.calendar.day && !next.bankrupt) {
+          showDayCard(ui, next);
+          if (next.story.ending && !next.story.endingSeen) this.time.delayedCall(2600, () => this.showEnding());
+        }
         this.weather?.set(next.weather);
         getAudio(this)?.setAmbience('rain', next.weather === 'hujan');
         if (next.bankrupt && !this.bankruptShown) {
@@ -175,6 +189,7 @@ export class AngkringanScene extends Phaser.Scene {
     }
     this.cameras.main.fadeIn(450, 20, 15, 31);
     if (!state.bankrupt && state.phase === 'persiapan') this.time.delayedCall(350, () => showDayCard(ui, this.ctx.store.get()));
+    if (!state.bankrupt && state.phase === 'persiapan' && state.story.ending && !state.story.endingSeen) this.time.delayedCall(2600, () => this.showEnding());
     // Dimuat setelah tutup tapi belum ganti hari: tampilkan ringkasan lagi.
     if (state.phase === 'evaluasi') this.time.delayedCall(700, () => showDaySummary(this.ctx, ui));
     this.ctx.notify(`Hari ${state.calendar.day} · ${formatDateLong(state.calendar.day)}. Selamat datang di angkringanmu!`, 'info', 4200);
@@ -239,6 +254,47 @@ export class AngkringanScene extends Phaser.Scene {
     this.ctx.startNewGame();
     this.cameras.main.fadeOut(300, 20, 15, 31);
     this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => this.scene.restart());
+  }
+
+  /** Toast untuk kabar sistem cerita. */
+  private onStoryNotice(notice: StoryNotice): void {
+    for (const id of notice.update?.chapters ?? []) {
+      if (id === 1 || id === 7) continue;
+      const c = CHAPTERS.find((x) => x.id === id);
+      if (c) this.ctx.notify(`📖 Bab baru Buku Dapur Kardi: ${c.title}`, 'success', 5000);
+    }
+    const sum = notice.update?.summarized.length ?? 0;
+    if (sum) this.ctx.notify(`📰 ${sum} kabar lama kamu dengar dari warga (ringkasan di Kabar Kampung).`, 'info', 4500);
+    if (notice.stageUp) this.ctx.notify(`❤ ${namedById(notice.stageUp.who).name} makin dekat denganmu (tahap ${notice.stageUp.stage}).`, 'success', 4500);
+  }
+
+  /** Akhir cerita: dialog penutup, lalu kartu akhir. */
+  private showEnding(): void {
+    const ui = getUI(this);
+    const s = this.ctx.store.get();
+    if (!s.story.ending || s.story.endingSeen || ui.hasOpenModal()) return;
+    const ending = endingById(s.story.ending);
+    openDialogue(ui, {
+      who: ending.speaker,
+      title: ending.title,
+      lines: ending.lines,
+      onDone: () => {
+        this.ctx.actions.markStoryFlag('endingSeen');
+        ui.openModal({
+          title: ending.title,
+          body: el('div', {
+            children: [
+              el('p', { className: 'modal-body', text: 'Cerita Gang Melati sudah sampai di akhirnya. Bab 7 Buku Dapur Kardi kini terbuka.' }),
+              el('p', { className: 'modal-body muted', text: 'Permainan tetap berlanjut dalam mode bebas: warga masih mampir dan mengobrol, tanpa babak baru.' }),
+            ],
+          }),
+          actions: [
+            { label: 'Baca Bab 7', onClick: () => this.ctx.bus.emit('ui:open-panel', { panel: 'story', tab: 'buku' }) },
+            { label: 'Lanjut berjualan', variant: 'primary' },
+          ],
+        });
+      },
+    });
   }
 
   private returnToMenu(): void {

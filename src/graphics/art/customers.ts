@@ -1,5 +1,6 @@
 import { CUSTOMER_TYPES, type CustomerTypeDef } from '../../data/customers';
 import { CATALOG } from '../../data/catalog';
+import { NAMED_CUSTOMERS, namedById } from '../../data/story';
 import { shade, type Color } from '../color';
 import { PixelCanvas } from '../PixelCanvas';
 import { drawItemIcon, parseHex } from './itemIcons';
@@ -36,7 +37,7 @@ const SIT_LEGS = ['..pppppPP..', '..ff...ff..'];
 const SKINS: readonly Color[] = [0xc68a5a, 0xa8704a, 0xdba67c];
 export const CUSTOMER_FRAMES = 4;
 
-function palette(type: CustomerTypeDef, index: number, skin: Color): Record<string, Color> {
+function palette(type: Pick<CustomerTypeDef, 'id' | 'palettes'>, index: number, skin: Color): Record<string, Color> {
   const p = type.palettes[index] ?? type.palettes[0];
   if (!p) throw new Error(`Tipe ${type.id} tidak punya palet`);
   const shirt = parseHex(p.shirt);
@@ -75,7 +76,30 @@ export function paintCustomers(): ArtEntry[] {
       });
     });
   }
+  // Pelanggan bernama (cerita): satu palet khusus per tokoh.
+  NAMED_CUSTOMERS.forEach((c, i) => {
+    namedFrames(c.id, i).forEach((canvas, fi) => {
+      entries.push({ key: customerTextureKey(`named_${c.id}`, 0, fi), art: { canvas, anchorX: 6.5, anchorY: 20 } });
+    });
+  });
   return entries;
+}
+
+function namedFrames(id: string, index: number): PixelCanvas[] {
+  const c = namedById(id);
+  const pal = palette({ id: c.id, palettes: [c.palette] }, 0, SKINS[index % SKINS.length] as Color);
+  return [
+    frame([...UPPER, ...LEGS.stand], pal, 0),
+    frame([...UPPER, ...LEGS.walkA], pal, 0),
+    frame([...UPPER, ...LEGS.walkB], pal, 0),
+    frame([...UPPER, ...SIT_LEGS], pal, 3),
+  ];
+}
+
+/** Potret pelanggan bernama untuk panel dialog (sprite berdiri). */
+export function namedPortrait(id: string): PixelCanvas {
+  const index = NAMED_CUSTOMERS.findIndex((c) => c.id === id);
+  return namedFrames(id, Math.max(0, index))[0] as PixelCanvas;
 }
 
 /** Gelembung bicara, ikon emosi, dan ikon produk untuk gelembung pesanan. */
@@ -94,6 +118,7 @@ export function paintBubblesAndEmotes(): ArtEntry[] {
     wait: { rows: ['.........', '.........', '.........', '.........', 'oo.oo.oo.', 'oo.oo.oo.', '.........'], pal: { o: 0x5a4a40 } },
     happy: { rows: ['.rr...rr.', 'rRrr.rrrr', 'rRrrrrrrr', 'rrrrrrrrr', '.rrrrrrr.', '..rrrrr..', '...rrr...', '....r....'], pal: { r: 0xe0485a, R: 0xff9aa8 } },
     ok: { rows: ['..yyyyy..', '.yyyyyyy.', 'yyoyyyoyy', 'yyyyyyyyy', 'yoyyyyyoy', 'yyoooooyy', '.yyyyyyy.', '..yyyyy..'], pal: { y: 0xf6c453, o: 0x5a3a10 } },
+    talk: { rows: ['.........', '.........', 'oo.oo.oo.', 'oo.oo.oo.', 'oo.oo.oo.', '.........'], pal: { o: 0x1d6f8a } },
     angry: { rows: ['r..r.r..r', '.r.r.r.r.', '..rrrrr..', 'rrr...rrr', '..rrrrr..', '.r.r.r.r.', 'r..r.r..r'], pal: { r: 0xd6382a } },
   };
   const entries: ArtEntry[] = [{ key: BUBBLE_KEY, art: { canvas: bubble, anchorX: 12, anchorY: 23 } }];

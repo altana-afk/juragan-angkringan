@@ -24,8 +24,8 @@ const rich = (): GameState => {
 };
 
 describe('menu baru', () => {
-  it('30 menu, semua bahannya ada & bisa dibuka', () => {
-    expect(CATALOG.recipes.length).toBe(30);
+  it('30 menu biasa (+1 menu cerita), semua bahannya ada & bisa dibuka', () => {
+    expect(CATALOG.recipes.filter((r) => r.unlock.type !== 'story').length).toBe(30);
     for (const id of ['pisang_goreng', 'kacang_rebus', 'es_jeruk', 'jagung_bakar', 'kopi_susu', 'bihun_goreng', 'roti_bakar', 'teh_tarik', 'es_kopi_susu', 'pisang_bakar']) {
       const r = CATALOG.recipe(id);
       for (const ing of Object.keys(r.ingredients)) expect(() => CATALOG.ingredient(ing)).not.toThrow();

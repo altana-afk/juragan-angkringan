@@ -13,7 +13,7 @@ export interface StateChange {
 }
 
 /** Daftar seluruh event lintas modul beserta tipe payload-nya. */
-export type PanelId = 'shop' | 'kitchen' | 'promo' | 'stats' | 'upgrade' | 'storage' | 'bank' | 'achievements' | 'event' | 'location' | 'guide';
+export type PanelId = 'shop' | 'kitchen' | 'promo' | 'stats' | 'upgrade' | 'storage' | 'bank' | 'achievements' | 'event' | 'location' | 'guide' | 'story';
 
 export interface GameEvents {
   'state:changed': StateChange;
@@ -33,7 +33,11 @@ export interface GameEvents {
   'sales:speed-changed': { speed: SimSpeed };
   'sales:status': { seatsTaken: number; seatsTotal: number; groups: number };
   'sales:ended': void;
-  'ui:open-panel': { panel: PanelId };
+  'ui:open-panel': { panel: PanelId; tab?: string };
+  /** Petunjuk sekali "ketuk gelembung" (cerita). */
+  'story:hint': { show: boolean };
+  /** Kabar dari sistem cerita (bab baru, tahap hubungan, akhir). */
+  'story:notice': import('../systems/GameActions').StoryNotice;
   /** Upgrade dibeli: dunia dibangun ulang agar objek/varian baru tampil. */
   'world:rebuild': { reopen?: PanelId } | undefined;
   /** Pencapaian baru didapat. */

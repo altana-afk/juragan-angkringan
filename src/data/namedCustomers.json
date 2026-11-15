@@ -1,0 +1,132 @@
+{
+  "customers": [
+    {
+      "id": "gito",
+      "name": "Pak Gito",
+      "role": "Tukang ojek, pelanggan setia",
+      "want": "Pendapatan stabil dan kampung yang aman",
+      "fear": "Kehilangan lapak mangkal di ujung gang",
+      "baseType": "ojol",
+      "fromDay": 1,
+      "visitChance": 0.7,
+      "visitWindow": [1050, 1140],
+      "favorites": ["kopi_panas", "nasi_kucing", "tempe_goreng"],
+      "dislikes": ["es_sirup"],
+      "palette": { "hair": "#2a2220", "shirt": "#2f8a4a", "accent": "#f2c230", "pants": "#3a3a44" },
+      "talk": {
+        "0": [
+          "Kopi satu, Mas. Eh, Mbak. Pokoknya yang jaga gerobak sekarang.",
+          "Biasanya jam segini saya sudah duduk di bangku ini. Kebiasaan dari jaman Mbah Kardi.",
+          "Jalanan sepi hari ini. Penumpang pada pesan lewat aplikasi semua."
+        ],
+        "1": [
+          "Kopinya sudah mirip buatan Mbah Kardi. Belum sama, tapi mirip.",
+          "Anak saya tanya kenapa saya pulang malam terus. Saya bilang, mampir angkringan dulu.",
+          "Kalau hujan, saya neduh di sini sambil nunggu orderan. Jangan diusir, ya."
+        ],
+        "2": [
+          "Saya cerita ke teman-teman ojek, angkringan ini sudah hidup lagi.",
+          "Dulu Bu Sri suka kasih saya tempe gratis kalau orderan sepi. Orangnya baik sekali.",
+          "Kalau ada apa-apa sama gerobak ini, bilang saya. Teman-teman ojek siap bantu."
+        ],
+        "3": [
+          "Gang ini tanpa gerobakmu rasanya seperti jalan tanpa lampu.",
+          "Saya sudah anggap angkringan ini rumah kedua. Terima kasih sudah bertahan.",
+          "Apa pun keputusanmu nanti, saya tetap pelanggan pertamamu."
+        ]
+      }
+    },
+    {
+      "id": "surti",
+      "name": "Bu Surti",
+      "role": "Tetangga, penyebar kabar",
+      "want": "Kampung ramai dan semua orang tahu kabarnya",
+      "fear": "Kehilangan pengaruh di kampung",
+      "baseType": "keluarga",
+      "fromDay": 1,
+      "visitChance": 0.45,
+      "visitWindow": [1110, 1230],
+      "favorites": ["teh_hangat", "tahu_goreng", "wedang_jahe"],
+      "dislikes": ["kopi_joss"],
+      "palette": { "hair": "#3a2a2a", "shirt": "#b0457a", "accent": "#f0d070", "pants": "#5a3a52" },
+      "talk": {
+        "0": [
+          "Teh hangatnya jangan terlalu manis. Gula mahal, kasihan kamu.",
+          "Kamu ini siapanya Mbah Kardi to? Bukan saudara, kan? Ya sudah, yang penting rajin.",
+          "Saya cuma mampir sebentar. Ada kabar sedikit, tapi nanti saja."
+        ],
+        "1": [
+          "Tahu gorengmu mulai renyah. Saya sudah bilang ke ibu-ibu arisan.",
+          "Jangan dengarkan omongan Bu Darmi, dia itu suka melebih-lebihkan. Beda sama saya.",
+          "Anak saya di Jakarta, jarang pulang. Makanya saya suka ngobrol di sini."
+        ],
+        "2": [
+          "Kamu sudah seperti anak kampung sini sendiri. Saya bangga, lho.",
+          "Dulu Sri sering minta saya cicipi bumbunya. Lidah saya ini lidah juri.",
+          "Kalau ada yang macam-macam sama gerobak ini, saya yang maju duluan."
+        ],
+        "3": [
+          "Sri pasti senang lihat gerobaknya terawat begini.",
+          "Saya ini cerewet, tapi saya tahu mana yang tulus. Kamu tulus.",
+          "Mulai sekarang kabar yang saya bawa, kamu yang dengar pertama."
+        ]
+      }
+    },
+    {
+      "id": "bayu",
+      "name": "Mas Bayu",
+      "role": "Keponakan Mbah Kardi, pulang dari kota",
+      "want": "Usaha sendiri yang diakui",
+      "fear": "Gagal dan dianggap sok",
+      "baseType": "pekerja",
+      "fromDay": 7,
+      "visitChance": 0.4,
+      "visitWindow": [1200, 1320],
+      "favorites": ["kopi_joss", "kopi_susu", "sate_ayam"],
+      "dislikes": ["es_teh"],
+      "palette": { "hair": "#151214", "shirt": "#2a2a30", "accent": "#c28a3a", "pants": "#4a5a7a" },
+      "talk": {
+        "0": [
+          "Kopinya kurang mantap. Di kota, kopi segini sudah dikomplain pelanggan.",
+          "Saya cuma mampir. Jangan anggap saya mata-mata Pakde, ya.",
+          "Gerobaknya masih yang itu-itu juga. Belum ada yang diganti?"
+        ],
+        "1": [
+          "Oke, kopimu lumayan. Lumayan, ya, belum enak.",
+          "Kedai saya sepi kalau sore. Orang sini lebih suka duduk di gerobak.",
+          "Kalau kehabisan gula atau kopi, ambil saja di kedai saya. Bayar belakangan."
+        ],
+        "2": [
+          "Dulu saya malu jualan di gang. Sekarang lihat kamu, saya jadi mikir lagi.",
+          "Pakde dulu bilang, jualan itu bukan soal untung, tapi soal siapa yang pulang kenyang.",
+          "Kita ini saingan atau teman, sih? Ah, dua-duanya saja."
+        ],
+        "3": [
+          "Terima kasih sudah jaga gerobak Pakde. Harusnya itu tugas saya.",
+          "Kapan-kapan kita bikin menu kopi bareng. Resep saya, gerobakmu.",
+          "Saya tidak takut gagal lagi. Lihat kamu, gagal itu cuma hari yang belum selesai."
+        ]
+      }
+    },
+    {
+      "id": "hendra",
+      "name": "Pak Hendra",
+      "role": "Pengembang, pemilik rencana ruko",
+      "want": "Membangun tempat usaha besar",
+      "fear": "Dianggap merusak kampung",
+      "baseType": "royal",
+      "fromDay": 999,
+      "visitChance": 0,
+      "visitWindow": [1140, 1200],
+      "favorites": ["sego_bakar", "es_jeruk"],
+      "dislikes": [],
+      "palette": { "hair": "#2a2a2a", "shirt": "#e8e4dc", "accent": "#2a3a6a", "pants": "#2a2a36" },
+      "talk": {
+        "0": ["Saya cuma lewat. Tempatnya ramai juga, ya."],
+        "1": ["Saya tidak membenci tempat ini. Saya cuma melihat angka."],
+        "2": ["Kalau kampung ini punya ruko, anak-anak mudanya tidak perlu merantau."],
+        "3": ["Kamu membuat saya ragu. Itu jarang terjadi."]
+      }
+    }
+  ]
+}

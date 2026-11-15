@@ -23,6 +23,26 @@ import { prepareProducts, type CookResult } from './CookingSystem';
 import { applyPurchase, type CartLine, type PurchaseQuote } from './EconomySystem';
 import { refreshUnlocks, type CookOrder } from './RecipeSystem';
 import { GameRuleError } from './rules';
+import type { ChoiceId, NamedId, RelationStage } from '../data/story';
+import {
+  applyChoice,
+  applyNamedService,
+  applyNamedWalkAway,
+  applyTalk,
+  markChapterSeen,
+  namedArrived,
+  readNews,
+  refreshStory,
+  type NamedVisit,
+  type StoryUpdate,
+  type TalkResult,
+} from './StorySystem';
+
+/** Kabar dari sistem cerita untuk UI (bab baru, tahap hubungan naik, akhir cerita). */
+export interface StoryNotice {
+  readonly update?: StoryUpdate;
+  readonly stageUp?: { who: NamedId; stage: RelationStage };
+}
 
 export type ActionResult<T> = { ok: true; value: T; message: string } | { ok: false; code: string; message: string; details?: unknown };
 
@@ -35,15 +55,18 @@ export class GameActions {
     private readonly store: GameStore,
     private readonly catalog: Catalog,
     private readonly onUnlock: (recipes: RecipeDef[]) => void = () => undefined,
+    private readonly onStory: (notice: StoryNotice) => void = () => undefined,
   ) {}
 
   private run<T>(reason: string, apply: (draft: GameState) => T, message: (v: T) => string): ActionResult<T> {
     let value!: T;
     let opened: RecipeDef[] = [];
+    let story: StoryUpdate | null = null;
     try {
       this.store.update(reason, (draft) => {
         if (draft.bankrupt) throw new GameRuleError('bankrupt', 'Usaha sudah bangkrut. Mulai permainan baru.');
         value = apply(draft);
+        story = refreshStory(draft);
         opened = refreshUnlocks(draft, this.catalog);
       });
     } catch (error) {
@@ -51,11 +74,17 @@ export class GameActions {
       throw error;
     }
     if (opened.length) this.onUnlock(opened);
+    const st = story as StoryUpdate | null;
+    if (st && (st.chapters.length || st.ending || st.summarized.length)) this.onStory({ update: st });
     return { ok: true, value, message: message(value) };
   }
 
   buyIngredients(cart: readonly CartLine[]): ActionResult<PurchaseQuote> {
-    return this.run('beli-bahan', (draft) => applyPurchase(draft, this.catalog, cart), (q) => `Belanja ${q.lines.length} bahan seharga ${formatRupiah(q.total)} berhasil.`);
+    return this.run('beli-bahan', (draft) => {
+      const quote = applyPurchase(draft, this.catalog, cart);
+      if (draft.mapId === 'pasar') draft.story.flags.pasar = true;
+      return quote;
+    }, (q) => `Belanja ${q.lines.length} bahan seharga ${formatRupiah(q.total)} berhasil.`);
   }
 
   prepare(orders: readonly CookOrder[]): ActionResult<CookResult> {
@@ -112,15 +141,24 @@ export class GameActions {
   /** Layani satu rombongan: tentukan hasil pesanan dari stok terkini lalu catat penjualannya. */
   serveCustomer(plan: CustomerPlan, waitedMinutes: number, rng: SeededRandom): OrderOutcome {
     let outcome!: OrderOutcome;
+    let stageUp: { who: NamedId; stage: RelationStage } | null = null;
     this.store.update('jual', (draft) => {
       outcome = resolveOrder(draft, this.catalog, plan, rng, waitedMinutes);
       applySale(draft, outcome);
+      if (plan.namedId) {
+        const up = applyNamedService(draft, plan.namedId, outcome.satisfaction, outcome.sold.map((l) => l.recipeId));
+        if (up !== null) stageUp = { who: plan.namedId, stage: up };
+      }
     });
+    if (stageUp) this.onStory({ stageUp });
     return outcome;
   }
 
   customerWalkedAway(plan: CustomerPlan): void {
-    this.store.update('pelanggan-pergi', (draft) => applyWalkAway(draft, plan.wants));
+    this.store.update('pelanggan-pergi', (draft) => {
+      applyWalkAway(draft, plan.wants);
+      if (plan.namedId) applyNamedWalkAway(draft, plan.namedId);
+    });
   }
 
   /** Jam permainan bergerak (dipanggil tiap menit permainan selama berjualan). */
@@ -181,6 +219,44 @@ export class GameActions {
       },
       (r) => `Hari ${this.store.get().calendar.day} dimulai · ${WEATHER_EFFECTS[this.store.get().weather].label}.${this.store.get().event ? ` Event: ${eventById(this.store.get().event!.id).name}!` : ''}${r.wastedProducts + r.wastedIngredients > 0 ? ` Stok basi dibuang (modal ${formatRupiah(r.wasteCost)}).` : ''}`,
     );
+  }
+
+  // ---------- cerita ----------
+
+  /** Pelanggan bernama tiba (kabar yang dibawa masuk log). */
+  storyArrive(visit: NamedVisit): void {
+    this.store.update('cerita-tiba', (draft) => namedArrived(draft, visit));
+  }
+
+  /** Selesai mengobrol lewat gelembung. */
+  storyTalk(who: NamedId, newsId: string | null): ActionResult<TalkResult> {
+    const res = this.run('cerita-obrol', (draft) => applyTalk(draft, who, newsId), () => '');
+    if (res.ok && res.value.stageUp !== null) this.onStory({ stageUp: { who, stage: res.value.stageUp } });
+    return res;
+  }
+
+  /** Baca kabar dari log. Mengembalikan true jika kabar membuka keputusan. */
+  readNews(id: string): ActionResult<boolean> {
+    return this.run('cerita-baca', (draft) => readNews(draft, id), () => '');
+  }
+
+  chooseEnding(id: ChoiceId): ActionResult<ChoiceId> {
+    return this.run('cerita-keputusan', (draft) => {
+      applyChoice(draft, id);
+      return id;
+    }, () => 'Keputusan sudah diambil. Kabar akhirnya akan sampai dalam beberapa hari.');
+  }
+
+  markChapterSeen(id: number): void {
+    if (this.store.get().story.chaptersSeen.includes(id)) return;
+    this.store.update('cerita-bab', (draft) => markChapterSeen(draft, id));
+  }
+
+  markStoryFlag(flag: 'bubbleHint' | 'endingSeen'): void {
+    this.store.update('cerita-tanda', (draft) => {
+      if (flag === 'endingSeen') draft.story.endingSeen = true;
+      else draft.story.flags.bubbleHint = true;
+    });
   }
 
   /** Majukan tutorial sesuai state; `skip` melewatinya. */

@@ -61,6 +61,13 @@ export class PauseMenu implements UIComponent {
           },
         },
         {
+          label: 'Kabar Kampung',
+          onClick: () => {
+            this.ctx.bus.emit('ui:open-panel', { panel: 'story' });
+            return false;
+          },
+        },
+        {
           label: 'Panduan & Info',
           onClick: () => {
             this.ctx.bus.emit('ui:open-panel', { panel: 'guide' });

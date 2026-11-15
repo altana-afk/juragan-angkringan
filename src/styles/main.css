@@ -1846,3 +1846,154 @@ button.hud-pill { font: inherit; color: inherit; cursor: pointer; text-align: le
 .changelog-version { font: 700 12px/1 var(--font); color: var(--c-muted); padding: 3px 7px; border-radius: 6px; background: rgba(255, 255, 255, 0.07); }
 .changelog-entry .about-list { margin: 0; }
 .sheet-changelog { max-width: 640px; }
+
+/* ---------- Cerita: panel dialog bawah (gaya RPG) ---------- */
+.dialogue-panel {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--safe-bottom) + 100px);
+  transform: translate(-50%, 16px);
+  width: min(720px, calc(100vw - 24px));
+  display: flex;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(14, 10, 20, 0.95);
+  border: 2px solid #5fd4f0;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55);
+  pointer-events: auto;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 200ms ease, transform 200ms ease;
+  z-index: 30;
+}
+.dialogue-panel.is-visible { opacity: 1; transform: translate(-50%, 0); }
+.dialogue-portrait {
+  flex: none;
+  width: 78px;
+  height: 96px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: radial-gradient(circle at 50% 40%, #3a2a3a, #1a1220);
+  border: 1px solid rgba(95, 212, 240, 0.4);
+}
+.dialogue-portrait img { width: 52px; height: 84px; image-rendering: pixelated; }
+.dialogue-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.dialogue-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+.dialogue-name { color: #5fd4f0; font-size: 17px; letter-spacing: 0.02em; }
+.dialogue-title { color: var(--c-accent); font-size: 12px; font-weight: 700; }
+.dialogue-text { margin: 0; color: #ffffff; font-size: 16px; line-height: 1.5; min-height: 3em; }
+.dialogue-text.is-in { animation: dialogue-in 220ms ease-out; }
+@keyframes dialogue-in { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
+.dialogue-foot { display: flex; align-items: center; justify-content: flex-end; gap: 10px; margin-top: auto; }
+.dialogue-counter { color: var(--c-muted); font-size: 12px; margin-right: auto; }
+.dialogue-next { min-height: 36px; padding: 6px 16px; }
+@media (max-width: 640px), (max-height: 480px) {
+  .dialogue-panel { bottom: calc(var(--safe-bottom) + 84px); padding: 10px; gap: 10px; }
+  .dialogue-portrait { width: 56px; height: 72px; }
+  .dialogue-portrait img { width: 39px; height: 63px; }
+  .dialogue-text { font-size: 14px; min-height: 2.6em; }
+}
+@media (max-height: 420px) {
+  .dialogue-panel { bottom: calc(var(--safe-bottom) + 70px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dialogue-text.is-in { animation: none; }
+}
+
+/* ---------- Cerita: tombol HUD Kabar Kampung ---------- */
+.hud-story {
+  position: relative;
+  width: auto;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--c-text);
+  font: 700 13px/1 var(--font);
+  white-space: nowrap;
+}
+.hud-story-icon { font-size: 18px; line-height: 1; }
+.hud-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--c-bad);
+  color: #fff;
+  font: 700 11px/1 var(--font);
+  box-shadow: 0 0 0 2px #2a1c23;
+}
+.hud-badge[hidden] { display: none; }
+.hud-story.has-news .hud-story-icon { animation: story-wiggle 2.4s ease-in-out infinite; }
+@keyframes story-wiggle { 0%, 80%, 100% { transform: none; } 85% { transform: rotate(-12deg); } 90% { transform: rotate(10deg); } 95% { transform: rotate(-6deg); } }
+@media (max-width: 1100px) {
+  .hud-story { width: var(--pill-h); padding: 0; justify-content: center; }
+  .hud-story-label { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hud-story.has-news .hud-story-icon { animation: none; }
+}
+
+/* ---------- Cerita: panel Kabar Kampung ---------- */
+.tab-count {
+  margin-left: 6px;
+  min-width: 18px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--c-bad);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+}
+.story-avatar {
+  flex: none;
+  width: 32px;
+  height: 52px;
+  image-rendering: pixelated;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+}
+.story-news.is-unread { border: 1px solid rgba(245, 176, 65, 0.6); }
+.story-news.is-important .guide-card-head strong { color: #ffcf5c; }
+.story-line { font-style: italic; }
+.story-summary { color: var(--c-muted); }
+.story-read { align-self: flex-start; margin-top: 4px; }
+.story-recipe { color: var(--c-accent); }
+.story-memory { font-style: italic; line-height: 1.55; }
+.story-hearts { color: #ef6f6c; letter-spacing: 1px; }
+.story-blocker { color: var(--c-warn); font-weight: 700; }
+.story-choice .btn { align-self: flex-start; margin-top: 6px; }
+.story-reminder {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(127, 182, 232, 0.12);
+  border: 1px solid rgba(127, 182, 232, 0.5);
+}
+.story-reminder.is-important { background: rgba(245, 176, 65, 0.14); border-color: rgba(245, 176, 65, 0.7); }
+.story-reminder p { flex: 1; min-width: 180px; margin: 0; font-size: 14px; line-height: 1.4; }
+.tutorial-coach.is-story { border-color: #5fd4f0; }
+/* Layar pendek (ponsel mendatar): petunjuk gelembung di pojok kanan atas supaya tidak menutupi pelanggan. */
+@media (max-height: 520px) {
+  .tutorial-coach.is-story {
+    left: auto;
+    right: calc(var(--safe-right) + 10px);
+    top: calc(var(--safe-top) + 64px);
+    bottom: auto;
+    width: min(300px, 45vw);
+    padding: 8px 10px 6px;
+    transform: none;
+  }
+  .tutorial-coach.is-story .coach-text { font-size: 12px; line-height: 1.35; }
+}

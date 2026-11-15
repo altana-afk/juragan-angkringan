@@ -78,6 +78,24 @@ export class UIManager {
     return this.openModals.length > 0;
   }
 
+  private timeHolds = 0;
+
+  /** Tahan jam permainan (mis. selama panel dialog terbuka). Panggil fungsi kembaliannya untuk melepas. */
+  holdTime(): () => void {
+    this.timeHolds++;
+    let released = false;
+    return () => {
+      if (released) return;
+      released = true;
+      this.timeHolds = Math.max(0, this.timeHolds - 1);
+    };
+  }
+
+  /** True jika waktu sedang ditahan (modal terbuka atau dialog berlangsung). */
+  isTimeHeld(): boolean {
+    return this.timeHolds > 0 || this.hasOpenModal();
+  }
+
   openModal(options: ModalOptions): ModalHandle {
     const dismissible = options.dismissible ?? true;
     const titleId = `modal-title-${Math.random().toString(36).slice(2, 8)}`;

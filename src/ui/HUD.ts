@@ -9,6 +9,8 @@ import { formatDateShort } from '../utils/calendar';
 import { formatClock, formatRupiah, formatRupiahShort } from '../utils/formatting';
 import { el, replayAnimation, setText, type UIComponent } from './dom';
 import { icon, type IconName } from './icons';
+import { storyBadgeCount } from './StoryPanel';
+import { unreadNews } from '../systems/StorySystem';
 
 const PHASE_LABELS: Record<GamePhase, string> = {
   persiapan: 'Persiapan',
@@ -44,6 +46,8 @@ export class HUD implements UIComponent {
   private readonly offState: () => void;
   private readonly eventChip: HTMLElement;
   private readonly locationChip: HTMLElement;
+  private readonly storyBadge = el('span', { className: 'hud-badge' });
+  private readonly storyButton: HTMLElement;
 
   constructor(ctx: GameContext, parent: HTMLElement) {
     this.moneyPill = el('button', {
@@ -95,6 +99,12 @@ export class HUD implements UIComponent {
       attrs: { title: 'Cuaca hari ini' },
       children: [this.weatherIcon, this.weatherValue],
     });
+    this.storyButton = el('button', {
+      className: 'hud-btn hud-story',
+      attrs: { type: 'button', 'aria-label': 'Kabar Kampung', title: 'Kabar Kampung (N)' },
+      children: [el('span', { className: 'hud-story-icon', text: '📰', attrs: { 'aria-hidden': 'true' } }), el('span', { className: 'hud-story-label', text: 'Kabar Kampung' }), this.storyBadge],
+      onClick: () => ctx.bus.emit('ui:open-panel', { panel: 'story' }),
+    });
     const menuButton = el('button', {
       className: 'hud-btn hud-menu',
       attrs: { type: 'button', 'aria-label': 'Buka menu', title: 'Menu (Esc)' },
@@ -107,7 +117,7 @@ export class HUD implements UIComponent {
       children: [
         el('div', { className: 'hud-group hud-left', children: [this.moneyPill, dayPill] }),
         clock,
-        el('div', { className: 'hud-group hud-right', children: [this.popPill, weather, menuButton] }),
+        el('div', { className: 'hud-group hud-right', children: [this.popPill, weather, this.storyButton, menuButton] }),
       ],
     });
     parent.append(this.root);
@@ -150,6 +160,15 @@ export class HUD implements UIComponent {
     this.popPill.dataset.tier = tier.id;
     this.popPill.title = `Popularitas ${Math.round(popularity)}/100 — ${tier.label}: ${tier.description}`;
     if (prev && prev.player.popularity !== popularity) replayAnimation(this.popPill, popularity > prev.player.popularity ? 'bump-up' : 'bump-down');
+
+    const badge = storyBadgeCount(state);
+    const unread = unreadNews(state).length;
+    setText(this.storyBadge, badge > 9 ? '9+' : String(badge));
+    this.storyBadge.hidden = badge === 0;
+    this.storyButton.classList.toggle('has-news', unread > 0);
+    this.storyButton.title = `Kabar Kampung (${unread} belum dibaca) — tombol N`;
+    this.storyButton.setAttribute('aria-label', `Kabar Kampung, ${unread} belum dibaca`);
+    if (prev && unread > unreadNews(prev).length) replayAnimation(this.storyButton, 'bump-up');
 
     const weatherIcon = icon(WEATHER_ICONS[state.weather]).src;
     if (this.weatherIcon.src !== weatherIcon) this.weatherIcon.src = weatherIcon;

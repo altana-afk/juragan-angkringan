@@ -1,0 +1,352 @@
+{
+  "news": [
+    {
+      "id": "gerobak_kosong",
+      "day": 1,
+      "speaker": "surti",
+      "important": false,
+      "title": "Gerobak Mbah Kardi kosong",
+      "lines": [
+        "Oalah, jadi kamu yang jaga gerobak Mbah Kardi sekarang?",
+        "Empat puluh tahun gerobak ini di ujung gang. Sejak Mbah Kardi sakit dan dibawa anaknya ke kota, gang ini sepi sekali.",
+        "Saya Surti, rumah saya yang pagarnya hijau itu. Apa pun yang terjadi di gang ini, saya pasti tahu duluan.",
+        "Jaga gerobaknya baik-baik, ya. Orang sini masih ingat rasanya."
+      ],
+      "summary": "Bu Surti, tetangga di pagar hijau, menyambutmu. Gerobak Mbah Kardi sudah 40 tahun di ujung gang dan warga masih ingat rasanya."
+    },
+    {
+      "id": "gito_langganan",
+      "day": 2,
+      "speaker": "gito",
+      "important": false,
+      "title": "Pelanggan pertama",
+      "lines": [
+        "Lho, gerobaknya buka lagi! Saya Gito, ojek pangkalan depan.",
+        "Dulu tiap sore saya ngopi di sini sebelum narik malam. Bangku ini sudah hafal bentuk badan saya.",
+        "Kalau kopinya enak, saya langganan. Kalau tidak enak, saya tetap langganan. Mau ke mana lagi?"
+      ],
+      "summary": "Pak Gito, tukang ojek pangkalan, kembali ngopi di gerobak. Ia pelanggan sore sejak jaman Mbah Kardi."
+    },
+    {
+      "id": "surti_buku",
+      "day": 4,
+      "speaker": "surti",
+      "important": false,
+      "title": "Buku tulisan tangan",
+      "lines": [
+        "Kamu sudah buka buku catatan di laci gerobak itu?",
+        "Itu Buku Dapur Kardi. Tulisannya Sri, istri Mbah Kardi. Almarhumah.",
+        "Dulu semua orang di sini bilang, yang bikin angkringan ini terkenal ya tangannya Sri. Sambalnya itu, aduh.",
+        "Tapi sejak Sri meninggal, Mbah Kardi tidak pernah jual sambal itu lagi. Tidak ada yang tahu kenapa."
+      ],
+      "summary": "Buku resep di laci gerobak ditulis oleh Sri, almarhumah istri Mbah Kardi. Sejak Sri meninggal, Sambal Sri tidak pernah dijual lagi."
+    },
+    {
+      "id": "bayu_pulang",
+      "day": 7,
+      "speaker": "bayu",
+      "important": false,
+      "title": "Mas Bayu kembali dari kota",
+      "lines": [
+        "Jadi kamu yang dititipi gerobak Pakde. Saya Bayu, keponakannya.",
+        "Saya cuma mampir. Lagi lihat-lihat tempat, mau buka usaha kopi.",
+        "Kopimu ini... ya, jujur saja, masih kalah sama kedai di kota. Tapi gerobaknya masih wangi arang. Itu tidak bisa dibeli."
+      ],
+      "summary": "Mas Bayu, keponakan Mbah Kardi, pulang dari kota. Ia ingin membuka usaha kopi dan sempat mengkritik kopimu."
+    },
+    {
+      "id": "gito_malam",
+      "day": 9,
+      "speaker": "gito",
+      "important": false,
+      "title": "Ada orang asing di ujung gang",
+      "lines": [
+        "Tadi siang saya lihat mobil bagus parkir di ujung gang. Orangnya bawa meteran.",
+        "Ukur-ukur tanah, foto-foto gerobak. Saya tanya, katanya dari kota.",
+        "Mungkin cuma survei. Mungkin."
+      ],
+      "summary": "Pak Gito melihat orang dari kota mengukur tanah dan memotret gerobak di ujung gang."
+    },
+    {
+      "id": "hendra_ukur",
+      "day": 10,
+      "speaker": "surti",
+      "important": true,
+      "title": "Tanah di ujung gang diukur",
+      "lines": [
+        "Kamu sudah dengar? Saya sudah tanya-tanya ke Pak RT.",
+        "Yang ukur tanah kemarin itu orangnya Pak Hendra. Pengembang. Katanya mau bangun deretan ruko di ujung gang ini.",
+        "Termasuk tanah tempat gerobakmu berdiri.",
+        "Pak RT bilang belum ada keputusan. Tapi kalau orang kota sudah bawa meteran, biasanya itu bukan main-main."
+      ],
+      "summary": "Orang suruhan Pak Hendra, seorang pengembang, mengukur tanah di ujung gang. Ia berencana membangun ruko, termasuk di tempat gerobakmu.",
+      "requires": ["gerobak_kosong"]
+    },
+    {
+      "id": "pasar_malam",
+      "day": 12,
+      "speaker": "gito",
+      "important": false,
+      "title": "Pasar malam akan digelar",
+      "lines": [
+        "Kabar bagus! Lapangan dekat ujung gang mau dipakai pasar malam.",
+        "Bianglala, komidi putar, lampu-lampu. Rame pasti. Kalau mau, coba buka di sana kapan-kapan.",
+        "Tapi hati-hati, pedagangnya banyak. Jangan sampai gerobakmu kalah terang."
+      ],
+      "summary": "Pasar malam akan digelar dekat ujung gang. Kamu bisa mencoba berjualan di sana lewat chip 📍.",
+      "requires": ["hendra_ukur"]
+    },
+    {
+      "id": "bayu_kedai",
+      "day": 14,
+      "speaker": "bayu",
+      "important": false,
+      "title": "Kedai kopi di seberang gang",
+      "lines": [
+        "Besok kedai saya buka. Di seberang gang, yang dulu bekas warung pulsa.",
+        "Bukan mau nyaingin kamu, lho. Kopi saya kopi kekinian, gerobakmu kopi tubruk. Pasarnya beda.",
+        "...Ya, mungkin sedikit nyaingin. Tapi kalau kamu kehabisan bahan, mampir saja."
+      ],
+      "summary": "Mas Bayu membuka kedai kopi di seberang gang. Saingan, tapi ia menawarkan bantuan kalau kamu kehabisan bahan.",
+      "requires": ["hendra_ukur"]
+    },
+    {
+      "id": "warga_bisik",
+      "day": 17,
+      "speaker": "surti",
+      "important": false,
+      "title": "Bisik-bisik di arisan",
+      "lines": [
+        "Di arisan tadi semua ngomongin ruko.",
+        "Bu Darmi bilang bagus, anaknya bisa kerja jadi kasir. Pak Narto bilang jangan, nanti gang ini jadi parkiran.",
+        "Saya? Saya belum memihak. Tapi saya catat semua yang ngomong."
+      ],
+      "summary": "Warga mulai membicarakan rencana ruko di arisan. Ada yang setuju demi lapangan kerja, ada yang menolak.",
+      "requires": ["hendra_ukur"]
+    },
+    {
+      "id": "hendra_tawaran",
+      "day": 20,
+      "speaker": "hendra",
+      "important": true,
+      "title": "Pak Hendra menawarkan kerja sama",
+      "lines": [
+        "Selamat malam. Saya Hendra. Mungkin Anda sudah dengar nama saya dari warga.",
+        "Saya tidak datang untuk mengusir. Saya datang untuk menawarkan sesuatu.",
+        "Kalau ruko jadi, saya butuh satu tenant makanan di ujung. Tempatnya bersih, ada listrik, ada parkir. Gerobak ini bisa jadi kios di sana.",
+        "Tidak perlu jawab sekarang. Pikirkan saja. Kampung ini butuh lapangan kerja, dan Anda butuh tempat yang pasti."
+      ],
+      "summary": "Pak Hendra datang sendiri dan menawarkan kios di ruko yang akan dibangun. Ia meminta kamu memikirkannya dulu.",
+      "requires": ["hendra_ukur"]
+    },
+    {
+      "id": "bayu_bantu",
+      "day": 23,
+      "speaker": "bayu",
+      "important": false,
+      "title": "Kedai Bayu sepi",
+      "lines": [
+        "Kedai saya sepi seminggu ini. Orang lewat, lihat harga, terus pergi.",
+        "Di kota, harga segitu dianggap murah. Di sini, segitu bisa buat makan tiga kali.",
+        "Mungkin Pakde benar. Jualan di kampung itu soal tahu diri, bukan soal gaya."
+      ],
+      "summary": "Kedai kopi Mas Bayu sepi. Ia mulai sadar jualan di kampung berbeda dengan di kota.",
+      "requires": ["bayu_kedai"]
+    },
+    {
+      "id": "warga_terbelah",
+      "day": 25,
+      "speaker": "surti",
+      "important": false,
+      "title": "Warga mulai terbelah",
+      "lines": [
+        "Sekarang sudah ada dua kubu. Yang pro ruko dan yang kontra.",
+        "Kemarin sampai ada yang nggak mau tegur sapa di pos ronda. Gara-gara ruko!",
+        "Gerobakmu ini jadi semacam lambang. Kalau gerobak bertahan, kampung bertahan. Begitu kata orang."
+      ],
+      "summary": "Warga terbelah menjadi pro dan kontra ruko. Gerobakmu mulai dianggap lambang kampung.",
+      "requires": ["hendra_tawaran"]
+    },
+    {
+      "id": "gito_lapak",
+      "day": 28,
+      "speaker": "gito",
+      "important": false,
+      "title": "Pangkalan ojek terancam",
+      "lines": [
+        "Pangkalan ojek kami juga kena rencana ruko. Katanya mau dijadikan lahan parkir.",
+        "Saya sudah dua puluh tahun mangkal di situ. Mau mangkal di mana lagi?",
+        "Kalau gerobakmu pindah, saya ikut pindah. Kalau gerobakmu tutup... ya sudah, saya tidak tahu."
+      ],
+      "summary": "Pangkalan ojek Pak Gito juga terancam dijadikan parkir ruko. Ia khawatir kehilangan tempat mangkal.",
+      "requires": ["hendra_tawaran"]
+    },
+    {
+      "id": "gusur_14",
+      "day": 30,
+      "speaker": "surti",
+      "important": true,
+      "title": "Penggusuran dalam 14 hari",
+      "lines": [
+        "Ini serius. Surat dari kelurahan sudah keluar.",
+        "Empat belas hari lagi, tanah di ujung gang akan dibersihkan. Kecuali warga punya keputusan bersama.",
+        "Pak RT minta semua yang punya usaha di ujung gang menentukan sikap.",
+        "Kamu juga. Gerobakmu ada di tengah-tengahnya."
+      ],
+      "summary": "Surat kelurahan keluar: dalam 14 hari tanah di ujung gang akan dibersihkan, kecuali warga punya keputusan bersama.",
+      "requires": ["hendra_tawaran"]
+    },
+    {
+      "id": "bayu_ngaku",
+      "day": 34,
+      "speaker": "bayu",
+      "important": false,
+      "title": "Pengakuan Mas Bayu",
+      "lines": [
+        "Ada yang harus saya bilang.",
+        "Sebelum Pakde sakit, dia minta saya yang meneruskan gerobak ini. Saya menolak.",
+        "Saya bilang, saya mau sukses di kota. Padahal sebenarnya saya takut. Takut gagal di depan orang yang kenal saya sejak kecil.",
+        "Makanya waktu Pakde menitipkan ke kamu, saya kesal. Kesal ke diri sendiri, bukan ke kamu."
+      ],
+      "summary": "Mas Bayu mengaku pernah diminta meneruskan gerobak oleh Mbah Kardi, tapi menolak karena takut gagal.",
+      "requires": ["gusur_14"]
+    },
+    {
+      "id": "surti_sri",
+      "day": 35,
+      "speaker": "surti",
+      "important": false,
+      "title": "Cerita Bu Surti tentang Sri",
+      "lines": [
+        "Sri itu sahabat saya sejak kecil. Kami satu SD.",
+        "Waktu Sri sakit, Kardi jualan sendirian. Tiap malam dia bawa pulang sisa dagangan, terus dia bagi ke tetangga yang susah. Diam-diam.",
+        "Saya yang suka cerewet ini, dulu juga pernah dikasih. Waktu suami saya di-PHK.",
+        "Makanya saya tidak rela gerobak itu hilang. Bukan karena gerobaknya. Karena yang pernah ada di sana."
+      ],
+      "summary": "Bu Surti bercerita: Sri adalah sahabatnya. Saat Sri sakit, Mbah Kardi diam-diam membagikan sisa dagangan ke tetangga yang kesusahan.",
+      "requires": ["gusur_14"],
+      "requiresStage": { "who": "surti", "stage": 2 }
+    },
+    {
+      "id": "sambal_robek",
+      "day": 38,
+      "speaker": "bayu",
+      "important": true,
+      "title": "Halaman Sambal Sri yang robek",
+      "lines": [
+        "Coba lihat ini. Saya menemukannya di kotak barang Pakde di rumah lama.",
+        "Ini halaman yang hilang dari Buku Dapur. Resep Sambal Sri. Tapi robek, takaran terakhirnya tidak ada.",
+        "Bumbunya pakai cabai dan bawang yang dulu Bude beli di Pinggir Pasar. Mungkin pedagang di sana masih ingat.",
+        "Kalau kamu bisa melengkapinya... gang ini akan ingat lagi rasanya."
+      ],
+      "summary": "Mas Bayu menemukan halaman robek resep Sambal Sri. Bahannya dulu dibeli di Pinggir Pasar.",
+      "requires": ["gusur_14"]
+    },
+    {
+      "id": "keputusan",
+      "day": 43,
+      "speaker": "hendra",
+      "important": true,
+      "title": "Keputusan warga dan tawaran akhir",
+      "lines": [
+        "Besok batas waktunya. Saya ingin dengar langsung dari Anda.",
+        "Saya sudah dengar macam-macam. Ada yang ingin gerobak ini tetap, ada yang ingin kios di ruko, ada yang ingin saya pergi.",
+        "Tawaran saya: sewa tanah ini, beli gerobaknya, atau tunjukkan bahwa kampung ini sungguh-sungguh mau mempertahankannya.",
+        "Apa pun pilihan Anda, saya akan menghormatinya."
+      ],
+      "summary": "Pak Hendra datang untuk mendengar keputusanmu tentang gerobak dan tanah di ujung gang. Buka tab Keputusan di Kabar Kampung.",
+      "requires": ["sambal_robek"],
+      "opensDecision": true
+    }
+  ],
+  "decision": {
+    "choices": [
+      {
+        "id": "bertahan",
+        "title": "Bertahan dan membayar sewa",
+        "text": "Kamu menyewa tanah itu dari Pak Hendra dengan uangmu sendiri. Angkringan tetap berdiri, tapi warga merasa tidak diajak bicara.",
+        "requirement": "Kas minimal Rp1.500.000",
+        "cost": 1500000,
+        "effects": "Kas −Rp1.500.000 · popularitas −3"
+      },
+      {
+        "id": "gotong",
+        "title": "Mengajak warga bergotong royong",
+        "text": "Kamu mengumpulkan warga, membagi nasi untuk yang datang, dan meminta kampung bersama-sama menolak penggusuran.",
+        "requirement": "Popularitas minimal 55 dan total tahap hubungan Bu Surti, Pak Gito, dan Mas Bayu minimal 5",
+        "effects": "Popularitas +6 · loyalitas +15"
+      },
+      {
+        "id": "warisan",
+        "title": "Menyerahkan gerobak kepada Mas Bayu",
+        "text": "Gerobak kembali ke keluarga Mbah Kardi. Kamu dan Mas Bayu menjalankannya bersama: kopi kedainya, dapur gerobakmu.",
+        "requirement": "Tahap hubungan dengan Mas Bayu minimal 2",
+        "effects": "Menu kopi terbuka · loyalitas +10"
+      },
+      {
+        "id": "jual",
+        "title": "Menjual gerobak kepada Pak Hendra",
+        "text": "Kamu menerima uang dari Pak Hendra. Gerobak dipindah ke kios ruko. Kas besar, tapi gang kehilangan sesuatu.",
+        "requirement": "Selalu bisa dipilih",
+        "effects": "Kas +Rp3.000.000 · popularitas −15 · hubungan dengan Bu Surti dan Pak Gito kembali ke awal"
+      }
+    ]
+  },
+  "endings": [
+    {
+      "id": "lengkap",
+      "title": "Akhir Lengkap: Untuk Kardi, Jangan Berhenti",
+      "speaker": "surti",
+      "lines": [
+        "Mbah Kardi menelepon dari kota. Suaranya pelan, tapi saya dengar dia tertawa.",
+        "Katanya, dia sudah dengar Sambal Sri dijual lagi di gang ini.",
+        "Dia berhenti dulu karena tidak sanggup membuatnya tanpa Sri. Setiap kali menumbuk cabai, dia ingat tangan Sri.",
+        "Sekarang dia bilang, akhirnya ada yang meneruskan. Gerobak itu bukan miliknya lagi. Gerobak itu milik gang ini."
+      ]
+    },
+    {
+      "id": "gotong_royong",
+      "title": "Akhir Gotong Royong",
+      "speaker": "gito",
+      "lines": [
+        "Kamu lihat tadi pagi? Satu kampung datang ke ujung gang. Bawa tikar, bawa termos, bawa anak-anak.",
+        "Pak Hendra datang, lihat kerumunan, terus dia cuma geleng-geleng sambil senyum.",
+        "Katanya, dia tidak mau membangun di atas tanah yang dicintai sebanyak ini. Rencananya dipindah ke jalan besar.",
+        "Gerobakmu tetap di sini. Kita semua tetap di sini."
+      ]
+    },
+    {
+      "id": "warisan",
+      "title": "Akhir Warisan",
+      "speaker": "bayu",
+      "lines": [
+        "Pakde sudah tanda tangan. Gerobak ini resmi usaha keluarga, dan kamu bagian dari keluarga itu.",
+        "Kedai saya tutup. Mesin kopinya saya pindah ke sini. Kopi kekinian di gerobak tua. Aneh, tapi laku.",
+        "Pak Hendra mundur karena tanahnya sekarang atas nama keluarga Pakde.",
+        "Terima kasih sudah membuat saya berani pulang."
+      ]
+    },
+    {
+      "id": "bertahan",
+      "title": "Akhir Bertahan",
+      "speaker": "hendra",
+      "lines": [
+        "Sewanya sudah saya terima. Tanah ini milik Anda untuk lima tahun ke depan.",
+        "Ruko tetap dibangun di sebelahnya. Gerobak Anda akan berdiri di samping kaca dan neon.",
+        "Warga masih berselisih soal ini. Tapi gerobaknya tetap menyala tiap malam.",
+        "Saya tidak menyangka akan berkata ini, tapi saya senang Anda bertahan."
+      ]
+    },
+    {
+      "id": "kota",
+      "title": "Akhir Kota",
+      "speaker": "surti",
+      "lines": [
+        "Jadi gerobaknya sudah dijual, ya.",
+        "Saya tidak marah. Saya cuma... sedih. Gang ini sekarang terang sekali, tapi rasanya dingin.",
+        "Pak Gito pindah mangkal ke jalan besar. Ibu-ibu arisan sekarang ke kafe.",
+        "Kamu masih jualan di kios itu? Ya sudah. Semoga laris. Sri pasti tetap mendoakan."
+      ]
+    }
+  ]
+}

@@ -72,6 +72,8 @@ export function isUnlockMet(condition: UnlockCondition, state: Readonly<GameStat
       return state.player.money >= condition.min;
     case 'level':
       return effectsOf(state).businessLevel >= condition.min;
+    case 'story':
+      return (state.story?.chapters[condition.chapter] ?? 0) > 0;
   }
 }
 
@@ -85,6 +87,8 @@ export function describeUnlock(condition: UnlockCondition): string {
       return `Terbuka saat kas mencapai ${formatRupiah(condition.min)}`;
     case 'level':
       return `Butuh level usaha ${condition.min} (upgrade gerobak)`;
+    case 'story':
+      return `Terbuka dari Buku Dapur Kardi bab ${condition.chapter}`;
   }
 }
 

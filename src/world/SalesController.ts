@@ -5,7 +5,11 @@ import type { SimSpeed } from '../core/GameEvents';
 import { CUSTOMER_TYPES } from '../data/customers';
 import { SalesSimulation, SIM_CONFIG } from '../systems/SalesSimulation';
 import type { UIManager } from '../ui/UIManager';
-import { CustomerLayer } from './CustomerLayer';
+import { CustomerLayer, type TalkMark } from './CustomerLayer';
+import { canTalkToday, planVisits, talkContent } from '../systems/StorySystem';
+import { closeDialogue, isDialogueOpen, openDialogue } from '../ui/DialoguePanel';
+import type { Group } from '../systems/SalesSimulation';
+import { getAudio } from '../scenes/sceneKeys';
 import type { MapData } from './MapData';
 
 /**
@@ -25,7 +29,10 @@ export class SalesController {
     private readonly ui: UIManager,
     private readonly map: MapData,
   ) {
-    this.layer = new CustomerLayer(scene, map);
+    this.layer = new CustomerLayer(scene, map, {
+      mark: (group) => this.talkMark(group),
+      onTap: (group) => this.talk(group),
+    });
     this.offs.push(
       ctx.bus.on('sales:set-speed', ({ speed }) => this.setSpeed(speed)),
       ctx.bus.on('sales:start-request', () => this.requestStart()),
@@ -80,7 +87,7 @@ export class SalesController {
         walkAway: (plan) => this.ctx.actions.customerWalkedAway(plan),
         setClock: (minutes) => this.ctx.actions.setClock(minutes),
       },
-      { seed: `hari-${day}-${startMinutes}`, startMinutes },
+      { seed: `hari-${day}-${startMinutes}`, startMinutes, namedVisits: planVisits(this.ctx.store.get()) },
     );
     this.setSpeed(1);
   }
@@ -104,21 +111,54 @@ export class SalesController {
     const sim = this.sim;
     if (!sim) return;
     // Waktu berhenti saat jeda atau saat panel/menu terbuka.
-    if (this.speed > 0 && !this.ui.hasOpenModal()) {
+    if (this.speed > 0 && !this.ui.isTimeHeld()) {
       const minutes = (Math.min(deltaMs, 100) / 1000) * SIM_CONFIG.minutesPerSecond * this.speed;
       const events = sim.advance(minutes);
       this.layer.handleEvents(events);
       for (const e of events) {
+        if (e.type === 'named-arrive') this.namedArrived(e.visit);
         if (e.type === 'closed') this.ctx.notify('Sudah jam tutup — pelanggan terakhir sedang dilayani.', 'info');
         if (e.type === 'ended') this.end();
       }
     }
-    this.layer.sync(this.sim?.groups ?? [], this.speed > 0 && !this.ui.hasOpenModal() ? deltaMs : 0);
+    this.layer.sync(this.sim?.groups ?? [], this.speed > 0 && !this.ui.isTimeHeld() ? deltaMs : 0);
     this.statusTimer -= deltaMs;
     if (this.sim && this.statusTimer <= 0) {
       this.statusTimer = 250;
       this.ctx.bus.emit('sales:status', { seatsTaken: this.sim.seatsTaken, seatsTotal: this.sim.seatsTotal, groups: this.sim.groups.length });
     }
+  }
+
+  private talkMark(group: Group): TalkMark {
+    if (!group.named || isDialogueOpen()) return null;
+    const state = this.ctx.store.get();
+    if (!canTalkToday(state, group.named.who)) return null;
+    return talkContent(state, group.named.who).newsId ? 'news' : 'chat';
+  }
+
+  private namedArrived(visit: NonNullable<Group['named']>): void {
+    this.ctx.actions.storyArrive(visit);
+    if (!this.ctx.store.get().story.flags.bubbleHint) this.ctx.bus.emit('story:hint', { show: true });
+  }
+
+  /** Pemain mengetuk gelembung "...": buka panel dialog, lalu catat obrolannya. */
+  private talk(group: Group): void {
+    if (!group.named || isDialogueOpen() || this.ui.hasOpenModal()) return;
+    const who = group.named.who;
+    const content = talkContent(this.ctx.store.get(), who);
+    this.ctx.bus.emit('story:hint', { show: false });
+    getAudio(this.scene)?.play('click');
+    openDialogue(this.ui, {
+      who,
+      title: content.title,
+      lines: content.lines,
+      onDone: () => {
+        const res = this.ctx.actions.storyTalk(who, content.newsId);
+        if (res.ok && res.value.opensDecision) {
+          this.ctx.notify('Saatnya mengambil keputusan. Buka Kabar Kampung → Keputusan setelah tutup.', 'warning', 6000);
+        }
+      },
+    });
   }
 
   private end(): void {
@@ -131,7 +171,9 @@ export class SalesController {
   destroy(): void {
     for (const off of this.offs) off();
     window.removeEventListener('keydown', this.onKey);
+    closeDialogue();
     this.layer.clear();
     this.sim = null;
   }
 }
+

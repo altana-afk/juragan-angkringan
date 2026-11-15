@@ -332,6 +332,34 @@ Target: *satu siklus permainan dapat berjalan secara utuh.*
 - 172 test lulus; e2e desktop & ponsel LULUS (muncul sekali, tidak muncul lagi setelah kembali ke menu/reload,
   bisa dibuka lewat ikon).
 
+## Pembaruan 0.12.0 — Kabar Kampung & Buku Dapur Kardi
+
+Implementasi `claude/rencana-0.12.0.md` dengan isi cerita dari `claude/alur-cerita.md`.
+
+- **Data** (`src/data/news.json`, `storyChapters.json`, `namedCustomers.json`, dimuat & divalidasi oleh `data/story.ts`):
+  18 kabar (5 penting: tanah diukur, tawaran Pak Hendra, penggusuran 14 hari, halaman Sambal Sri, keputusan),
+  4 pelanggan bernama (Pak Gito, Bu Surti, Mas Bayu, Pak Hendra) dengan menu favorit dan obrolan per tahap,
+  7 bab Buku Dapur Kardi, 4 pilihan, 5 akhir. Hari di data = *hari cerita* (save lama mulai dari hari saat diperbarui).
+- **`systems/StorySystem.ts`**: status kabar `belum_dibaca | dibaca | diringkas`; kabar penting menahan kabar yang
+  bergantung padanya; **pengaman 5 hari** (kabar tak dibaca → ringkasan "didengar dari warga", dianggap sudah
+  didengar, cerita tak pernah terkunci); jadwal kunjungan deterministik (pembicara kabar pasti mampir, satu kabar per
+  pembicara per hari); **tahap hubungan 0–3** (puas +1, menu favorit +1, mengobrol +1/hari, pergi −1; tahap tidak turun);
+  syarat bab (bab 4 punya pengaman Pinggir Pasar 7 hari); babak 1–4; keputusan & efeknya; akhir 3 hari setelah memilih.
+- **Save v9** (`StoryState` di `GameState`, migrasi v8→v9).
+- **Simulasi**: `SalesSimulation` menerima `namedVisits`; pelanggan bernama datang sendirian, sedikit lebih sabar,
+  mencari menu favorit (`planNamedCustomer`). Sprite & palet khusus per tokoh.
+- **UI**: gelembung "..." di atas pelanggan bernama (berkedip jika ada kabar, bisa diketuk, nama di bawah kaki);
+  `ui/DialoguePanel.ts` panel bawah gaya RPG (potret kiri, nama cyan, teks putih; Enter/Spasi/ketuk lanjut) —
+  **jam ditahan selama dialog** (`UIManager.holdTime`) sehingga kesabaran pelanggan berhenti;
+  tombol HUD **Kabar Kampung** dengan lencana (kabar belum dibaca + bab baru + keputusan), juga di menu jeda & tombol N;
+  `ui/StoryPanel.ts` (tab Kabar, Buku Dapur, Warga, Keputusan); pengingat kabar penting / keputusan di laporan harian;
+  petunjuk sekali "ketuk gelembung" di `TutorialCoach`; layar akhir cerita + Bab 7, lalu mode bebas.
+- Resep cerita **Sego Sambal Sri** (unlock jenis baru `story`, dari Bab 6). Ekonomi lain tidak berubah kecuali lewat pilihan akhir.
+- Perbaikan sentuh: klik sintetis setelah mengetuk gelembung tidak lagi langsung menutup dialog.
+- Verifikasi: 184 test (26 file) lulus termasuk `tests/story.test.ts` (status kabar, pengaman 5 hari, jadwal kunjungan,
+  hubungan, alur penuh pemain rajin → akhir lengkap, pemain cuek tetap sampai keputusan, efek pilihan, migrasi, simulasi);
+  e2e desktop & ponsel LULUS; uji browser gelembung → dialog → log → keputusan → akhir di desktop & ponsel mendatar.
+
 ## Status akhir
 
 Ketujuh stage dari dokumen desain selesai. Ide lanjutan: lebih banyak peta/lokasi, event acak harian

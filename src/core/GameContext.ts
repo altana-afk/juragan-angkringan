@@ -33,9 +33,14 @@ export class GameContext {
     const detected = options.storage ? { storage: options.storage, persistent: true } : detectStorage();
     this.saves = new SaveSystem(detected.storage, this.catalog);
     this.persistentStorage = detected.persistent;
-    this.actions = new GameActions(this.store, this.catalog, (recipes) => {
-      for (const r of recipes) this.notify(`Menu baru terbuka: ${r.name}!`, 'success', 4500);
-    });
+    this.actions = new GameActions(
+      this.store,
+      this.catalog,
+      (recipes) => {
+        for (const r of recipes) this.notify(`Menu baru terbuka: ${r.name}!`, 'success', 4500);
+      },
+      (notice) => this.bus.emit('story:notice', notice),
+    );
     this.bus.on('state:changed', ({ reason, state }) => {
       if (this.autosaveEnabled && !NO_AUTOSAVE_REASONS.has(reason)) this.scheduleSave();
       // Pencapaian diperiksa setelah setiap perubahan (hanya saat sesi bermain).
