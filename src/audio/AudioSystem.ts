@@ -1,4 +1,5 @@
 import { BEATS_PER_LOOP, BPM, buildLoop, type Note } from './music';
+import cricketUrl from '../assets/audio/jangkrik.mp3?url';
 import { loadAudioSettings, saveAudioSettings, type AudioSettings } from './AudioSettings';
 
 export type SfxName =
@@ -9,8 +10,8 @@ export const AUDIO_REGISTRY_KEY = 'audio';
 export type Ambience = 'night' | 'rain';
 
 /**
- * Semua suara dibuat prosedural dengan Web Audio (tanpa file aset): efek suara, musik gamelan malam,
- * suara jangkrik & hujan. Konteks audio baru dibuat setelah gestur pertama pengguna (aturan autoplay browser).
+ * Suara dibuat prosedural dengan Web Audio: efek suara, musik gamelan malam, dan hujan.
+ * Jangkrik memakai sampel rekaman (`assets/audio/jangkrik.mp3`, 3 kicauan berjarak 0,6 detik). Konteks audio baru dibuat setelah gestur pertama pengguna (aturan autoplay browser).
  */
 export class AudioSystem {
   settings: AudioSettings = loadAudioSettings();
@@ -20,6 +21,7 @@ export class AudioSystem {
   private busSfx: GainNode | null = null;
   private busAmb: GainNode | null = null;
   private noise: AudioBuffer | null = null;
+  private cricket: AudioBuffer | null = null;
   private musicTimer: ReturnType<typeof setInterval> | null = null;
   private musicOn = false;
   private nextLoopAt = 0;
@@ -50,6 +52,11 @@ export class AudioSystem {
     this.noise = ctx.createBuffer(1, len, ctx.sampleRate);
     const data = this.noise.getChannelData(0);
     for (let i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
+    void fetch(cricketUrl)
+      .then((r) => r.arrayBuffer())
+      .then((b) => ctx.decodeAudioData(b))
+      .then((buf) => { this.cricket = buf; })
+      .catch(() => { /* tanpa jangkrik jika gagal dimuat */ });
     this.applyVolumes();
     if (this.musicOn) this.startMusicLoop();
     for (const a of this.wantedAmb) this.startAmb(a);
@@ -229,14 +236,47 @@ export class AudioSystem {
       src.start();
       this.ambNodes.set(kind, { gain, stop: () => src.stop() });
     } else {
-      // jangkrik: nada tinggi dengan denyut cepat, berulang acak
-      const timer = setInterval(() => {
-        if (!this.ctx) return;
-        const t = this.ctx.currentTime + Math.random() * 0.4;
-        const f = 4200 + Math.random() * 600;
-        for (let i = 0; i < 3; i++) this.tone(f, 0.03, 'sine', 0.05, t + i * 0.06, { out: gain });
-      }, 700);
-      this.ambNodes.set(kind, { gain, stop: () => clearInterval(timer) });
+      // Jangkrik (sampel rekaman): dua ekor, kiri dekat dan kanan agak jauh, bersahutan.
+      // Tiap kicau memilih satu dari 3 rekaman, diputar sedikit lebih lambat (nada lebih rendah, tidak menusuk).
+      // Jeda acak 2–5 detik, sesekali hening 9–15 detik supaya nyaman didengar lama.
+      const timers = new Set<ReturnType<typeof setTimeout>>();
+      const voices = [
+        { pan: -0.4, vol: 0.55, rate: 0.9 },
+        { pan: 0.45, vol: 0.35, rate: 0.86 },
+      ].map((v) => {
+        const p = ctx.createStereoPanner();
+        p.pan.value = v.pan;
+        p.connect(gain);
+        return { ...v, out: p };
+      });
+      const chirp = (v: (typeof voices)[number]): void => {
+        if (!this.ctx || !this.cricket) return;
+        const src = this.ctx.createBufferSource();
+        src.buffer = this.cricket;
+        src.playbackRate.value = v.rate + (Math.random() - 0.5) * 0.04;
+        const g = this.ctx.createGain();
+        g.gain.value = v.vol * (0.8 + Math.random() * 0.2);
+        src.connect(g).connect(v.out);
+        src.start(this.ctx.currentTime + 0.02, Math.floor(Math.random() * 3) * 0.6, 0.6);
+      };
+      const schedule = (v: (typeof voices)[number], first: boolean): void => {
+        const rest = Math.random() < 0.15 ? 9000 + Math.random() * 6000 : 2000 + Math.random() * 3000;
+        const id = setTimeout(() => {
+          timers.delete(id);
+          chirp(v);
+          schedule(v, false);
+        }, first ? 500 + Math.random() * 2500 : rest);
+        timers.add(id);
+      };
+      for (const v of voices) schedule(v, true);
+      this.ambNodes.set(kind, {
+        gain,
+        stop: () => {
+          for (const id of timers) clearTimeout(id);
+          timers.clear();
+          for (const v of voices) v.out.disconnect();
+        },
+      });
     }
   }
 

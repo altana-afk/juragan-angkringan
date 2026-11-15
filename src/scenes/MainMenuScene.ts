@@ -20,7 +20,7 @@ export class MainMenuScene extends Phaser.Scene {
   }
 
   create(): void {
-    getAudio(this)?.setAmbience('night', true);
+    getAudio(this)?.setAmbience('night', false);
     const ctx = getContext(this);
     const ui = getUI(this);
     this.starting = false;

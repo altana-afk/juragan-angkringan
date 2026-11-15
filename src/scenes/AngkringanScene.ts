@@ -95,7 +95,7 @@ export class AngkringanScene extends Phaser.Scene {
     const location = new LocationPanel(this.ctx, ui);
     this.weather = new WeatherFx(this, state.weather, (f) => this.lighting.setWeatherDim(f));
     const audio = getAudio(this);
-    audio?.setAmbience('night', true);
+    audio?.setAmbience('night', state.phase === 'berjualan');
     audio?.setAmbience('rain', state.weather === 'hujan');
 
     const bus = this.ctx.bus;
@@ -159,6 +159,7 @@ export class AngkringanScene extends Phaser.Scene {
         }
         this.weather?.set(next.weather);
         getAudio(this)?.setAmbience('rain', next.weather === 'hujan');
+        getAudio(this)?.setAmbience('night', next.phase === 'berjualan');
         if (next.bankrupt && !this.bankruptShown) {
           this.bankruptShown = true;
           this.time.delayedCall(400, () => showBankrupt(this.ctx, ui, () => this.newGameAfterBankrupt()));
@@ -351,6 +352,7 @@ export class AngkringanScene extends Phaser.Scene {
     this.input.off(Phaser.Input.Events.GAME_OUT);
     getUI(this).closeAllModals();
     getAudio(this)?.setAmbience('rain', false);
+    getAudio(this)?.setAmbience('night', false);
     this.weather?.destroy();
     this.weather = null;
     this.lighting.destroy();

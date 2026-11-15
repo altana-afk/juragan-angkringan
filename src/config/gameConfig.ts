@@ -7,7 +7,7 @@ export const GAME_CONFIG = {
   /** Nama sementara proyek — cukup ubah di sini untuk mengganti judul di seluruh game. */
   title: 'Juragan Angkringan',
   subtitle: 'Simulator',
-  version: '0.12.0',
+  version: '0.12.1',
   stage: 'Kabar Kampung & Buku Dapur Kardi',
   backgroundColor: '#140f1f',
 

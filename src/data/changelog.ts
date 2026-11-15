@@ -10,6 +10,15 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: readonly ChangelogEntry[] = [
   {
+    version: '0.12.1',
+    title: 'Suara jangkrik lebih nyaman',
+    items: [
+      'Jangkrik kini memakai suara rekaman asli, lebih lembut dan tidak menusuk telinga.',
+      'Jangkrik berkicau bersahutan dengan jeda yang lebih panjang, dan sesekali hening.',
+      'Suara jangkrik hanya terdengar saat sesi penjualan. Menu utama dan persiapan lebih tenang.',
+    ],
+  },
+  {
     version: '0.12.0',
     title: 'Kabar Kampung & Buku Dapur Kardi',
     items: [
