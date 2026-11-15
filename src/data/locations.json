@@ -1,0 +1,221 @@
+{
+  "version": 1,
+  "locations": [
+    {
+      "id": "main-street",
+      "mapId": "main-street",
+      "name": "Jalan Kampung",
+      "tagline": "Kampung ramai keluarga & pekerja",
+      "description": "Pelanggan beragam: keluarga, pekerja, ojol. Ramai di akhir pekan, terutama Sabtu malam. Sewa tempat murah.",
+      "rent": 10000,
+      "weekday": [
+        1.3,
+        0.95,
+        0.95,
+        0.95,
+        1.0,
+        1.15,
+        1.4
+      ],
+      "typeWeights": {},
+      "budgetFactor": 1,
+      "lateNight": 1,
+      "perks": [
+        "Akhir pekan ramai (+30–40%)",
+        "Sewa Rp10.000/hari",
+        "Cocok untuk pemula"
+      ],
+      "moveCost": 20000,
+      "hours": [],
+      "patience": 0,
+      "ingredientPriceFactor": 1
+    },
+    {
+      "id": "kampus",
+      "mapId": "kampus",
+      "name": "Dekat Kampus",
+      "tagline": "Seberang kampus, buka sampai larut",
+      "description": "Mahasiswa berlimpah dan betah sampai larut malam, tapi kantongnya tipis. Hari kuliah ramai, akhir pekan sepi karena kampus libur. Sewa lebih mahal.",
+      "rent": 15000,
+      "weekday": [
+        0.6,
+        1.25,
+        1.25,
+        1.25,
+        1.2,
+        1.0,
+        0.65
+      ],
+      "typeWeights": {
+        "mahasiswa": 3,
+        "keluarga": 0.3,
+        "royal": 0.5,
+        "pekerja": 0.8,
+        "tetap": 1.2
+      },
+      "budgetFactor": 0.9,
+      "lateNight": 1.45,
+      "perks": [
+        "Hari kuliah ramai (+20–25%)",
+        "Akhir pekan sepi (−35–40%)",
+        "Mahasiswa ×3, ramai lewat jam 22.00",
+        "Anggaran pelanggan −10%",
+        "Sewa Rp15.000/hari"
+      ],
+      "moveCost": 30000,
+      "hours": [],
+      "patience": 0,
+      "ingredientPriceFactor": 1
+    },
+    {
+      "id": "pasar",
+      "mapId": "pasar",
+      "name": "Pinggir Pasar",
+      "tagline": "Dekat pasar, bahan murah, ramai sore",
+      "description": "Di sebelah pasar tradisional. Bahan baku lebih murah karena tinggal ambil di pasar, dan sore sampai jam 21.00 sangat ramai keluarga & pedagang. Tantangannya: banyak pedagang pesaing, dan setelah pasar tutup (21.30) jalanan langsung sepi — stok harus laku cepat dan kursi harus cukup untuk lonjakan sore.",
+      "rent": 14000,
+      "moveCost": 25000,
+      "weekday": [
+        1.1,
+        0.9,
+        0.9,
+        0.9,
+        0.9,
+        1.0,
+        1.1
+      ],
+      "typeWeights": {
+        "keluarga": 1.5,
+        "pekerja": 1.3,
+        "mahasiswa": 0.6,
+        "royal": 0.6
+      },
+      "budgetFactor": 0.95,
+      "lateNight": 1,
+      "patience": 0,
+      "ingredientPriceFactor": 0.9,
+      "hours": [
+        {
+          "from": 1020,
+          "to": 1260,
+          "factor": 1.3
+        },
+        {
+          "from": 1290,
+          "to": 1560,
+          "factor": 0.4
+        }
+      ],
+      "perks": [
+        "Bahan baku −10%",
+        "Sangat ramai 17.00–21.00 (+30%)",
+        "Sepi setelah 21.30 (−60%)",
+        "Banyak pesaing: hari biasa sedikit lebih sepi",
+        "Keluarga & pedagang, kantong pas-pasan",
+        "Sewa Rp14.000/hari"
+      ]
+    },
+    {
+      "id": "stasiun",
+      "mapId": "stasiun",
+      "name": "Depan Stasiun",
+      "tagline": "Arus komuter, pelanggan buru-buru",
+      "description": "Di depan stasiun kereta. Dua gelombang besar: pekerja pulang kantor (17.00–19.30) dan penumpang kereta terakhir (23.00–01.00), plus banyak ojol menunggu. Uang pelanggan lebih tebal, tapi mereka buru-buru — cepat pergi kalau menunggu. Hari kerja ramai, akhir pekan biasa saja. Sewa paling mahal.",
+      "rent": 20000,
+      "moveCost": 40000,
+      "weekday": [
+        0.75,
+        1.2,
+        1.2,
+        1.2,
+        1.2,
+        1.25,
+        0.8
+      ],
+      "typeWeights": {
+        "pekerja": 2,
+        "ojol": 2.5,
+        "keluarga": 0.4,
+        "mahasiswa": 0.8,
+        "penasaran": 1.3
+      },
+      "budgetFactor": 1.15,
+      "lateNight": 1,
+      "patience": -3,
+      "ingredientPriceFactor": 1,
+      "hours": [
+        {
+          "from": 1020,
+          "to": 1170,
+          "factor": 1.5
+        },
+        {
+          "from": 1380,
+          "to": 1500,
+          "factor": 1.4
+        },
+        {
+          "from": 1200,
+          "to": 1350,
+          "factor": 0.85
+        }
+      ],
+      "perks": [
+        "Gelombang pulang kerja & kereta terakhir",
+        "Anggaran pelanggan +15%",
+        "Pelanggan kurang sabar (−3 menit)",
+        "Ojol & pekerja dominan",
+        "Sewa Rp20.000/hari"
+      ]
+    },
+    {
+      "id": "pasar-malam",
+      "mapId": "pasar-malam",
+      "name": "Pasar Malam",
+      "tagline": "Bianglala & lampu warna-warni sampai jam 2",
+      "description": "Di tepi lapangan pasar malam dengan bianglala dan komidi putar. Mulai ramai lepas Isya dan tetap padat sampai jam 02.00, puncaknya malam Minggu. Tantangannya: sore masih sepi, hari kerja jauh lebih lengang, kebanyakan pengunjung sekali datang (sedikit pelanggan tetap), lingkungan bising membuat pelanggan kurang sabar, bahan harus dibawa dari jauh, dan sewa lapak paling mahal.",
+      "rent": 22000,
+      "moveCost": 35000,
+      "weekday": [
+        1.45,
+        0.85,
+        0.85,
+        0.85,
+        0.9,
+        1.15,
+        1.6
+      ],
+      "typeWeights": {
+        "penasaran": 2.2,
+        "keluarga": 1.4,
+        "mahasiswa": 1.3,
+        "tetap": 0.5,
+        "royal": 1.2
+      },
+      "budgetFactor": 1.05,
+      "lateNight": 1.25,
+      "patience": -1,
+      "ingredientPriceFactor": 1.08,
+      "hours": [
+        {
+          "from": 1020,
+          "to": 1170,
+          "factor": 0.65
+        },
+        {
+          "from": 1230,
+          "to": 1560,
+          "factor": 1.2
+        }
+      ],
+      "perks": [
+        "Ramai 20.30–02.00, puncak malam Minggu",
+        "Akhir pekan sangat ramai (+45–60%)",
+        "Hari kerja agak sepi (−10–15%), sore sepi",
+        "Banyak pengunjung baru, sedikit pelanggan tetap",
+        "Bising: pelanggan −1 menit sabar",
+        "Bahan +8%, sewa Rp22.000/hari"
+      ]
+    }
+  ]
+}

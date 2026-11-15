@@ -1,0 +1,382 @@
+{
+  "version": 1,
+  "types": [
+    {
+      "id": "mahasiswa",
+      "name": "Mahasiswa",
+      "weight": 1.4,
+      "budget": [
+        8000,
+        18000
+      ],
+      "patience": 10,
+      "party": [
+        1,
+        2
+      ],
+      "categoryWeights": {
+        "makanan": 1.0,
+        "gorengan": 1.4,
+        "sate": 1.0,
+        "minuman": 1.0
+      },
+      "tagWeights": {
+        "murah": 1.8,
+        "mengenyangkan": 1.2
+      },
+      "foodItems": [
+        1,
+        2
+      ],
+      "drinkChance": 0.85,
+      "peakHour": 21.5,
+      "spread": 2.5,
+      "names": [
+        "Raka",
+        "Dimas",
+        "Salsa",
+        "Nadia",
+        "Bima",
+        "Fajar",
+        "Laras",
+        "Yoga"
+      ],
+      "palettes": [
+        {
+          "hair": "#1f1a1c",
+          "shirt": "#3e6fb0",
+          "accent": "#2a2a30",
+          "pants": "#3a4f74"
+        },
+        {
+          "hair": "#2b211d",
+          "shirt": "#5a8f4a",
+          "accent": "#2a2a30",
+          "pants": "#4a4a52"
+        },
+        {
+          "hair": "#1f1a1c",
+          "shirt": "#8c8f96",
+          "accent": "#b8442f",
+          "pants": "#2f4466"
+        }
+      ]
+    },
+    {
+      "id": "pekerja",
+      "name": "Pekerja",
+      "weight": 1.2,
+      "budget": [
+        15000,
+        30000
+      ],
+      "patience": 8,
+      "party": [
+        1,
+        2
+      ],
+      "categoryWeights": {
+        "makanan": 1.6,
+        "gorengan": 1.0,
+        "sate": 1.2,
+        "minuman": 1.0
+      },
+      "tagWeights": {
+        "mengenyangkan": 1.8,
+        "hangat": 1.2
+      },
+      "foodItems": [
+        1,
+        2
+      ],
+      "drinkChance": 0.9,
+      "peakHour": 19.5,
+      "spread": 1.6,
+      "names": [
+        "Pak Budi",
+        "Mas Anton",
+        "Mbak Sri",
+        "Pak Joko",
+        "Mbak Rina",
+        "Mas Hendra"
+      ],
+      "palettes": [
+        {
+          "hair": "#1f1a1c",
+          "shirt": "#e8ecf2",
+          "accent": "#2f4466",
+          "pants": "#26262c"
+        },
+        {
+          "hair": "#2b211d",
+          "shirt": "#a9c8e6",
+          "accent": "#1f1a1c",
+          "pants": "#3a3a42"
+        },
+        {
+          "hair": "#1f1a1c",
+          "shirt": "#d9c9a8",
+          "accent": "#7a3a20",
+          "pants": "#2f2f36"
+        }
+      ]
+    },
+    {
+      "id": "ojol",
+      "name": "Pengemudi ojol",
+      "weight": 1.0,
+      "budget": [
+        10000,
+        22000
+      ],
+      "patience": 6,
+      "party": [
+        1,
+        1
+      ],
+      "categoryWeights": {
+        "makanan": 1.2,
+        "gorengan": 1.3,
+        "sate": 1.0,
+        "minuman": 1.3
+      },
+      "tagWeights": {
+        "praktis": 2.0,
+        "murah": 1.3,
+        "dingin": 1.2
+      },
+      "foodItems": [
+        1,
+        2
+      ],
+      "drinkChance": 0.95,
+      "peakHour": 20.0,
+      "spread": 3.0,
+      "names": [
+        "Bang Ucok",
+        "Mas Eko",
+        "Bang Rizal",
+        "Mas Tono"
+      ],
+      "palettes": [
+        {
+          "hair": "#2f8a3e",
+          "shirt": "#2f8a3e",
+          "accent": "#1f1a1c",
+          "pants": "#26262c"
+        },
+        {
+          "hair": "#2f8a3e",
+          "shirt": "#3a9a4a",
+          "accent": "#e8ecf2",
+          "pants": "#3a3a42"
+        }
+      ]
+    },
+    {
+      "id": "keluarga",
+      "name": "Keluarga",
+      "weight": 0.7,
+      "budget": [
+        12000,
+        25000
+      ],
+      "patience": 9,
+      "party": [
+        2,
+        4
+      ],
+      "categoryWeights": {
+        "makanan": 1.4,
+        "gorengan": 1.3,
+        "sate": 1.3,
+        "minuman": 1.1
+      },
+      "tagWeights": {
+        "mengenyangkan": 1.3,
+        "hangat": 1.1
+      },
+      "foodItems": [
+        1,
+        2
+      ],
+      "drinkChance": 0.8,
+      "peakHour": 19.0,
+      "spread": 1.4,
+      "names": [
+        "Keluarga Pak Hadi",
+        "Keluarga Bu Ani",
+        "Keluarga Pak Darmo"
+      ],
+      "palettes": [
+        {
+          "hair": "#8a3a5a",
+          "shirt": "#c86a8a",
+          "accent": "#f1dcb0",
+          "pants": "#4a3a5a"
+        },
+        {
+          "hair": "#1f1a1c",
+          "shirt": "#d9a84a",
+          "accent": "#7a4a22",
+          "pants": "#3a3a42"
+        },
+        {
+          "hair": "#3a5a8a",
+          "shirt": "#6a8fc8",
+          "accent": "#f1dcb0",
+          "pants": "#2f3a52"
+        }
+      ]
+    },
+    {
+      "id": "tetap",
+      "name": "Pelanggan tetap",
+      "weight": 0.6,
+      "budget": [
+        12000,
+        25000
+      ],
+      "patience": 12,
+      "party": [
+        1,
+        2
+      ],
+      "categoryWeights": {
+        "makanan": 1.2,
+        "gorengan": 1.2,
+        "sate": 1.4,
+        "minuman": 1.2
+      },
+      "tagWeights": {
+        "hangat": 1.4
+      },
+      "foodItems": [
+        1,
+        3
+      ],
+      "drinkChance": 1.0,
+      "peakHour": 22.0,
+      "spread": 2.5,
+      "names": [
+        "Mbah Karto",
+        "Pak RT",
+        "Mas Gendut",
+        "Pakde Wir"
+      ],
+      "palettes": [
+        {
+          "hair": "#d8d4cc",
+          "shirt": "#8a5a34",
+          "accent": "#e0b33a",
+          "pants": "#3d5f8f"
+        },
+        {
+          "hair": "#1f1a1c",
+          "shirt": "#6e4a2a",
+          "accent": "#c98a46",
+          "pants": "#5a3a24"
+        }
+      ]
+    },
+    {
+      "id": "penasaran",
+      "name": "Pelanggan penasaran",
+      "weight": 0.5,
+      "budget": [
+        10000,
+        25000
+      ],
+      "patience": 7,
+      "party": [
+        1,
+        2
+      ],
+      "categoryWeights": {
+        "makanan": 1.0,
+        "gorengan": 1.2,
+        "sate": 1.2,
+        "minuman": 1.2
+      },
+      "tagWeights": {},
+      "foodItems": [
+        1,
+        2
+      ],
+      "drinkChance": 0.8,
+      "peakHour": 20.5,
+      "spread": 2.5,
+      "popularityBoost": 0.02,
+      "names": [
+        "Kak Tiara",
+        "Mas Andre",
+        "Mbak Vina",
+        "Kak Galih"
+      ],
+      "palettes": [
+        {
+          "hair": "#5a3a24",
+          "shirt": "#e07a3a",
+          "accent": "#f4f1ea",
+          "pants": "#3a4f74"
+        },
+        {
+          "hair": "#1f1a1c",
+          "shirt": "#8a4fb0",
+          "accent": "#f4f1ea",
+          "pants": "#26262c"
+        }
+      ]
+    },
+    {
+      "id": "royal",
+      "name": "Pelanggan royal",
+      "weight": 0.3,
+      "budget": [
+        25000,
+        50000
+      ],
+      "patience": 5,
+      "party": [
+        1,
+        3
+      ],
+      "categoryWeights": {
+        "makanan": 1.5,
+        "gorengan": 1.0,
+        "sate": 1.5,
+        "minuman": 1.2
+      },
+      "tagWeights": {
+        "mengenyangkan": 1.3
+      },
+      "foodItems": [
+        2,
+        3
+      ],
+      "drinkChance": 1.0,
+      "peakHour": 21.0,
+      "spread": 2.0,
+      "popularityBoost": 0.015,
+      "names": [
+        "Juragan Haji Mansur",
+        "Bos Kevin",
+        "Ibu Ratna"
+      ],
+      "palettes": [
+        {
+          "hair": "#1f1a1c",
+          "shirt": "#b8862a",
+          "accent": "#5a2a10",
+          "pants": "#1f1a1c"
+        },
+        {
+          "hair": "#1f1a1c",
+          "shirt": "#7a2a2a",
+          "accent": "#e0b33a",
+          "pants": "#26262c"
+        }
+      ]
+    }
+  ]
+}

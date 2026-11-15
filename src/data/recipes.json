@@ -1,0 +1,737 @@
+{
+  "version": 1,
+  "recipes": [
+    {
+      "id": "nasi_goreng",
+      "name": "Nasi goreng",
+      "category": "makanan",
+      "salePrice": 12000,
+      "ingredients": {
+        "beras": 1,
+        "telur": 1,
+        "minyak": 1,
+        "bawang": 1,
+        "cabai": 1,
+        "kecap": 1
+      },
+      "unlock": {
+        "type": "start"
+      },
+      "shelfLifeDays": 0,
+      "tags": [
+        "mengenyangkan",
+        "hangat"
+      ],
+      "icon": {
+        "shape": "plate",
+        "color": "#d9a55a",
+        "accent": "#f3e3c3"
+      }
+    },
+    {
+      "id": "tempe_goreng",
+      "name": "Tempe goreng",
+      "category": "gorengan",
+      "salePrice": 2000,
+      "ingredients": {
+        "tempe": 1,
+        "minyak": 1
+      },
+      "unlock": {
+        "type": "start"
+      },
+      "shelfLifeDays": 0,
+      "tags": [
+        "murah",
+        "hangat"
+      ],
+      "icon": {
+        "shape": "fried",
+        "color": "#c99a4a",
+        "accent": "#8a5f2a"
+      }
+    },
+    {
+      "id": "tahu_goreng",
+      "name": "Tahu goreng",
+      "category": "gorengan",
+      "salePrice": 2000,
+      "ingredients": {
+        "tahu": 1,
+        "minyak": 1
+      },
+      "unlock": {
+        "type": "start"
+      },
+      "shelfLifeDays": 0,
+      "tags": [
+        "murah",
+        "hangat"
+      ],
+      "icon": {
+        "shape": "fried",
+        "color": "#e0b45e",
+        "accent": "#a8742a"
+      }
+    },
+    {
+      "id": "es_teh",
+      "name": "Es teh",
+      "category": "minuman",
+      "salePrice": 4000,
+      "ingredients": {
+        "teh": 1,
+        "gula": 1,
+        "air_minum": 1,
+        "es_batu": 1
+      },
+      "unlock": {
+        "type": "start"
+      },
+      "shelfLifeDays": 0,
+      "tags": [
+        "dingin"
+      ],
+      "icon": {
+        "shape": "glass_ice",
+        "color": "#b5652c",
+        "accent": "#d6f0fb"
+      }
+    },
+    {
+      "id": "teh_hangat",
+      "name": "Teh hangat",
+      "category": "minuman",
+      "salePrice": 3000,
+      "ingredients": {
+        "teh": 1,
+        "gula": 1,
+        "air_minum": 1
+      },
+      "unlock": {
+        "type": "start"
+      },
+      "shelfLifeDays": 0,
+      "tags": [
+        "hangat"
+      ],
+      "icon": {
+        "shape": "glass",
+        "color": "#a8541f",
+        "accent": "#f3e3c3"
+      }
+    },
+    {
+      "id": "sate_usus",
+      "name": "Sate usus",
+      "category": "sate",
+      "salePrice": 3000,
+      "ingredients": {
+        "usus": 1,
+        "kecap": 1
+      },
+      "unlock": {
+        "type": "popularity",
+        "min": 20
+      },
+      "shelfLifeDays": 0,
+      "tags": [
+        "murah"
+      ],
+      "icon": {
+        "shape": "skewer_dish",
+        "color": "#c98a4a",
+        "accent": "#6e4320"
+      }
+    },
+    {
+      "id": "sate_ati_ampela",
+      "name": "Sate ati ampela",
+      "category": "sate",
+      "salePrice": 3500,
+      "ingredients": {
+        "ati_ampela": 1,
+        "kecap": 1
+      },
+      "unlock": {
+        "type": "popularity",
+        "min": 20
+      },
+      "shelfLifeDays": 0,
+      "tags": [],
+      "icon": {
+        "shape": "skewer_dish",
+        "color": "#6e2a22",
+        "accent": "#3a1814"
+      }
+    },
+    {
+      "id": "sosis_bakar",
+      "name": "Sosis bakar",
+      "category": "sate",
+      "salePrice": 3500,
+      "ingredients": {
+        "sosis": 1,
+        "kecap": 1
+      },
+      "unlock": {
+        "type": "popularity",
+        "min": 20
+      },
+      "shelfLifeDays": 0,
+      "tags": [
+        "praktis"
+      ],
+      "icon": {
+        "shape": "skewer_dish",
+        "color": "#b8442f",
+        "accent": "#6e2418"
+      }
+    },
+    {
+      "id": "kopi_panas",
+      "name": "Kopi panas",
+      "category": "minuman",
+      "salePrice": 4000,
+      "ingredients": {
+        "kopi": 1,
+        "gula": 1,
+        "air_minum": 1
+      },
+      "unlock": {
+        "type": "popularity",
+        "min": 20
+      },
+      "shelfLifeDays": 0,
+      "tags": [
+        "hangat"
+      ],
+      "icon": {
+        "shape": "cup",
+        "color": "#3a2418",
+        "accent": "#f3e3c3"
+      }
+    },
+    {
+      "id": "es_sirup",
+      "name": "Es sirup",
+      "category": "minuman",
+      "salePrice": 4000,
+      "ingredients": {
+        "sirup": 1,
+        "air_minum": 1,
+        "es_batu": 1
+      },
+      "unlock": {
+        "type": "popularity",
+        "min": 20
+      },
+      "shelfLifeDays": 0,
+      "tags": [
+        "dingin"
+      ],
+      "icon": {
+        "shape": "glass_ice",
+        "color": "#d6385a",
+        "accent": "#d6f0fb"
+      }
+    },
+    {
+      "id": "air_mineral",
+      "name": "Air mineral",
+      "category": "minuman",
+      "salePrice": 3000,
+      "ingredients": {
+        "air_mineral": 1
+      },
+      "unlock": {
+        "type": "popularity",
+        "min": 20
+      },
+      "shelfLifeDays": 30,
+      "tags": [
+        "praktis",
+        "dingin"
+      ],
+      "icon": {
+        "shape": "water",
+        "color": "#bfe3f5",
+        "accent": "#2f6fa8"
+      }
+    },
+    {
+      "id": "mi_goreng",
+      "name": "Mi goreng",
+      "category": "makanan",
+      "salePrice": 10000,
+      "ingredients": {
+        "mi_instan": 1,
+        "telur": 1,
+        "minyak": 1,
+        "bawang": 1
+      },
+      "unlock": {
+        "type": "money",
+        "min": 1500000
+      },
+      "shelfLifeDays": 0,
+      "tags": [
+        "mengenyangkan",
+        "hangat"
+      ],
+      "icon": {
+        "shape": "plate",
+        "color": "#e3b04a",
+        "accent": "#f3e3c3"
+      }
+    },
+    {
+      "id": "mi_rebus",
+      "name": "Mi rebus",
+      "category": "makanan",
+      "salePrice": 9000,
+      "ingredients": {
+        "mi_instan": 1,
+        "bawang": 1,
+        "cabai": 1,
+        "air_minum": 1
+      },
+      "unlock": {
+        "type": "money",
+        "min": 1500000
+      },
+      "shelfLifeDays": 0,
+      "tags": [
+        "mengenyangkan",
+        "hangat"
+      ],
+      "icon": {
+        "shape": "bowl",
+        "color": "#e9c23a",
+        "accent": "#d8822a"
+      }
+    },
+    {
+      "id": "bakso_bakar",
+      "name": "Bakso bakar",
+      "category": "sate",
+      "salePrice": 3000,
+      "ingredients": {
+        "bakso": 1,
+        "kecap": 1
+      },
+      "unlock": {
+        "type": "money",
+        "min": 1500000
+      },
+      "shelfLifeDays": 0,
+      "tags": [],
+      "icon": {
+        "shape": "skewer_dish",
+        "color": "#8a5a3a",
+        "accent": "#5a3420"
+      }
+    },
+    {
+      "id": "sate_ayam",
+      "name": "Sate ayam",
+      "category": "sate",
+      "salePrice": 5000,
+      "ingredients": {
+        "ayam": 1,
+        "kecap": 1,
+        "bawang": 1
+      },
+      "unlock": {
+        "type": "money",
+        "min": 1500000
+      },
+      "shelfLifeDays": 0,
+      "tags": [
+        "mengenyangkan"
+      ],
+      "icon": {
+        "shape": "skewer_dish",
+        "color": "#c98a4a",
+        "accent": "#7a4a22"
+      }
+    },
+    {
+      "id": "nasi_kucing",
+      "name": "Nasi kucing",
+      "category": "makanan",
+      "salePrice": 4000,
+      "ingredients": {
+        "beras": 1,
+        "cabai": 1,
+        "tempe": 1
+      },
+      "unlock": {
+        "type": "level",
+        "min": 2
+      },
+      "shelfLifeDays": 0,
+      "tags": [
+        "murah",
+        "praktis"
+      ],
+      "icon": {
+        "shape": "sack",
+        "color": "#dcc292",
+        "accent": "#6d9440"
+      }
+    },
+    {
+      "id": "wedang_jahe",
+      "name": "Wedang jahe",
+      "category": "minuman",
+      "salePrice": 6000,
+      "ingredients": {
+        "jahe": 1,
+        "gula": 1,
+        "air_minum": 1
+      },
+      "unlock": {
+        "type": "level",
+        "min": 2
+      },
+      "shelfLifeDays": 0,
+      "tags": [
+        "hangat"
+      ],
+      "icon": {
+        "shape": "cup",
+        "color": "#c98a3a",
+        "accent": "#8a5a34"
+      }
+    },
+    {
+      "id": "kopi_joss",
+      "name": "Kopi joss",
+      "category": "minuman",
+      "salePrice": 8000,
+      "ingredients": {
+        "kopi": 1,
+        "gula": 1,
+        "air_minum": 1,
+        "arang": 1
+      },
+      "unlock": {
+        "type": "level",
+        "min": 3
+      },
+      "shelfLifeDays": 0,
+      "tags": [
+        "hangat",
+        "spesial"
+      ],
+      "icon": {
+        "shape": "cup",
+        "color": "#1f1414",
+        "accent": "#ff7a2f"
+      }
+    },
+    {
+      "id": "susu_jahe",
+      "name": "Susu jahe",
+      "category": "minuman",
+      "salePrice": 8000,
+      "ingredients": {
+        "susu": 1,
+        "jahe": 1,
+        "air_minum": 1
+      },
+      "unlock": {
+        "type": "level",
+        "min": 3
+      },
+      "shelfLifeDays": 0,
+      "tags": [
+        "hangat",
+        "spesial"
+      ],
+      "icon": {
+        "shape": "cup",
+        "color": "#efe3c8",
+        "accent": "#c98a3a"
+      }
+    },
+    {
+      "id": "sego_bakar",
+      "name": "Sego bakar spesial",
+      "category": "makanan",
+      "salePrice": 15000,
+      "ingredients": {
+        "beras": 1,
+        "ayam": 1,
+        "kecap": 1,
+        "cabai": 1
+      },
+      "unlock": {
+        "type": "level",
+        "min": 4
+      },
+      "shelfLifeDays": 0,
+      "tags": [
+        "mengenyangkan",
+        "hangat",
+        "spesial"
+      ],
+      "icon": {
+        "shape": "plate",
+        "color": "#8a5a34",
+        "accent": "#6d9440"
+      }
+    },
+    {
+      "id": "pisang_goreng",
+      "name": "Pisang goreng",
+      "category": "gorengan",
+      "salePrice": 2500,
+      "ingredients": {
+        "pisang": 1,
+        "minyak": 1
+      },
+      "unlock": {
+        "type": "popularity",
+        "min": 12
+      },
+      "shelfLifeDays": 0,
+      "tags": [
+        "murah",
+        "hangat"
+      ],
+      "icon": {
+        "shape": "fried",
+        "color": "#e9b44a",
+        "accent": "#9a6a22"
+      }
+    },
+    {
+      "id": "kacang_rebus",
+      "name": "Kacang rebus",
+      "category": "gorengan",
+      "salePrice": 4000,
+      "ingredients": {
+        "kacang": 1,
+        "air_minum": 1
+      },
+      "unlock": {
+        "type": "popularity",
+        "min": 15
+      },
+      "shelfLifeDays": 0,
+      "tags": [
+        "murah",
+        "praktis"
+      ],
+      "icon": {
+        "shape": "bowl",
+        "color": "#c79a5a",
+        "accent": "#7a5230"
+      }
+    },
+    {
+      "id": "es_jeruk",
+      "name": "Es jeruk",
+      "category": "minuman",
+      "salePrice": 5000,
+      "ingredients": {
+        "jeruk": 1,
+        "gula": 1,
+        "es_batu": 1,
+        "air_minum": 1
+      },
+      "unlock": {
+        "type": "popularity",
+        "min": 15
+      },
+      "shelfLifeDays": 0,
+      "tags": [
+        "dingin"
+      ],
+      "icon": {
+        "shape": "glass_ice",
+        "color": "#f39a1e",
+        "accent": "#d6f0fb"
+      }
+    },
+    {
+      "id": "jagung_bakar",
+      "name": "Jagung bakar",
+      "category": "sate",
+      "salePrice": 7000,
+      "ingredients": {
+        "jagung": 1,
+        "cabai": 1,
+        "arang": 1
+      },
+      "unlock": {
+        "type": "popularity",
+        "min": 30
+      },
+      "shelfLifeDays": 0,
+      "tags": [
+        "hangat"
+      ],
+      "icon": {
+        "shape": "skewer_dish",
+        "color": "#f4c430",
+        "accent": "#7a4a22"
+      }
+    },
+    {
+      "id": "kopi_susu",
+      "name": "Kopi susu",
+      "category": "minuman",
+      "salePrice": 6000,
+      "ingredients": {
+        "kopi": 1,
+        "susu": 1,
+        "air_minum": 1
+      },
+      "unlock": {
+        "type": "popularity",
+        "min": 30
+      },
+      "shelfLifeDays": 0,
+      "tags": [
+        "hangat"
+      ],
+      "icon": {
+        "shape": "cup",
+        "color": "#8a5a34",
+        "accent": "#f3e3c3"
+      }
+    },
+    {
+      "id": "bihun_goreng",
+      "name": "Bihun goreng",
+      "category": "makanan",
+      "salePrice": 10000,
+      "ingredients": {
+        "bihun": 1,
+        "telur": 1,
+        "kecap": 1,
+        "minyak": 1
+      },
+      "unlock": {
+        "type": "money",
+        "min": 1000000
+      },
+      "shelfLifeDays": 0,
+      "tags": [
+        "mengenyangkan",
+        "hangat"
+      ],
+      "icon": {
+        "shape": "plate",
+        "color": "#efe0b8",
+        "accent": "#b8442f"
+      }
+    },
+    {
+      "id": "roti_bakar",
+      "name": "Roti bakar cokelat",
+      "category": "makanan",
+      "salePrice": 9000,
+      "ingredients": {
+        "roti": 1,
+        "cokelat": 1,
+        "susu": 1
+      },
+      "unlock": {
+        "type": "level",
+        "min": 2
+      },
+      "shelfLifeDays": 0,
+      "tags": [
+        "praktis",
+        "spesial"
+      ],
+      "icon": {
+        "shape": "block",
+        "color": "#c98a4a",
+        "accent": "#5a341e"
+      }
+    },
+    {
+      "id": "teh_tarik",
+      "name": "Teh tarik",
+      "category": "minuman",
+      "salePrice": 7000,
+      "ingredients": {
+        "teh": 1,
+        "susu": 1,
+        "gula": 1,
+        "air_minum": 1
+      },
+      "unlock": {
+        "type": "level",
+        "min": 2
+      },
+      "shelfLifeDays": 0,
+      "tags": [
+        "hangat",
+        "spesial"
+      ],
+      "icon": {
+        "shape": "glass",
+        "color": "#c98a5a",
+        "accent": "#f3e3c3"
+      }
+    },
+    {
+      "id": "es_kopi_susu",
+      "name": "Es kopi susu",
+      "category": "minuman",
+      "salePrice": 9000,
+      "ingredients": {
+        "kopi": 1,
+        "susu": 1,
+        "es_batu": 1,
+        "air_minum": 1
+      },
+      "unlock": {
+        "type": "level",
+        "min": 3
+      },
+      "shelfLifeDays": 0,
+      "tags": [
+        "dingin",
+        "spesial"
+      ],
+      "icon": {
+        "shape": "glass_ice",
+        "color": "#a8743e",
+        "accent": "#d6f0fb"
+      }
+    },
+    {
+      "id": "pisang_bakar",
+      "name": "Pisang bakar keju-cokelat",
+      "category": "sate",
+      "salePrice": 10000,
+      "ingredients": {
+        "pisang": 2,
+        "cokelat": 1,
+        "susu": 1,
+        "arang": 1
+      },
+      "unlock": {
+        "type": "level",
+        "min": 3
+      },
+      "shelfLifeDays": 0,
+      "tags": [
+        "spesial",
+        "hangat"
+      ],
+      "icon": {
+        "shape": "skewer_dish",
+        "color": "#e9b44a",
+        "accent": "#5a341e"
+      }
+    }
+  ]
+}

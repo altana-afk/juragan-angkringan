@@ -1,0 +1,14 @@
+# Aturan cache untuk Netlify & Cloudflare Pages (host lain mengabaikan file ini).
+# Aset ber-hash tidak pernah berubah → boleh di-cache selamanya.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Service worker, halaman & manifest harus selalu dicek ulang agar update cepat sampai ke pemain.
+/sw.js
+  Cache-Control: no-cache
+/index.html
+  Cache-Control: no-cache
+/
+  Cache-Control: no-cache
+/manifest.webmanifest
+  Cache-Control: no-cache

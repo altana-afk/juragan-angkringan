@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "ads": [
+    { "id": "selebaran", "name": "Selebaran", "cost": 10000, "arrivalBonus": 0.15, "newCustomerBonus": 0.1, "description": "Bagikan selebaran di sekitar kampung.", "effectLabel": "Tambahan pelanggan kecil" },
+    { "id": "whatsapp", "name": "Promosi WhatsApp", "cost": 20000, "arrivalBonus": 0.3, "newCustomerBonus": 0.15, "description": "Sebar info di grup WhatsApp warga & kampus.", "effectLabel": "Tambahan pelanggan sedang" },
+    { "id": "media_sosial", "name": "Media sosial", "cost": 35000, "arrivalBonus": 0.5, "newCustomerBonus": 0.3, "description": "Unggah foto menu & suasana angkringan.", "effectLabel": "Tambahan pelanggan cukup besar" },
+    { "id": "spanduk", "name": "Spanduk besar", "cost": 50000, "arrivalBonus": 0.65, "newCustomerBonus": 0.2, "description": "Spanduk mencolok di pinggir jalan.", "effectLabel": "Tambahan pelanggan sedang-besar" },
+    { "id": "influencer", "name": "Influencer lokal", "cost": 75000, "arrivalBonus": 0.95, "newCustomerBonus": 0.6, "description": "Kuliner influencer mampir & mengulas.", "effectLabel": "Tambahan pelanggan besar" }
+  ]
+}

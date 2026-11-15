@@ -1,0 +1,447 @@
+{
+  "version": 1,
+  "upgrades": [
+    {
+      "id": "gerobak_standar",
+      "category": "gerobak",
+      "name": "Gerobak standar",
+      "cost": 300000,
+      "requires": {
+        "day": 3
+      },
+      "effects": {
+        "businessLevel": 2,
+        "satisfaction": 2,
+        "arrivalBonus": 0.05,
+        "maxCookPortions": 10,
+        "variants": {
+          "cart": "standar"
+        }
+      },
+      "description": "Gerobak dicat ulang, etalase lebih rapi. Membuka menu level 2."
+    },
+    {
+      "id": "gerobak_modern",
+      "category": "gerobak",
+      "name": "Gerobak modern",
+      "cost": 900000,
+      "requires": {
+        "upgrades": [
+          "gerobak_standar"
+        ],
+        "popularity": 35
+      },
+      "effects": {
+        "businessLevel": 3,
+        "satisfaction": 3,
+        "arrivalBonus": 0.08,
+        "maxCookPortions": 10,
+        "variants": {
+          "cart": "modern"
+        }
+      },
+      "description": "Rangka baja, etalase kaca besar & lampu LED. Membuka menu spesial level 3."
+    },
+    {
+      "id": "gerobak_premium",
+      "category": "gerobak",
+      "name": "Gerobak premium",
+      "cost": 2500000,
+      "requires": {
+        "upgrades": [
+          "gerobak_modern"
+        ],
+        "popularity": 60
+      },
+      "effects": {
+        "businessLevel": 4,
+        "satisfaction": 4,
+        "arrivalBonus": 0.12,
+        "variants": {
+          "cart": "premium"
+        }
+      },
+      "description": "Kayu jati berukir & ornamen emas — angkringan kelas juragan. Membuka menu level 4."
+    },
+    {
+      "id": "kompor_tambahan",
+      "category": "peralatan",
+      "name": "Kompor tambahan",
+      "cost": 150000,
+      "requires": {},
+      "effects": {
+        "serviceSpeed": 0.35,
+        "maxCookPortions": 20
+      },
+      "description": "Pesanan disajikan lebih cepat sehingga kursi lebih cepat berganti."
+    },
+    {
+      "id": "wajan_besar",
+      "category": "peralatan",
+      "name": "Wajan lebih besar",
+      "cost": 120000,
+      "requires": {},
+      "effects": {
+        "maxCookPortions": 30
+      },
+      "description": "Masak lebih banyak porsi sekali jalan."
+    },
+    {
+      "id": "lemari_pendingin",
+      "category": "peralatan",
+      "name": "Lemari pendingin",
+      "cost": 400000,
+      "requires": {
+        "day": 5
+      },
+      "effects": {
+        "productShelfDays": 1,
+        "ingredientShelfDays": 2
+      },
+      "description": "Produk matang awet sampai besok, bahan segar tahan 2 hari lebih lama."
+    },
+    {
+      "id": "kulkas",
+      "category": "peralatan",
+      "name": "Kulkas",
+      "cost": 275000,
+      "requires": {},
+      "effects": {
+        "drinkShelfDays": 2,
+        "chilledShelfDays": 3,
+        "ingredientShelfDays": 1
+      },
+      "description": "Kulkas dua pintu: minuman matang (es teh, es sirup, kopi, dll.) awet 2 hari lebih lama, es batu & bahan dingin tahan 3 hari lebih lama, bahan mentah lain +1 hari sebelum basi."
+    },
+    {
+      "id": "rak_penyimpanan",
+      "category": "peralatan",
+      "name": "Tempat penyimpanan bahan",
+      "cost": 100000,
+      "requires": {},
+      "effects": {
+        "storage": 300
+      },
+      "description": "Kapasitas gudang bahan +300 satuan."
+    },
+    {
+      "id": "peralatan_minuman",
+      "category": "peralatan",
+      "name": "Peralatan minuman",
+      "cost": 180000,
+      "requires": {},
+      "effects": {
+        "drinkAppeal": 0.25,
+        "satisfaction": 1
+      },
+      "description": "Termos & gelas baru — minuman lebih diminati."
+    },
+    {
+      "id": "lampu_dekorasi",
+      "category": "peralatan",
+      "name": "Lampu dekorasi",
+      "cost": 160000,
+      "requires": {},
+      "effects": {
+        "arrivalBonus": 0.08,
+        "satisfaction": 1,
+        "variants": {
+          "canopy": "lights"
+        }
+      },
+      "description": "Lampu warna-warni di tenda, menarik pelanggan malam hari."
+    },
+    {
+      "id": "bangku_tambahan",
+      "category": "kapasitas",
+      "name": "Bangku tambahan",
+      "cost": 200000,
+      "requires": {},
+      "effects": {
+        "seats": 3
+      },
+      "description": "Satu bangku panjang di sisi gerobak (+3 kursi)."
+    },
+    {
+      "id": "tikar_kedua",
+      "category": "kapasitas",
+      "name": "Tikar lesehan kedua",
+      "cost": 250000,
+      "requires": {
+        "popularity": 20
+      },
+      "effects": {
+        "seats": 4
+      },
+      "description": "Area lesehan tambahan untuk rombongan (+4 kursi)."
+    },
+    {
+      "id": "gudang_besar",
+      "category": "kapasitas",
+      "name": "Gudang besar",
+      "cost": 350000,
+      "requires": {
+        "upgrades": [
+          "rak_penyimpanan"
+        ]
+      },
+      "effects": {
+        "storage": 600
+      },
+      "description": "Kapasitas gudang bahan +600 satuan."
+    },
+    {
+      "id": "area_makan_luas",
+      "category": "kapasitas",
+      "name": "Area makan lebih luas",
+      "cost": 500000,
+      "requires": {
+        "upgrades": [
+          "tikar_kedua"
+        ],
+        "popularity": 40
+      },
+      "effects": {
+        "seats": 3,
+        "satisfaction": 2
+      },
+      "description": "Bangku tambahan di depan ruko (+3 kursi), suasana lebih lega."
+    },
+    {
+      "id": "meja_kursi_bagus",
+      "category": "lingkungan",
+      "name": "Meja & kursi lebih baik",
+      "cost": 300000,
+      "requires": {
+        "upgrades": [
+          "bangku_tambahan"
+        ]
+      },
+      "effects": {
+        "satisfaction": 3,
+        "patience": 2,
+        "variants": {
+          "bench-front": "premium",
+          "bench-side": "premium",
+          "bench-extra": "premium"
+        }
+      },
+      "description": "Bangku jati berbantal — pelanggan betah."
+    },
+    {
+      "id": "dekorasi",
+      "category": "lingkungan",
+      "name": "Dekorasi angkringan",
+      "cost": 120000,
+      "requires": {},
+      "effects": {
+        "satisfaction": 1,
+        "patience": 2
+      },
+      "description": "Tanaman & hiasan di sekitar gerobak."
+    },
+    {
+      "id": "papan_nama",
+      "category": "lingkungan",
+      "name": "Papan nama",
+      "cost": 150000,
+      "requires": {},
+      "effects": {
+        "arrivalBonus": 0.08,
+        "newCustomerBonus": 0.1
+      },
+      "description": "Papan menu di pinggir jalan, menarik pelanggan baru."
+    },
+    {
+      "id": "penerangan",
+      "category": "lingkungan",
+      "name": "Penerangan",
+      "cost": 200000,
+      "requires": {},
+      "effects": {
+        "patience": 2,
+        "satisfaction": 1
+      },
+      "description": "Lampu taman tambahan — area makan terang & aman."
+    },
+    {
+      "id": "rak_dinding",
+      "category": "kapasitas",
+      "name": "Rak dinding",
+      "cost": 80000,
+      "requires": {},
+      "effects": {
+        "storage": 200
+      },
+      "description": "Rak gantung di dinding gerobak untuk bahan kering. Gudang +200 satuan."
+    },
+    {
+      "id": "gudang_sewaan",
+      "category": "kapasitas",
+      "name": "Gudang sewaan",
+      "cost": 700000,
+      "requires": {
+        "upgrades": [
+          "gudang_besar"
+        ],
+        "popularity": 40
+      },
+      "effects": {
+        "storage": 1000
+      },
+      "description": "Menyewa ruangan di belakang ruko. Gudang +1.000 satuan."
+    },
+    {
+      "id": "gudang_pendingin",
+      "category": "kapasitas",
+      "name": "Gudang berpendingin",
+      "cost": 1500000,
+      "requires": {
+        "upgrades": [
+          "gudang_sewaan",
+          "kulkas"
+        ]
+      },
+      "effects": {
+        "storage": 1500,
+        "ingredientShelfDays": 1,
+        "chilledShelfDays": 1
+      },
+      "description": "Ruang simpan berpendingin: gudang +1.500 satuan dan semua bahan lebih awet."
+    },
+    {
+      "id": "kursi_plastik",
+      "category": "kapasitas",
+      "name": "Kursi plastik lipat",
+      "cost": 90000,
+      "requires": {},
+      "effects": {
+        "seats": 2
+      },
+      "description": "Dua kursi plastik di depan, murah tapi menambah tempat (+2 kursi)."
+    },
+    {
+      "id": "tikar_ketiga",
+      "category": "kapasitas",
+      "name": "Tikar lesehan ketiga",
+      "cost": 300000,
+      "requires": {
+        "upgrades": [
+          "tikar_kedua"
+        ],
+        "popularity": 30
+      },
+      "effects": {
+        "seats": 4
+      },
+      "description": "Area lesehan tambahan di sisi kiri (+4 kursi)."
+    },
+    {
+      "id": "meja_payung",
+      "category": "kapasitas",
+      "name": "Meja payung taman",
+      "cost": 380000,
+      "requires": {
+        "upgrades": [
+          "area_makan_luas"
+        ],
+        "popularity": 45
+      },
+      "effects": {
+        "seats": 4,
+        "satisfaction": 1
+      },
+      "description": "Meja bundar dengan payung besar untuk rombongan (+4 kursi), terlindung dari gerimis."
+    },
+    {
+      "id": "kipas_angin",
+      "category": "lingkungan",
+      "name": "Kipas angin berdiri",
+      "cost": 140000,
+      "requires": {},
+      "effects": {
+        "heatComfort": 4,
+        "patience": 1
+      },
+      "description": "Pelanggan tetap sejuk: saat panas terik kepuasan +4, sabar +1 menit."
+    },
+    {
+      "id": "terpal_hujan",
+      "category": "lingkungan",
+      "name": "Terpal anti hujan",
+      "cost": 180000,
+      "requires": {},
+      "effects": {
+        "rainShelter": 0.15,
+        "rainComfort": 4
+      },
+      "description": "Terpal lebar menutupi area makan: saat hujan pelanggan berkurang lebih sedikit dan kepuasan +4."
+    },
+    {
+      "id": "wifi_gratis",
+      "category": "lingkungan",
+      "name": "Wi-Fi gratis",
+      "cost": 220000,
+      "requires": {
+        "day": 4
+      },
+      "effects": {
+        "patience": 3,
+        "satisfaction": 1
+      },
+      "description": "Pelanggan betah menunggu sambil berselancar (+3 menit kesabaran)."
+    },
+    {
+      "id": "radio_musik",
+      "category": "lingkungan",
+      "name": "Radio & musik keroncong",
+      "cost": 120000,
+      "requires": {},
+      "effects": {
+        "satisfaction": 2
+      },
+      "description": "Alunan musik bikin suasana akrab (+2 kepuasan)."
+    },
+    {
+      "id": "obat_nyamuk",
+      "category": "lingkungan",
+      "name": "Obat nyamuk bakar",
+      "cost": 60000,
+      "requires": {},
+      "effects": {
+        "satisfaction": 1,
+        "patience": 1
+      },
+      "description": "Tidak ada lagi nyamuk mengganggu."
+    },
+    {
+      "id": "kursi_tunggu",
+      "category": "lingkungan",
+      "name": "Bangku antre teduh",
+      "cost": 160000,
+      "requires": {
+        "upgrades": [
+          "bangku_tambahan"
+        ]
+      },
+      "effects": {
+        "patience": 4
+      },
+      "description": "Bangku khusus untuk yang menunggu tempat — antrean lebih sabar (+4 menit)."
+    },
+    {
+      "id": "toilet_umum",
+      "category": "lingkungan",
+      "name": "Toilet & tempat cuci tangan",
+      "cost": 350000,
+      "requires": {
+        "popularity": 30
+      },
+      "effects": {
+        "satisfaction": 2,
+        "patience": 2
+      },
+      "description": "Fasilitas bersih yang jarang dimiliki angkringan (+2 kepuasan, +2 menit kesabaran)."
+    }
+  ]
+}

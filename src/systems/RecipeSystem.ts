@@ -1,0 +1,112 @@
+import { effectsOf } from './UpgradeSystem';
+import type { GameState } from '../core/GameState';
+import type { Catalog, RecipeDef, UnlockCondition } from '../data/catalog';
+import { formatRupiah } from '../utils/formatting';
+import { unitCostOn } from './EconomySystem';
+import { totalQty } from './InventorySystem';
+
+/** Pesanan memasak: resep & jumlah porsi. */
+export interface CookOrder {
+  readonly recipeId: string;
+  readonly portions: number;
+}
+
+export interface Shortage {
+  readonly ingredientId: string;
+  readonly need: number;
+  readonly have: number;
+  readonly missing: number;
+}
+
+/** Kebutuhan bahan untuk sejumlah porsi satu resep. */
+export function requirementsFor(recipe: RecipeDef, portions: number): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const [id, qty] of Object.entries(recipe.ingredients)) out[id] = qty * portions;
+  return out;
+}
+
+/** Gabungkan kebutuhan beberapa pesanan sekaligus (bahan yang sama dijumlahkan). */
+export function aggregateRequirements(catalog: Catalog, orders: readonly CookOrder[]): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const order of orders) {
+    for (const [id, qty] of Object.entries(requirementsFor(catalog.recipe(order.recipeId), order.portions))) {
+      out[id] = (out[id] ?? 0) + qty;
+    }
+  }
+  return out;
+}
+
+/** Bahan yang kurang untuk memenuhi kebutuhan. */
+export function findShortages(state: Readonly<GameState>, requirements: Readonly<Record<string, number>>): Shortage[] {
+  const shortages: Shortage[] = [];
+  for (const [id, need] of Object.entries(requirements)) {
+    const have = totalQty(state.inventory.ingredients[id]);
+    if (have < need) shortages.push({ ingredientId: id, need, have, missing: need - have });
+  }
+  return shortages;
+}
+
+/** Porsi maksimum yang bisa dimasak dari stok saat ini. */
+export function maxPortions(state: Readonly<GameState>, recipe: RecipeDef): number {
+  let max = Number.POSITIVE_INFINITY;
+  for (const [id, need] of Object.entries(recipe.ingredients)) {
+    max = Math.min(max, Math.floor(totalQty(state.inventory.ingredients[id]) / need));
+  }
+  return Number.isFinite(max) ? max : 0;
+}
+
+/** Perkiraan modal per porsi berdasarkan harga bahan hari ini. */
+export function estimatedPortionCost(catalog: Catalog, recipe: RecipeDef, day: number): number {
+  let cost = 0;
+  for (const [id, qty] of Object.entries(recipe.ingredients)) cost += unitCostOn(catalog.ingredient(id), day) * qty;
+  return cost;
+}
+
+export function isUnlockMet(condition: UnlockCondition, state: Readonly<GameState>): boolean {
+  switch (condition.type) {
+    case 'start':
+      return true;
+    case 'popularity':
+      return state.player.popularity >= condition.min;
+    case 'money':
+      return state.player.money >= condition.min;
+    case 'level':
+      return effectsOf(state).businessLevel >= condition.min;
+  }
+}
+
+export function describeUnlock(condition: UnlockCondition): string {
+  switch (condition.type) {
+    case 'start':
+      return 'Tersedia sejak awal';
+    case 'popularity':
+      return `Terbuka saat popularitas ≥ ${condition.min}`;
+    case 'money':
+      return `Terbuka saat kas mencapai ${formatRupiah(condition.min)}`;
+    case 'level':
+      return `Butuh level usaha ${condition.min} (upgrade gerobak)`;
+  }
+}
+
+export function isRecipeUnlocked(state: Readonly<GameState>, recipeId: string): boolean {
+  return state.unlockedRecipes.includes(recipeId);
+}
+
+/** Buka resep yang syaratnya sudah terpenuhi. Sekali terbuka, resep tidak terkunci lagi. */
+export function refreshUnlocks(draft: GameState, catalog: Catalog): RecipeDef[] {
+  const opened: RecipeDef[] = [];
+  for (const recipe of catalog.recipes) {
+    if (!draft.unlockedRecipes.includes(recipe.id) && isUnlockMet(recipe.unlock, draft)) {
+      draft.unlockedRecipes.push(recipe.id);
+      opened.push(recipe);
+    }
+  }
+  return opened;
+}
+
+/** Bahan yang dipakai oleh minimal satu resep yang sudah terbuka. */
+export function ingredientsInUse(state: Readonly<GameState>, catalog: Catalog): Set<string> {
+  const used = new Set<string>();
+  for (const id of state.unlockedRecipes) for (const ing of Object.keys(catalog.recipe(id).ingredients)) used.add(ing);
+  return used;
+}

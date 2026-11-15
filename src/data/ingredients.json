@@ -1,0 +1,444 @@
+{
+  "version": 1,
+  "ingredients": [
+    {
+      "id": "beras",
+      "name": "Beras",
+      "unit": "porsi nasi",
+      "pack": "1 kg",
+      "packSize": 8,
+      "basePrice": 14000,
+      "shelfLifeDays": null,
+      "icon": {
+        "shape": "sack",
+        "color": "#efe6cf",
+        "accent": "#b99b6b"
+      }
+    },
+    {
+      "id": "telur",
+      "name": "Telur",
+      "unit": "butir",
+      "pack": "1 kg (16 butir)",
+      "packSize": 16,
+      "basePrice": 28000,
+      "shelfLifeDays": 10,
+      "icon": {
+        "shape": "egg",
+        "color": "#f3e3c3",
+        "accent": "#d9b98a"
+      }
+    },
+    {
+      "id": "sosis",
+      "name": "Sosis",
+      "unit": "buah",
+      "pack": "1 pak (10 buah)",
+      "packSize": 10,
+      "basePrice": 18000,
+      "shelfLifeDays": 5,
+      "icon": {
+        "shape": "sausage",
+        "color": "#c8553d",
+        "accent": "#8f3423"
+      }
+    },
+    {
+      "id": "tempe",
+      "name": "Tempe",
+      "unit": "potong",
+      "pack": "1 papan (10 potong)",
+      "packSize": 10,
+      "basePrice": 6000,
+      "shelfLifeDays": 2,
+      "icon": {
+        "shape": "block",
+        "color": "#d8c08a",
+        "accent": "#a8884e"
+      }
+    },
+    {
+      "id": "tahu",
+      "name": "Tahu",
+      "unit": "potong",
+      "pack": "10 potong",
+      "packSize": 10,
+      "basePrice": 6000,
+      "shelfLifeDays": 2,
+      "icon": {
+        "shape": "block",
+        "color": "#f2ead2",
+        "accent": "#c9bd98"
+      }
+    },
+    {
+      "id": "ati_ampela",
+      "name": "Ati ampela",
+      "unit": "tusuk",
+      "pack": "1/2 kg (12 tusuk)",
+      "packSize": 12,
+      "basePrice": 22000,
+      "shelfLifeDays": 1,
+      "icon": {
+        "shape": "skewer",
+        "color": "#7a2f2a",
+        "accent": "#5a1f1c"
+      }
+    },
+    {
+      "id": "ayam",
+      "name": "Ayam",
+      "unit": "tusuk",
+      "pack": "1/2 kg (12 tusuk)",
+      "packSize": 12,
+      "basePrice": 30000,
+      "shelfLifeDays": 2,
+      "icon": {
+        "shape": "skewer",
+        "color": "#e3b48a",
+        "accent": "#b9845a"
+      }
+    },
+    {
+      "id": "usus",
+      "name": "Usus",
+      "unit": "tusuk",
+      "pack": "1/2 kg (15 tusuk)",
+      "packSize": 15,
+      "basePrice": 15000,
+      "shelfLifeDays": 1,
+      "icon": {
+        "shape": "skewer",
+        "color": "#d9a86e",
+        "accent": "#a87842"
+      }
+    },
+    {
+      "id": "bakso",
+      "name": "Bakso",
+      "unit": "tusuk",
+      "pack": "1 pak (20 butir)",
+      "packSize": 20,
+      "basePrice": 25000,
+      "shelfLifeDays": 3,
+      "icon": {
+        "shape": "ball",
+        "color": "#9a7b62",
+        "accent": "#6e5442"
+      }
+    },
+    {
+      "id": "mi_instan",
+      "name": "Mi instan",
+      "unit": "bungkus",
+      "pack": "5 bungkus",
+      "packSize": 5,
+      "basePrice": 15000,
+      "shelfLifeDays": null,
+      "icon": {
+        "shape": "packet",
+        "color": "#e9c23a",
+        "accent": "#c0392b"
+      }
+    },
+    {
+      "id": "cabai",
+      "name": "Cabai",
+      "unit": "takar",
+      "pack": "1 ons (10 takar)",
+      "packSize": 10,
+      "basePrice": 5000,
+      "shelfLifeDays": 4,
+      "icon": {
+        "shape": "chili",
+        "color": "#d63a2a",
+        "accent": "#3f7d32"
+      }
+    },
+    {
+      "id": "bawang",
+      "name": "Bawang",
+      "unit": "takar",
+      "pack": "1/4 kg (20 takar)",
+      "packSize": 20,
+      "basePrice": 9000,
+      "shelfLifeDays": 14,
+      "icon": {
+        "shape": "onion",
+        "color": "#c98aa8",
+        "accent": "#8f4f6e"
+      }
+    },
+    {
+      "id": "kecap",
+      "name": "Kecap",
+      "unit": "takar",
+      "pack": "1 botol (25 takar)",
+      "packSize": 25,
+      "basePrice": 12000,
+      "shelfLifeDays": null,
+      "icon": {
+        "shape": "bottle",
+        "color": "#3a2418",
+        "accent": "#e8c35a"
+      }
+    },
+    {
+      "id": "minyak",
+      "name": "Minyak goreng",
+      "unit": "takar",
+      "pack": "1 liter (40 takar)",
+      "packSize": 40,
+      "basePrice": 18000,
+      "shelfLifeDays": null,
+      "icon": {
+        "shape": "bottle",
+        "color": "#f2c84a",
+        "accent": "#d9a520"
+      }
+    },
+    {
+      "id": "gula",
+      "name": "Gula",
+      "unit": "takar",
+      "pack": "1 kg (40 takar)",
+      "packSize": 40,
+      "basePrice": 16000,
+      "shelfLifeDays": null,
+      "icon": {
+        "shape": "bag",
+        "color": "#f6f3ea",
+        "accent": "#9fb8d6"
+      }
+    },
+    {
+      "id": "teh",
+      "name": "Teh",
+      "unit": "takar",
+      "pack": "1 pak (30 takar)",
+      "packSize": 30,
+      "basePrice": 7000,
+      "shelfLifeDays": null,
+      "icon": {
+        "shape": "bag",
+        "color": "#3f6e32",
+        "accent": "#c0392b"
+      }
+    },
+    {
+      "id": "kopi",
+      "name": "Kopi",
+      "unit": "takar",
+      "pack": "1 pak (20 takar)",
+      "packSize": 20,
+      "basePrice": 12000,
+      "shelfLifeDays": null,
+      "icon": {
+        "shape": "bag",
+        "color": "#5a3a24",
+        "accent": "#e8c35a"
+      }
+    },
+    {
+      "id": "sirup",
+      "name": "Sirup",
+      "unit": "gelas",
+      "pack": "1 botol (25 gelas)",
+      "packSize": 25,
+      "basePrice": 18000,
+      "shelfLifeDays": null,
+      "icon": {
+        "shape": "bottle",
+        "color": "#d6385a",
+        "accent": "#f2a0b8"
+      }
+    },
+    {
+      "id": "air_minum",
+      "name": "Air matang",
+      "unit": "gelas",
+      "pack": "1 galon (40 gelas)",
+      "packSize": 40,
+      "basePrice": 20000,
+      "shelfLifeDays": null,
+      "icon": {
+        "shape": "jug",
+        "color": "#9cc7e6",
+        "accent": "#2f6fa8"
+      },
+      "chilled": true
+    },
+    {
+      "id": "air_mineral",
+      "name": "Air mineral",
+      "unit": "botol",
+      "pack": "1 dus (24 botol)",
+      "packSize": 24,
+      "basePrice": 22000,
+      "shelfLifeDays": null,
+      "icon": {
+        "shape": "water",
+        "color": "#bfe3f5",
+        "accent": "#2f6fa8"
+      },
+      "chilled": true
+    },
+    {
+      "id": "es_batu",
+      "name": "Es batu",
+      "unit": "takar",
+      "pack": "1 kantong (20 takar)",
+      "packSize": 20,
+      "basePrice": 5000,
+      "shelfLifeDays": 1,
+      "icon": {
+        "shape": "cube",
+        "color": "#d6f0fb",
+        "accent": "#8fc4dd"
+      },
+      "chilled": true
+    },
+    {
+      "id": "jahe",
+      "name": "Jahe",
+      "unit": "takar",
+      "pack": "1/4 kg (20 takar)",
+      "packSize": 20,
+      "basePrice": 8000,
+      "shelfLifeDays": 10,
+      "icon": {
+        "shape": "onion",
+        "color": "#c9a05a",
+        "accent": "#8a6a32"
+      }
+    },
+    {
+      "id": "susu",
+      "name": "Susu kental manis",
+      "unit": "takar",
+      "pack": "1 kaleng (16 takar)",
+      "packSize": 16,
+      "basePrice": 14000,
+      "shelfLifeDays": null,
+      "icon": {
+        "shape": "bottle",
+        "color": "#f4f1ea",
+        "accent": "#d63a2a"
+      },
+      "chilled": true
+    },
+    {
+      "id": "arang",
+      "name": "Arang",
+      "unit": "bara",
+      "pack": "1 karung kecil (30 bara)",
+      "packSize": 30,
+      "basePrice": 9000,
+      "shelfLifeDays": null,
+      "icon": {
+        "shape": "sack",
+        "color": "#3a3436",
+        "accent": "#ff7a2f"
+      }
+    },
+    {
+      "id": "pisang",
+      "name": "Pisang kepok",
+      "unit": "buah",
+      "pack": "1 sisir (12 buah)",
+      "packSize": 12,
+      "basePrice": 15000,
+      "shelfLifeDays": 4,
+      "icon": {
+        "shape": "sausage",
+        "color": "#f2d04a",
+        "accent": "#8a6a22"
+      }
+    },
+    {
+      "id": "jagung",
+      "name": "Jagung manis",
+      "unit": "tongkol",
+      "pack": "1 ikat (6 tongkol)",
+      "packSize": 6,
+      "basePrice": 15000,
+      "shelfLifeDays": 4,
+      "icon": {
+        "shape": "sausage",
+        "color": "#f4c430",
+        "accent": "#5e8a32"
+      }
+    },
+    {
+      "id": "kacang",
+      "name": "Kacang tanah",
+      "unit": "porsi",
+      "pack": "1 kg (12 porsi)",
+      "packSize": 12,
+      "basePrice": 24000,
+      "shelfLifeDays": 6,
+      "icon": {
+        "shape": "bag",
+        "color": "#c79a5a",
+        "accent": "#7a5230"
+      }
+    },
+    {
+      "id": "roti",
+      "name": "Roti tawar",
+      "unit": "porsi",
+      "pack": "1 bungkus (6 porsi)",
+      "packSize": 6,
+      "basePrice": 16000,
+      "shelfLifeDays": 3,
+      "icon": {
+        "shape": "block",
+        "color": "#e9c88a",
+        "accent": "#a8743e"
+      }
+    },
+    {
+      "id": "bihun",
+      "name": "Bihun",
+      "unit": "porsi",
+      "pack": "1 pak (8 porsi)",
+      "packSize": 8,
+      "basePrice": 14000,
+      "shelfLifeDays": null,
+      "icon": {
+        "shape": "packet",
+        "color": "#f2eee2",
+        "accent": "#d6385a"
+      }
+    },
+    {
+      "id": "jeruk",
+      "name": "Jeruk peras",
+      "unit": "buah",
+      "pack": "1 kg (10 buah)",
+      "packSize": 10,
+      "basePrice": 18000,
+      "shelfLifeDays": 6,
+      "chilled": true,
+      "icon": {
+        "shape": "ball",
+        "color": "#f39a1e",
+        "accent": "#5e8a32"
+      }
+    },
+    {
+      "id": "cokelat",
+      "name": "Meses & selai cokelat",
+      "unit": "takar",
+      "pack": "1 toples (20 takar)",
+      "packSize": 20,
+      "basePrice": 22000,
+      "shelfLifeDays": null,
+      "icon": {
+        "shape": "jug",
+        "color": "#5a341e",
+        "accent": "#c98a4a"
+      }
+    }
+  ]
+}
