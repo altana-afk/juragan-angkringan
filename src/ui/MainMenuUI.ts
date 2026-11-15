@@ -1,5 +1,6 @@
 import { GAME_CONFIG } from '../config/gameConfig';
 import { CATALOG } from '../data/catalog';
+import { hasUnseenChangelog, openChangelog } from './ChangelogPanel';
 import { openGuide } from './GuidePanel';
 import type { SaveSummary } from '../systems/SaveSystem';
 import { installMode, onInstallModeChange, promptInstall } from '../pwa/pwa';
@@ -36,6 +37,13 @@ export class MainMenuUI implements UIComponent {
     onClick: () => void this.install(),
   });
   private readonly stopInstallWatch: () => void;
+  /** Ikon 📜 di pojok kanan atas untuk membuka lagi catatan pembaruan. */
+  private readonly changelogButton = el('button', {
+    className: 'changelog-btn',
+    attrs: { type: 'button', title: 'Apa yang baru (catatan pembaruan)', 'aria-label': 'Apa yang baru' },
+    children: [el('span', { text: '📜', attrs: { 'aria-hidden': 'true' } }), el('span', { className: 'changelog-dot', attrs: { 'aria-hidden': 'true' } })],
+    onClick: () => this.showChangelog(),
+  });
 
   constructor(
     private readonly ui: UIManager,
@@ -97,6 +105,7 @@ export class MainMenuUI implements UIComponent {
           ],
         }),
         el('p', { className: 'menu-footer', text: `v${GAME_CONFIG.version} · ${GAME_CONFIG.stage}` }),
+        this.changelogButton,
       ],
     });
     this.minorActions.append(guide, fullscreen, sound, about);
@@ -104,9 +113,12 @@ export class MainMenuUI implements UIComponent {
     this.renderSaveButtons();
     this.renderInstallButton();
     this.stopInstallWatch = onInstallModeChange(() => this.renderInstallButton());
+    this.changelogButton.classList.toggle('has-new', hasUnseenChangelog());
     requestAnimationFrame(() => {
       this.root.classList.add('is-visible');
       (this.actionsEl.querySelector('button') as HTMLButtonElement | null)?.focus({ preventScroll: true });
+      // Muncul sendiri sekali setiap ada versi baru; setelah itu hanya lewat ikon 📜.
+      if (hasUnseenChangelog() && !this.ui.hasOpenModal()) this.showChangelog();
     });
   }
 
@@ -206,6 +218,11 @@ export class MainMenuUI implements UIComponent {
       }),
       actions: [{ label: 'Mengerti', variant: 'primary' }],
     });
+  }
+
+  private showChangelog(): void {
+    openChangelog(this.ui);
+    this.changelogButton.classList.remove('has-new');
   }
 
   private showAbout(): void {

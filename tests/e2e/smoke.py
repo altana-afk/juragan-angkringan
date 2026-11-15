@@ -32,6 +32,11 @@ async def flow(browser, name, viewport, mobile):
 
     await page.goto(URL)
     await page.wait_for_selector('.main-menu.is-visible', timeout=60000)
+    # catatan pembaruan muncul sendiri sekali, lalu ditutup
+    await page.wait_for_selector('.sheet-changelog', timeout=5000)
+    checks['changelog_muncul_sekali'] = await page.is_visible('.sheet-changelog')
+    await click('.sheet-changelog .btn-primary'); await page.wait_for_timeout(300)
+    checks['changelog_titik_hilang'] = not await page.is_visible('.changelog-dot')
     await click('text=Mulai Bermain'); await page.wait_for_selector('.action-bar'); await page.wait_for_timeout(900)
     base = await page.evaluate(PROBE)
     checks['tutorial_tampil'] = await page.is_visible('.tutorial-coach.is-visible')
@@ -93,7 +98,11 @@ async def flow(browser, name, viewport, mobile):
 
     # ke menu & lanjutkan
     await click('text=Kembali ke menu utama'); await click('text=Ya, keluar')
-    await page.wait_for_selector('.main-menu.is-visible', timeout=20000); await page.wait_for_timeout(300)
+    await page.wait_for_selector('.main-menu.is-visible', timeout=20000); await page.wait_for_timeout(600)
+    checks['changelog_tidak_muncul_lagi'] = not await page.is_visible('.sheet-changelog')
+    await click('.changelog-btn'); await page.wait_for_selector('.sheet-changelog')
+    checks['changelog_lewat_ikon'] = await page.locator('.changelog-entry').count() >= 13
+    await page.keyboard.press('Escape'); await page.wait_for_timeout(300)
     await click('text=Lanjutkan'); await page.wait_for_selector('.action-bar'); await page.wait_for_timeout(1200)
     after = await page.evaluate(PROBE)
     checks['tidak_ada_panel_sendiri'] = after['modals'] == 0

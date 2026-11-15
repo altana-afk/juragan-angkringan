@@ -58,3 +58,16 @@ describe('panel Panduan & Info', () => {
     expect(describeEventEffects(eventById('hajatan'), CATALOG).join(' ')).toContain('makanan');
   });
 });
+
+describe('catatan pembaruan', () => {
+  it('entri teratas = versi game, urut dari terbaru ke versi pertama', async () => {
+    const { CHANGELOG } = await import('../src/data/changelog');
+    const { GAME_CONFIG } = await import('../src/config/gameConfig');
+    const { compareVersions } = await import('../src/ui/ChangelogPanel');
+    expect(CHANGELOG[0]?.version).toBe(GAME_CONFIG.version);
+    expect(CHANGELOG.at(-1)?.version).toBe('0.1.0');
+    for (let i = 1; i < CHANGELOG.length; i++) expect(compareVersions(CHANGELOG[i - 1]!.version, CHANGELOG[i]!.version)).toBeGreaterThan(0);
+    for (const e of CHANGELOG) expect(e.items.length).toBeGreaterThan(0);
+    expect(compareVersions('0.10.0', '0.9.0')).toBeGreaterThan(0);
+  });
+});

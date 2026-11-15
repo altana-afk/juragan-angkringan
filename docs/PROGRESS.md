@@ -320,6 +320,18 @@ Target: *satu siklus permainan dapat berjalan secara utuh.*
   dan "Masih terkunci".
 - 171 test (25 file) lulus, e2e desktop & ponsel LULUS.
 
+## Pembaruan 0.11.1 — Catatan Pembaruan
+
+- Panel **"Apa yang baru"** muncul sendiri **sekali** di halaman awal setiap kali versi game berubah
+  (versi terakhir yang dilihat disimpan di `localStorage`, terpisah dari save). Versi yang lebih baru dari
+  kunjungan terakhir diberi tanda "Baru".
+- Ikon **📜 di pojok kanan atas** halaman awal membuka panel itu lagi kapan saja; titik merah menandai ada
+  pembaruan yang belum dilihat.
+- Isinya riwayat lengkap 0.1.0 → sekarang (`src/data/changelog.ts`). **Saat menaikkan versi, tambahkan entri baru
+  di paling atas** — test memastikan entri teratas sama dengan `GAME_CONFIG.version`.
+- 172 test lulus; e2e desktop & ponsel LULUS (muncul sekali, tidak muncul lagi setelah kembali ke menu/reload,
+  bisa dibuka lewat ikon).
+
 ## Status akhir
 
 Ketujuh stage dari dokumen desain selesai. Ide lanjutan: lebih banyak peta/lokasi, event acak harian

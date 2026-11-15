@@ -1805,3 +1805,44 @@ button.hud-pill { font: inherit; color: inherit; cursor: pointer; text-align: le
 @media (min-width: 641px) {
   .guide-tabs { flex-wrap: wrap; }
 }
+
+/* ---------- Catatan pembaruan (changelog) ---------- */
+.changelog-btn {
+  position: absolute;
+  top: calc(var(--safe-top) + 14px);
+  right: calc(var(--safe-right, 0px) + 14px);
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+  border-radius: 12px;
+  border: 1px solid rgba(246, 196, 83, 0.45);
+  background: var(--c-panel-solid);
+  color: var(--c-text);
+  cursor: pointer;
+  pointer-events: auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+.changelog-btn:hover { border-color: var(--c-accent); }
+.changelog-btn:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 2px; }
+.changelog-dot {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--c-bad, #e5533d);
+  box-shadow: 0 0 0 2px var(--c-panel-solid);
+  display: none;
+}
+.changelog-btn.has-new .changelog-dot { display: block; }
+.changelog-list { display: flex; flex-direction: column; gap: 10px; }
+.changelog-entry { padding: 10px 12px; border-radius: 10px; background: rgba(0, 0, 0, 0.22); }
+.changelog-entry.is-latest { border: 1px solid rgba(246, 196, 83, 0.45); }
+.changelog-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin-bottom: 4px; }
+.changelog-head strong { color: var(--c-accent-strong); font-size: 15px; }
+.changelog-version { font: 700 12px/1 var(--font); color: var(--c-muted); padding: 3px 7px; border-radius: 6px; background: rgba(255, 255, 255, 0.07); }
+.changelog-entry .about-list { margin: 0; }
+.sheet-changelog { max-width: 640px; }
