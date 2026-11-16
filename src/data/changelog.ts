@@ -10,6 +10,13 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: readonly ChangelogEntry[] = [
   {
+    version: '0.14.3',
+    title: 'Daftar persiapan tetap tersimpan',
+    items: [
+      'Menu di Daftar persiapan tidak hilang lagi setelah tombol Masak ditekan. Hapus menu dengan tombol × atau Kosongkan.',
+    ],
+  },
+  {
     version: '0.14.2',
     title: 'Riwayat hari lebih lengkap',
     items: [

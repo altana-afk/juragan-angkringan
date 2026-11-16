@@ -328,12 +328,11 @@ export class KitchenPanel {
   private cook(orders: CookOrder[], onlyRecipe?: string): void {
     const result = this.ctx.actions.prepare(orders.filter((o) => o.portions > 0));
     if (result.ok) {
-      if (onlyRecipe) this.plan.delete(onlyRecipe);
-      else this.plan.clear();
+      // Menu tetap di Daftar persiapan supaya bisa langsung dimasak lagi (hapus manual lewat ×/Kosongkan).
       this.ctx.notify(`${result.message} Modal ${formatRupiah(result.value.totalCost)}.`, 'success');
     } else {
       this.ctx.notify(result.message, 'error', 5000);
     }
-    this.render();
+    this.render(onlyRecipe ? `plan-${onlyRecipe}` : null);
   }
 }
