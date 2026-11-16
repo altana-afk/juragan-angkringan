@@ -9,6 +9,8 @@ import { formatRupiah } from '../utils/formatting';
 import { el } from './dom';
 import { itemIcon } from './itemIcon';
 import type { UIManager } from './UIManager';
+import { openBranchReportDetail } from './BranchPanel';
+import { locationById } from '../data/locations';
 import { decisionAvailable, unreadImportant, unreadNews } from '../systems/StorySystem';
 import type { GameState } from '../core/GameState';
 
@@ -56,7 +58,7 @@ export function showDaySummary(ctx: GameContext, ui: UIManager): void {
     title: `Laporan Hari ${report.day}`,
     className: 'sheet sheet-report',
     dismissible: false,
-    body: el('div', { children: [storyReminder(ctx, state), renderReport(ctx, report)] }),
+    body: el('div', { children: [storyReminder(ctx, state), renderReport(ctx, report, ui)] }),
     actions: [
       {
         label: `Lanjutkan ke Hari ${report.day + 1}`,
@@ -70,7 +72,7 @@ export function showDaySummary(ctx: GameContext, ui: UIManager): void {
   });
 }
 
-export function renderReport(ctx: GameContext, r: DayReport): HTMLElement {
+export function renderReport(ctx: GameContext, r: DayReport, ui?: UIManager): HTMLElement {
   const catalog = ctx.catalog;
   const name = (id: string, kind: 'produk' | 'bahan' = 'produk'): string => (kind === 'bahan' ? catalog.ingredient(id).name : catalog.recipe(id).name);
   const icon = (id: string, kind: 'produk' | 'bahan' = 'produk'): HTMLImageElement =>
@@ -111,6 +113,9 @@ export function renderReport(ctx: GameContext, r: DayReport): HTMLElement {
           row('Biaya bahan baku', money(r.ingredientCost, '−')),
           row(`Biaya promosi${r.ads.length ? ` (${r.ads.map((a) => adById(a).name).join(', ')})` : ''}`, money(r.promotionCost, '−')),
           row('Biaya operasional / sewa', money(r.operationalCost, '−')),
+          r.online?.commission ? row('Komisi ojol', money(r.online.commission, '−')) : null,
+          r.online?.wage ? row('Gaji kurir', money(r.online.wage, '−')) : null,
+          r.online?.feesKept ? row('Ongkir pesanan online', money(r.online.feesKept, '+'), 'is-good') : null,
           r.bankIncome ? row('Bunga & bonus deposito', money(r.bankIncome, '+'), 'is-good') : null,
           r.loanCost ? row('Bunga pinjaman', money(r.loanCost, '−'), 'is-bad') : null,
           row('Keuntungan bersih', money(r.netProfit, r.netProfit >= 0 ? '+' : '−'), r.netProfit >= 0 ? 'is-good' : 'is-bad'),
@@ -123,6 +128,22 @@ export function renderReport(ctx: GameContext, r: DayReport): HTMLElement {
           row('Laba kotor (penjualan − modal produk terjual)', money(r.grossProfit, r.grossProfit >= 0 ? '+' : '−')),
         ],
       }),
+      ...branchSection(ctx, r, ui),
+      r.online
+        ? el('h3', { className: 'section-title', text: 'Pesanan online' })
+        : null,
+      r.online
+        ? el('div', {
+            className: 'report-grid',
+            children: [
+              row('Diterima / selesai', `${r.online.accepted} / ${r.online.delivered}${r.online.late ? ` (${r.online.late} terlambat)` : ''}`),
+              row('Batal (stok habis / tak terantar)', String(r.online.cancelled), r.online.cancelled ? 'is-bad' : ''),
+              row('Ditolak / tidak dijawab', `${r.online.rejected} / ${r.online.expired}`),
+              row('Pendapatan bersih online', money(r.online.gross - r.online.commission + r.online.feesKept - r.online.wage, r.online.gross - r.online.commission + r.online.feesKept - r.online.wage >= 0 ? '+' : '−'), 'is-good'),
+              row('Rating kemitraan', `${r.online.ratingChange >= 0 ? '+' : ''}${Math.round(r.online.ratingChange)} · popularitas ${r.online.popularityDelta >= 0 ? '+' : ''}${r.online.popularityDelta}`),
+            ],
+          })
+        : null,
       el('h3', { className: 'section-title', text: 'Pelanggan' }),
       el('div', {
         className: 'report-grid',
@@ -152,4 +173,47 @@ export function renderReport(ctx: GameContext, r: DayReport): HTMLElement {
       chips(r.wasted.map(([id, n, kind]) => chip(`${name(id, kind)} ${n} ${kind === 'bahan' ? catalog.ingredient(id).unit : 'porsi'}`, icon(id, kind)))),
     ],
   });
+}
+
+/** Ringkasan cabang di laporan harian: pendapatan & bersih per cabang + tombol rincian. */
+function branchSection(ctx: GameContext, r: DayReport, ui?: UIManager): HTMLElement[] {
+  const list = r.branches ?? [];
+  if (!list.length) return [];
+  const money = (v: number): string => `${v < 0 ? '−' : '+'}${formatRupiah(Math.abs(v))}`;
+  const total = list.reduce((s, b) => s + b.net, 0);
+  const warnings = list.filter((b) => (b.status !== 'penuh' && b.status !== 'tutup') || b.wageLate || b.staffQuit);
+  const nodes: (HTMLElement | null)[] = [
+    el('h3', { className: 'section-title', text: 'Cabang' }),
+    el('div', {
+      className: 'report-grid',
+      children: [
+        ...list.map((b) =>
+          el('div', {
+            className: `report-row ${b.net >= 0 ? 'is-good' : 'is-bad'}`,
+            children: [
+              el('span', { text: `${b.name} · ${locationById(b.mapId).name} — ${b.status === 'tutup' ? 'tutup' : `${b.portions} porsi, pendapatan ${formatRupiah(b.revenue)}`}` }),
+              el('strong', { text: money(b.net) }),
+            ],
+          }),
+        ),
+        el('div', { className: `report-row ${total >= 0 ? 'is-good' : 'is-bad'}`, children: [el('span', { text: 'Bersih semua cabang (sudah masuk kas)' }), el('strong', { text: money(total) })] }),
+      ],
+    }),
+    ...warnings.map((b) =>
+      el('p', {
+        className: 'panel-warning',
+        text: b.staffQuit
+          ? `${b.name}: karyawan keluar karena gaji telat 3× berturut-turut. Rekrut lagi di panel Cabang.`
+          : b.wageLate
+            ? `${b.name}: gaji telat karena kas kurang — kinerja karyawan turun.`
+            : b.status === 'tanpa_produk'
+              ? `${b.name}: buka tanpa produk — popularitas cabang turun. Kirim stok besok.`
+              : `${b.name}: buka tanpa karyawan — tidak ada yang berjualan.`,
+      }),
+    ),
+    ui
+      ? el('button', { className: 'btn btn-secondary btn-sm branch-detail-btn', text: 'Rincian cabang', attrs: { type: 'button' }, onClick: () => openBranchReportDetail(ctx, ui, list) })
+      : null,
+  ];
+  return nodes.filter((n): n is HTMLElement => n !== null);
 }

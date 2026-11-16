@@ -451,3 +451,32 @@ export function paintUmbrellaTable(): ArtEntry {
   });
   return { key: objectTextureKey('umbrella_table', 'green'), art };
 }
+
+/** Kunci tekstur pengantar pesanan online bermotor. */
+export const RIDER_KEYS = { ojol: 'rider-ojol', kurir: 'rider-kurir' } as const;
+
+/** Motor + pengendara berhelm + kotak antaran di belakang (pesanan online). */
+export function paintRiders(): ArtEntry[] {
+  const looks: [string, Color, Color, Color][] = [
+    // kunci, warna motor, jaket/helm, kotak
+    [RIDER_KEYS.ojol, 0x2b2b2f, 0x2fa04a, 0x2fa04a],
+    [RIDER_KEYS.kurir, 0xc0392b, 0xe08a2c, 0x2e6fb0],
+  ];
+  return looks.map(([key, bike, jacket, box]) => ({
+    key,
+    art: paintIsoSprite({ footW: 22, footD: 6, height: 30 }, (p) => {
+      drawMotorbike(p, bike);
+      // Kotak antaran di jok belakang.
+      p.box(0.5, 0.6, 9.6, 5, 5.2, 6, boxColors(box), { noise: 0.05, seed: 17 });
+      p.box(0.5, 0.6, 15.6, 5, 5.2, 0.6, shade(box, 1.2));
+      // Kaki, badan, lengan, kepala berhelm.
+      p.box(9, 1.6, 6, 2.4, 3.2, 4, 0x2b3550);
+      p.box(7.6, 1.4, 9.6, 3.4, 3.6, 6.4, boxColors(jacket));
+      p.box(11, 1.6, 13.4, 4.6, 1, 1.2, shade(jacket, 0.85));
+      p.box(11, 4.4, 13.4, 4.6, 1, 1.2, shade(jacket, 0.85));
+      p.box(8, 1.7, 16, 2.8, 3, 2.6, 0xe0b48a);
+      p.box(7.6, 1.4, 17.6, 3.6, 3.6, 2.6, boxColors(jacket));
+      p.box(10.6, 1.8, 17.2, 0.8, 2.8, 1.2, 0x9fd3f0);
+    }),
+  }));
+}

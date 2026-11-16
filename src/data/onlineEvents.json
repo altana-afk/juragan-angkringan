@@ -1,0 +1,38 @@
+{
+  "events": [
+    {
+      "id": "diskon_toko",
+      "name": "Diskon Toko Online",
+      "icon": "🏷️",
+      "description": "Aplikasi pesan-antar memasang diskon untuk warungmu. Harga pesanan online turun 15%, tapi pesanan yang masuk naik 50%.",
+      "chance": 0.25,
+      "orders": 1.5,
+      "price": 0.85,
+      "ratingGain": 1,
+      "minRating": 0
+    },
+    {
+      "id": "ulasan_viral",
+      "name": "Ulasan Viral",
+      "icon": "⭐",
+      "description": "Ulasan pelanggan tentang warungmu ramai dibagikan. Pesanan online naik 30% dan rating naik dua kali lebih cepat.",
+      "chance": 0.1,
+      "orders": 1.3,
+      "price": 1,
+      "ratingGain": 2,
+      "minRating": 70
+    },
+    {
+      "id": "aplikasi_gangguan",
+      "name": "Aplikasi Gangguan",
+      "icon": "📵",
+      "description": "Server aplikasi pesan-antar sedang bermasalah. Pesanan online yang masuk berkurang setengah.",
+      "chance": 0.08,
+      "orders": 0.5,
+      "price": 1,
+      "ratingGain": 1,
+      "minRating": 0
+    }
+  ],
+  "minGapDays": 3
+}

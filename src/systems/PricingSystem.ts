@@ -23,6 +23,25 @@ export function salePriceOf(state: Readonly<GameState>, recipe: RecipeDef): numb
   return state.prices[recipe.id] ?? recipe.salePrice;
 }
 
+/** Harga untuk pesanan online: harga khusus online jika diatur, selain itu harga di tempat. */
+export function onlinePriceOf(state: Readonly<GameState>, recipe: RecipeDef): number {
+  return state.online.prices[recipe.id] ?? salePriceOf(state, recipe);
+}
+
+/** Atur harga online (null = ikut harga di tempat). Batas sama dengan harga di tempat. */
+export function setOnlinePrice(draft: GameState, recipe: RecipeDef, price: number | null): number {
+  if (price === null) {
+    delete draft.online.prices[recipe.id];
+    return salePriceOf(draft, recipe);
+  }
+  if (!Number.isFinite(price)) throw new GameRuleError('price-invalid', 'Harga tidak valid.');
+  if (!draft.unlockedRecipes.includes(recipe.id)) throw new GameRuleError('recipe-locked', `${recipe.name} belum terbuka.`);
+  const { min, max } = priceBounds(recipe);
+  const next = Math.min(max, Math.max(min, Math.round(price / PRICE_RULES.step) * PRICE_RULES.step));
+  draft.online.prices[recipe.id] = next;
+  return next;
+}
+
 export function priceRatio(state: Readonly<GameState>, recipe: RecipeDef): number {
   return salePriceOf(state, recipe) / recipe.salePrice;
 }

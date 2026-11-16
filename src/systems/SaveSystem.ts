@@ -1,4 +1,4 @@
-import { createEmptyBank, createEmptyLedger, createInitialState, createStoryState, validateState, type GameState } from '../core/GameState';
+import { createEmptyBank, createEmptyLedger, createInitialState, createOnlineState, createBranchesState, createStoryState, validateState, type GameState } from '../core/GameState';
 import { CATALOG, type Catalog } from '../data/catalog';
 
 /**
@@ -7,7 +7,7 @@ import { CATALOG, type Catalog } from '../data/catalog';
  * sehingga save lama tetap bisa dimuat setelah game diperbarui.
  */
 
-export const SAVE_VERSION = 9;
+export const SAVE_VERSION = 12;
 export const SAVE_KEY = 'juragan-angkringan:save';
 
 export interface StorageLike {
@@ -107,6 +107,12 @@ const MIGRATIONS: Record<number, Migration> = {
       lastReport: report ? { moveCost: 0, mapId: s.mapId ?? 'main-street', ...report } : null,
     };
   },
+  // v9 → v10 (0.13.0): pesanan online. Pemain lama belum memilih cara mengantar.
+  9: (s) => ({ ...s, online: createOnlineState() }),
+  // v10 → v11 (0.13.3): sakelar pesanan online & harga khusus online.
+  10: (s) => ({ ...s, online: { ...(s.online as object), enabled: true, prices: {} } }),
+  // v11 → v12 (0.14.0): cabang angkringan.
+  11: (s) => ({ ...s, branches: createBranchesState() }),
   // v8 → v9 (0.12.0): cerita kampung. Save lama memulai cerita dari hari saat ini (tanpa banjir kabar lama).
   8: (s) => {
     const calendar = (s.calendar ?? { day: 1 }) as GameState['calendar'];

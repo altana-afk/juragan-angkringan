@@ -442,6 +442,59 @@
         "patience": 2
       },
       "description": "Fasilitas bersih yang jarang dimiliki angkringan (+2 kepuasan, +2 menit kesabaran)."
+    },
+    {
+      "id": "sistem_pemesanan",
+      "category": "online",
+      "name": "Sistem pemesanan",
+      "cost": 300000,
+      "requires": {
+        "day": 2
+      },
+      "effects": {
+        "onlineLimit": 3
+      },
+      "description": "Tablet kasir khusus pesanan online. Batas pesanan online harian +3."
+    },
+    {
+      "id": "sistem_pemesanan_2",
+      "category": "online",
+      "name": "Sistem pemesanan lanjutan",
+      "cost": 500000,
+      "requires": {
+        "upgrades": [
+          "sistem_pemesanan"
+        ],
+        "popularity": 30
+      },
+      "effects": {
+        "onlineLimit": 3
+      },
+      "description": "Notifikasi otomatis dan cetak struk. Batas pesanan online harian +3 lagi."
+    },
+    {
+      "id": "motor_kurir",
+      "category": "online",
+      "name": "Motor kurir",
+      "cost": 400000,
+      "requires": {
+        "day": 3
+      },
+      "effects": {
+        "courierSpeed": 0.25
+      },
+      "description": "Motor bebek yang lebih bertenaga. Perjalanan kurir sendiri 25% lebih cepat."
+    },
+    {
+      "id": "kotak_termos",
+      "category": "online",
+      "name": "Kotak termos",
+      "cost": 150000,
+      "requires": {},
+      "effects": {
+        "thermal": 20
+      },
+      "description": "Kotak antar berinsulasi. Makanan yang diantar kurir sendiri tetap hangat 20 menit lebih lama."
     }
   ]
 }

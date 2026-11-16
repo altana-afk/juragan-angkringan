@@ -5,6 +5,7 @@ import type { SimSpeed } from '../core/GameEvents';
 import { CUSTOMER_TYPES } from '../data/customers';
 import { SalesSimulation, SIM_CONFIG } from '../systems/SalesSimulation';
 import type { UIManager } from '../ui/UIManager';
+import { RiderLayer } from './RiderLayer';
 import { CustomerLayer, type TalkMark } from './CustomerLayer';
 import { canTalkToday, planVisits, talkContent } from '../systems/StorySystem';
 import { closeDialogue, isDialogueOpen, openDialogue } from '../ui/DialoguePanel';
@@ -19,6 +20,7 @@ import type { MapData } from './MapData';
 export class SalesController {
   private sim: SalesSimulation | null = null;
   private readonly layer: CustomerLayer;
+  private readonly riders: RiderLayer;
   private speed: SimSpeed = 1;
   private readonly offs: (() => void)[] = [];
   private statusTimer = 0;
@@ -33,6 +35,7 @@ export class SalesController {
       mark: (group) => this.talkMark(group),
       onTap: (group) => this.talk(group),
     });
+    this.riders = new RiderLayer(scene, map);
     this.offs.push(
       ctx.bus.on('sales:set-speed', ({ speed }) => this.setSpeed(speed)),
       ctx.bus.on('sales:start-request', () => this.requestStart()),
@@ -114,6 +117,7 @@ export class SalesController {
     if (this.speed > 0 && !this.ui.isTimeHeld()) {
       const minutes = (Math.min(deltaMs, 100) / 1000) * SIM_CONFIG.minutesPerSecond * this.speed;
       const events = sim.advance(minutes);
+      this.tickOnline();
       this.layer.handleEvents(events);
       for (const e of events) {
         if (e.type === 'named-arrive') this.namedArrived(e.visit);
@@ -121,12 +125,38 @@ export class SalesController {
         if (e.type === 'ended') this.end();
       }
     }
-    this.layer.sync(this.sim?.groups ?? [], this.speed > 0 && !this.ui.isTimeHeld() ? deltaMs : 0);
+    const visibleDelta = this.speed > 0 && !this.ui.isTimeHeld() ? deltaMs : 0;
+    this.layer.sync(this.sim?.groups ?? [], visibleDelta);
+    // Motor ikut kecepatan permainan agar datang/pergi selaras dengan jadwal pesanan.
+    this.riders.sync(this.ctx.store.get(), visibleDelta * Math.min(this.speed, 2));
     this.statusTimer -= deltaMs;
     if (this.sim && this.statusTimer <= 0) {
       this.statusTimer = 250;
       this.ctx.bus.emit('sales:status', { seatsTaken: this.sim.seatsTaken, seatsTotal: this.sim.seatsTotal, groups: this.sim.groups.length });
     }
+  }
+
+  /** Pesanan online berjalan per menit permainan, mengikuti jam simulasi. */
+  private onlineMinute = -1;
+  private tickOnline(): void {
+    const now = this.ctx.store.get().calendar.clockMinutes;
+    if (this.onlineMinute < 0) this.onlineMinute = now - 1;
+    for (let m = this.onlineMinute + 1; m <= now; m++) {
+      for (const e of this.ctx.actions.onlineTick(m)) {
+        if (e.kind === 'baru') {
+          getAudio(this.scene)?.play('chime');
+          // Pelankan ke 1× agar pemain sempat membaca pesanan sebelum waktunya habis.
+          const slowed = this.speed > 1;
+          if (slowed) this.setSpeed(1);
+          this.ctx.notify(`📱 ${e.message} Ketuk Pesanan untuk menjawab.${slowed ? ' Kecepatan diturunkan ke 1×.' : ''}`, 'info', 4000);
+          if (!this.ctx.store.get().online.flags.orderHint) this.ctx.bus.emit('story:hint', { show: true, kind: 'order' });
+        } else if (e.kind === 'batal') this.ctx.notify(`❌ ${e.message}`, 'error', 5000);
+        else if (e.kind === 'kedaluwarsa') this.ctx.notify(`⌛ ${e.message}`, 'warning', 3500);
+        else if (e.kind === 'berangkat') this.ctx.notify(`🛵 ${e.message}`, 'info', 3000);
+        else if (e.kind === 'selesai' && e.order.late) this.ctx.notify(`🐢 ${e.message} Rating turun.`, 'warning', 3500);
+      }
+    }
+    this.onlineMinute = now;
   }
 
   private talkMark(group: Group): TalkMark {
@@ -164,6 +194,7 @@ export class SalesController {
   private end(): void {
     this.sim = null;
     this.layer.clear();
+    this.riders.clear();
     this.ctx.actions.finishSelling();
     this.ctx.bus.emit('sales:ended');
   }
@@ -173,6 +204,7 @@ export class SalesController {
     window.removeEventListener('keydown', this.onKey);
     closeDialogue();
     this.layer.clear();
+    this.riders.clear();
     this.sim = null;
   }
 }

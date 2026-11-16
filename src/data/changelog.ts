@@ -10,6 +10,58 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: readonly ChangelogEntry[] = [
   {
+    version: '0.14.0',
+    title: 'Cabang Angkringan',
+    items: [
+      'Buka sampai 3 cabang lewat Usaha → Cabang.',
+      'Cabang berjualan sendiri di latar belakang selama jam jualan toko utama — asal punya karyawan dan produk yang kamu kirim dari toko utama.',
+      'Rekrut karyawan dengan gaji harian, mingguan, atau bulanan. Lebih murah berarti terikat lebih lama; gaji telat menurunkan kinerja, telat 3× karyawan keluar.',
+      'Cabang buka membayar sewa + operasional setiap hari. Tutup sementara cabang yang tidak dipakai, atau pindahkan ke lokasi lain.',
+      'Satu lokasi hanya untuk satu angkringan yang buka, dan cabang mengikuti event harian di lokasinya.',
+      '5 upgrade yang tersedia untuk cabang',
+      'Laporan harian menampilkan hasil tiap cabang, dengan rincian terjual, tersisa, dan terbuang.',
+    ],
+  },
+  {
+    version: '0.13.3',
+    title: 'Pengaturan pesanan online',
+    items: [
+      'Panel Pengantaran menampilkan rating kemitraan dengan bintang di bagian atas.',
+      'Sakelar baru untuk membuka atau menutup pesanan online kapan saja. Pesanan yang sudah diterima tetap diantar.',
+      'Harga menu online bisa diatur terpisah dari harga di tempat. Harga yang lebih mahal membuat pesanan online lebih jarang masuk.',
+      'Kurir sendiri tidak lagi dibatasi 2× antar per hari — Mas Joko bolak-balik sepanjang jam jualan (tetap maks. 3 pesanan sekali antar).',
+    ],
+  },
+  {
+    version: '0.13.2',
+    title: 'Pengantar bermotor',
+    items: [
+      'Driver ojol kini terlihat datang naik motor ke jalan di samping gerobak, berhenti mengambil pesanan, lalu berangkat mengantar.',
+      'Kurir sendiri siaga dengan motornya di samping gerobak, berangkat saat mengantar, dan kembali siaga setelah pesanan selesai.',
+    ],
+  },
+  {
+    version: '0.13.1',
+    title: 'Saringan menu dapur & pesanan lebih santai',
+    items: [
+      'Panel Persiapan Dapur punya tombol Semua / Makanan / Minuman di judul Menu, jadi pemain ponsel tidak perlu menggulir jauh untuk membuat minuman.',
+      'Saat pesanan online masuk dan kecepatan 2× atau 3×, permainan otomatis kembali ke 1× agar sempat membaca pesanan.',
+    ],
+  },
+  {
+    version: '0.13.0',
+    title: 'Pesanan Online & tombol baru',
+    items: [
+      'Pesanan online! Saat berjualan, pesanan dari luar warung masuk lewat tombol Pesanan (atau O). Terima atau tolak sebelum waktunya habis.',
+      'Pilih cara mengantar di Usaha → Pengantaran: kurir sendiri (gaji harian, ongkir masuk kas) atau kemitraan ojol (tanpa gaji, komisi 20%).',
+      'Pesanan memakai stok yang sama dengan pembeli di tempat. Kalau stok keburu habis, pesanan batal dan rating turun.',
+      'Rating kemitraan, catatan pembeli, hujan yang memperlambat kurir, dan 4 upgrade baru: sistem pemesanan (2 tingkat), motor kurir, kotak termos.',
+      'Event pesanan online seperti Diskon Toko Online. Kalau ada dua event sekaligus, chip di atas menampilkan "2 event".',
+      'Bar bawah lebih ringkas: Upgrade, Promosi, Statistik, dan Bank kini ada di tombol Usaha. Bank juga bisa dibuka dengan mengetuk kas.',
+      'Info kursi pindah ke chip kecil di atas layar. Pintasan keyboard lama tetap berlaku.',
+    ],
+  },
+  {
     version: '0.12.1',
     title: 'Suara jangkrik lebih nyaman',
     items: [

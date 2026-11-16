@@ -10,6 +10,7 @@ import { formatClock, formatRupiah, formatRupiahShort } from '../utils/formattin
 import { el, replayAnimation, setText, type UIComponent } from './dom';
 import { icon, type IconName } from './icons';
 import { storyBadgeCount } from './StoryPanel';
+import { activeOnlineEvent } from '../systems/OnlineEventSystem';
 import { unreadNews } from '../systems/StorySystem';
 
 const PHASE_LABELS: Record<GamePhase, string> = {
@@ -46,8 +47,11 @@ export class HUD implements UIComponent {
   private readonly offState: () => void;
   private readonly eventChip: HTMLElement;
   private readonly locationChip: HTMLElement;
+  /** Kursi terisi saat berjualan (pindah dari bar bawah di 0.13.0). */
+  private readonly seatChip = el('span', { className: 'hud-event hud-seats', attrs: { title: 'Kursi terisi', hidden: '' } });
   private readonly storyBadge = el('span', { className: 'hud-badge' });
   private readonly storyButton: HTMLElement;
+  private readonly offSeats: () => void;
 
   constructor(ctx: GameContext, parent: HTMLElement) {
     this.moneyPill = el('button', {
@@ -78,7 +82,7 @@ export class HUD implements UIComponent {
     });
     const clock = el('div', {
       className: 'hud-center',
-      children: [clockPill, el('div', { className: 'hud-chips', children: [this.locationChip, this.eventChip] })],
+      children: [clockPill, el('div', { className: 'hud-chips', children: [this.locationChip, this.eventChip, this.seatChip] })],
     });
     this.popPill = el('div', {
       className: 'hud-pill hud-pop',
@@ -99,10 +103,15 @@ export class HUD implements UIComponent {
       attrs: { title: 'Cuaca hari ini' },
       children: [this.weatherIcon, this.weatherValue],
     });
+    this.offSeats = ctx.bus.on('sales:status', ({ seatsTaken, seatsTotal }) => {
+      this.seatChip.hidden = ctx.store.get().phase !== 'berjualan';
+      setText(this.seatChip, `🪑 ${seatsTaken}/${seatsTotal}`);
+      this.seatChip.title = `Kursi terisi ${seatsTaken} dari ${seatsTotal}`;
+    });
     this.storyButton = el('button', {
       className: 'hud-btn hud-story',
       attrs: { type: 'button', 'aria-label': 'Kabar Kampung', title: 'Kabar Kampung (N)' },
-      children: [el('span', { className: 'hud-story-icon', text: '📰', attrs: { 'aria-hidden': 'true' } }), el('span', { className: 'hud-story-label', text: 'Kabar Kampung' }), this.storyBadge],
+      children: [el('span', { className: 'hud-story-icon', text: '📰', attrs: { 'aria-hidden': 'true' } }), this.storyBadge],
       onClick: () => ctx.bus.emit('ui:open-panel', { panel: 'story' }),
     });
     const menuButton = el('button', {
@@ -147,8 +156,14 @@ export class HUD implements UIComponent {
     setText(this.locationChip, `📍 ${locationOf(state).name}`);
     this.locationChip.classList.toggle('can-move', state.phase === 'persiapan' && state.lastMoveDay !== state.calendar.day);
     const ev = state.event ? eventById(state.event.id) : null;
-    this.eventChip.hidden = !ev;
-    if (ev) setText(this.eventChip, `${ev.icon} ${ev.name}${state.event?.bulk?.status === 'menunggu' ? ' !' : ''}`);
+    const online = activeOnlineEvent(state);
+    this.eventChip.hidden = !ev && !online;
+    // Dua event (harian + online) → "2 event"; ketuk untuk membuka daftar.
+    if (ev && online) setText(this.eventChip, `🎉 2 event${state.event?.bulk?.status === 'menunggu' ? ' !' : ''}`);
+    else if (ev) setText(this.eventChip, `${ev.icon} ${ev.name}${state.event?.bulk?.status === 'menunggu' ? ' !' : ''}`);
+    else if (online) setText(this.eventChip, `${online.icon} ${online.name}`);
+    this.eventChip.title = [ev?.name, online?.name].filter(Boolean).join(' · ');
+    if (state.phase !== 'berjualan') this.seatChip.hidden = true;
     setText(this.dateValue, formatDateShort(state.calendar.day));
     setText(this.clockValue, formatClock(state.calendar.clockMinutes));
     setText(this.phaseValue, PHASE_LABELS[state.phase]);
@@ -206,6 +221,7 @@ export class HUD implements UIComponent {
 
   destroy(): void {
     this.offState();
+    this.offSeats();
     this.root.remove();
   }
 }

@@ -13,7 +13,7 @@ export interface StateChange {
 }
 
 /** Daftar seluruh event lintas modul beserta tipe payload-nya. */
-export type PanelId = 'shop' | 'kitchen' | 'promo' | 'stats' | 'upgrade' | 'storage' | 'bank' | 'achievements' | 'event' | 'location' | 'guide' | 'story';
+export type PanelId = 'shop' | 'kitchen' | 'promo' | 'stats' | 'upgrade' | 'storage' | 'bank' | 'achievements' | 'event' | 'location' | 'guide' | 'story' | 'orders' | 'delivery' | 'branches';
 
 export interface GameEvents {
   'state:changed': StateChange;
@@ -35,7 +35,7 @@ export interface GameEvents {
   'sales:ended': void;
   'ui:open-panel': { panel: PanelId; tab?: string };
   /** Petunjuk sekali "ketuk gelembung" (cerita). */
-  'story:hint': { show: boolean };
+  'story:hint': { show: boolean; kind?: 'bubble' | 'order' | 'bar' | 'branch' };
   /** Kabar dari sistem cerita (bab baru, tahap hubungan, akhir). */
   'story:notice': import('../systems/GameActions').StoryNotice;
   /** Upgrade dibeli: dunia dibangun ulang agar objek/varian baru tampil. */

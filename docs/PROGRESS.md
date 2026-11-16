@@ -360,6 +360,24 @@ Implementasi `claude/rencana-0.12.0.md` dengan isi cerita dari `claude/alur-ceri
   hubungan, alur penuh pemain rajin → akhir lengkap, pemain cuek tetap sampai keputusan, efek pilihan, migrasi, simulasi);
   e2e desktop & ponsel LULUS; uji browser gelembung → dialog → log → keputusan → akhir di desktop & ponsel mendatar.
 
+## Pembaruan 0.13.x — Pesanan Online
+
+- 0.13.0: pesanan online (kurir sendiri / kemitraan ojol), rating kemitraan, event online, 4 upgrade; bar bawah ringkas + lembar Usaha; info kursi di HUD.
+- 0.13.1: filter Semua/Makanan/Minuman di menu dapur; kecepatan otomatis 1× saat pesanan online masuk.
+- 0.13.2: pengantar bermotor terlihat di jalan samping gerobak (`world/RiderLayer.ts`).
+- 0.13.3: sakelar buka/tutup pesanan online, harga menu online terpisah (dengan filter), rating berbintang; kurir sendiri tanpa batas antar.
+
+## Pembaruan 0.14.0 — Cabang Angkringan
+
+| Item | Status | Catatan |
+| --- | --- | --- |
+| Data | ✅ | `branches.json` (3 slot: Rp1,5/3/5 jt, level usaha 2/3/4, popularitas 40/55/70), `branchUpgrades.json` (5), `branchStaff.json` (harian/mingguan/bulanan) |
+| State & save | ✅ | `GameState.branches`, save v12 (save lama tanpa cabang tetap bisa dimuat) |
+| Sistem | ✅ | `BranchSystem` (buka, tutup, pindah, upgrade, penjualan latar belakang saat tutup hari), `BranchStatusSystem`, `BranchStaffSystem` (gaji, ikatan, telat, keluar), `BranchSupplySystem` (kirim stok FEFO, ongkir gratis bila kurir sendiri/motor cabang) |
+| Aturan lokasi | ✅ | Satu lokasi untuk satu angkringan buka (termasuk toko utama); cabang ikut event harian lokasinya |
+| UI | ✅ | Cabang di lembar Usaha (titik merah), `ui/BranchPanel.ts` (slot, detail, pilih lokasi, kirim stok, upgrade), bagian Cabang di laporan + rincian (kartu di < 480 px), Panduan, petunjuk sekali |
+| Tes | ✅ | `tests/branches.test.ts`, `tests/branchLocation.test.ts` — 227 test lulus |
+
 ## Status akhir
 
 Ketujuh stage dari dokumen desain selesai. Ide lanjutan: lebih banyak peta/lokasi, event acak harian

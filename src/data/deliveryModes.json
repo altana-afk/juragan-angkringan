@@ -1,0 +1,41 @@
+{
+  "modes": [
+    {
+      "id": "kurir",
+      "name": "Kurir sendiri",
+      "icon": "🛵",
+      "description": "Mas Joko mengantar dengan motormu. Gaji harian tetap, tanpa komisi, dan ongkir masuk ke kasmu.",
+      "dailyWage": 40000,
+      "commission": 0,
+      "keepsFee": true,
+      "batchSize": 3,
+      "waitMinutes": [0, 0],
+      "courierName": "Mas Joko"
+    },
+    {
+      "id": "ojol",
+      "name": "Kemitraan ojol",
+      "icon": "🟢",
+      "description": "Driver ojol menjemput tiap pesanan. Tanpa gaji harian, tapi platform memotong komisi 20% dan ongkir untuk driver.",
+      "dailyWage": 0,
+      "commission": 0.2,
+      "keepsFee": false,
+      "batchSize": 1,
+      "waitMinutes": [5, 12],
+      "courierName": "Driver ojol"
+    }
+  ],
+  "rules": {
+    "deliveryFee": 6000,
+    "baseDailyLimit": 5,
+    "acceptWindow": 10,
+    "prepMinutes": 3,
+    "minutesPerKm": 4,
+    "stopMinutes": 2,
+    "dueSlack": 5,
+    "rainSlowdown": 0.5,
+    "hotMinutes": 25,
+    "startRating": 60,
+    "kurirDispatchWait": 8
+  }
+}

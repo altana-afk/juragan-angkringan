@@ -11,7 +11,7 @@ import { itemIcon, stepper } from './itemIcon';
 import { expiryText } from './ShopPanel';
 import type { ModalHandle, UIManager } from './UIManager';
 
-const CATEGORY_LABEL: Record<RecipeDef['category'], string> = {
+export const CATEGORY_LABEL: Record<RecipeDef['category'], string> = {
   makanan: 'Makanan',
   gorengan: 'Gorengan',
   sate: 'Sate & bakaran',
@@ -28,6 +28,8 @@ export class KitchenPanel {
   private modal: ModalHandle | null = null;
   private offState: (() => void) | null = null;
   private readonly menuEl = el('div', { className: 'recipe-grid' });
+  private menuFilter: 'semua' | 'makanan' | 'minuman' = 'semua';
+  private readonly filterEl = el('div', { className: 'menu-filter', attrs: { role: 'group', 'aria-label': 'Saring menu' } });
   private readonly planEl = el('div', { className: 'plan-list' });
   private readonly stockEl = el('div', { className: 'product-stock' });
   private readonly summaryEl = el('div', { className: 'panel-note' });
@@ -57,7 +59,7 @@ export class KitchenPanel {
       children: [
         el('h3', { className: 'section-title', text: 'Daftar persiapan' }),
         this.planEl,
-        el('h3', { className: 'section-title', text: 'Menu' }),
+        el('div', { className: 'menu-head', children: [el('h3', { className: 'section-title', text: 'Menu' }), this.filterEl] }),
         this.menuEl,
         el('h3', { className: 'section-title', text: 'Siap dijual' }),
         this.stockEl,
@@ -146,14 +148,36 @@ export class KitchenPanel {
         ],
       });
     };
-    const open = sorted.filter((r) => state.unlockedRecipes.includes(r.id));
-    const locked = sorted.filter((r) => !state.unlockedRecipes.includes(r.id));
+    this.renderFilter();
+    const shown = sorted.filter((r) => this.menuFilter === 'semua' || (this.menuFilter === 'minuman') === isDrink(r));
+    const open = shown.filter((r) => state.unlockedRecipes.includes(r.id));
+    const locked = shown.filter((r) => !state.unlockedRecipes.includes(r.id));
     const group = (title: string, list: RecipeDef[], extra = ''): HTMLElement[] =>
       list.length ? [el('div', { className: `recipe-group-title${extra}`, text: `${title} · ${list.length}` }), ...list.map(card)] : [];
     this.menuEl.replaceChildren(
       ...group('Makanan', open.filter((r) => !isDrink(r))),
       ...group('Minuman', open.filter(isDrink)),
       ...group('🔒 Masih terkunci', locked, ' is-locked'),
+    );
+  }
+
+  /** Tombol saring Semua / Makanan / Minuman agar pemain ponsel tidak perlu menggulir jauh. */
+  private renderFilter(): void {
+    const opts = [['semua', 'Semua'], ['makanan', 'Makanan'], ['minuman', 'Minuman']] as const;
+    this.filterEl.replaceChildren(
+      ...opts.map(([id, label]) =>
+        el('button', {
+          className: `filter-btn${this.menuFilter === id ? ' is-active' : ''}`,
+          text: label,
+          attrs: { type: 'button', 'aria-pressed': String(this.menuFilter === id) },
+          onClick: () => {
+            if (this.menuFilter === id) return;
+            this.menuFilter = id;
+            this.render();
+            this.filterEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          },
+        }),
+      ),
     );
   }
 

@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "upgrades": [
+    { "id": "lemari_pendingin", "name": "Lemari pendingin", "icon": "🧊", "cost": 400000, "description": "Produk yang dikirim ke cabang tahan 1 hari lebih lama — lebih sedikit yang basi.", "effects": { "shelfDays": 1 } },
+    { "id": "pelatihan_karyawan", "name": "Pelatihan karyawan", "icon": "🎓", "cost": 300000, "description": "Kinerja karyawan naik 15% tanpa menaikkan gaji.", "effects": { "performance": 0.15 } },
+    { "id": "kasir_buku", "name": "Kasir & buku catatan", "icon": "📒", "cost": 250000, "description": "Selisih kas berkurang 60%.", "effects": { "shrinkFactor": 0.4 } },
+    { "id": "papan_promosi", "name": "Papan promosi lokal", "icon": "🪧", "cost": 350000, "description": "Pembeli cabang +15% dan popularitas cabang naik 0,5 per hari buka penuh.", "effects": { "demand": 0.15, "popularityPerDay": 0.5 } },
+    { "id": "motor_cabang", "name": "Motor pengantar cabang", "icon": "🛵", "cost": 500000, "description": "Cabang ikut menerima pesanan online (+20% penjualan) dan kirim stok ke cabang gratis ongkir.", "effects": { "demand": 0.2, "freeShipping": true } }
+  ]
+}

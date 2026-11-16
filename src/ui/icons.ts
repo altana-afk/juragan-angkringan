@@ -12,6 +12,14 @@ interface IconDef {
 const WHITE = { w: 0xfff3df };
 
 const ICONS = {
+  briefcase: {
+    rows: ['...ooo...', '...o.o...', 'ooooooooo', 'obbbbbbbo', 'obbbybbbo', 'oBBByBBBo', 'obbbbbbbo', 'obbbbbbbo', 'ooooooooo'],
+    palette: { o: 0x3a2414, b: 0xa86a3a, B: 0x7a4a26, y: 0xf2c14e },
+  },
+  phone: {
+    rows: ['.ooooooo.', '.oKKKKKo.', '.oKgggKo.', '.oKgwgKo.', '.oKgggKo.', '.oKgggKo.', '.oKKKKKo.', '.oKKwKKo.', '.ooooooo.'],
+    palette: { o: 0x1a1418, K: 0x3a3440, g: 0x5fd47a, w: 0xfff3df },
+  },
   coin: {
     rows: ['..ooooo..', '.oYYyyyo.', 'oYyyyyydo', 'oYyyoyydo', 'oyyyoyydo', 'oyyyoyydo', 'oyyyyyddo', '.oyddddo.', '..ooooo..'],
     palette: { o: 0x5a3a10, y: 0xf2c14e, Y: 0xfff0a0, d: 0xc7902a },

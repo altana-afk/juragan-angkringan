@@ -4,6 +4,7 @@ import { ECONOMY_CONFIG } from '../config/economyConfig';
 import { GAME_CONFIG } from '../config/gameConfig';
 import { CATALOG, type Catalog } from '../data/catalog';
 import type { ChoiceId, EndingId, RelationStage } from '../data/story';
+import type { WagePlanId } from '../data/branches';
 
 export type WeatherKind = 'cerah' | 'berawan' | 'hujan' | 'panas';
 
@@ -177,6 +178,179 @@ export interface DayReport {
   event: DailyEvent | null;
   /** Hari berturut-turut kas minus (peringatan bangkrut). */
   debtDays: number;
+  /** Pesanan online hari itu (0.13.0). Tidak ada di laporan lama. */
+  online?: OnlineDayReport | null;
+  /** Hasil cabang hari ini (0.14.0). */
+  branches?: BranchDayReport[] | null;
+}
+
+// ---------- Pesanan online (0.13.0) ----------
+
+export type DeliveryMode = 'kurir' | 'ojol';
+export type OnlineOrderStatus = 'menunggu' | 'diterima' | 'diantar' | 'selesai' | 'batal' | 'ditolak' | 'kedaluwarsa';
+
+export interface OnlineOrderItem {
+  recipeId: string;
+  qty: number;
+}
+
+export interface OnlineOrder {
+  id: number;
+  buyer: string;
+  area: string;
+  km: number;
+  items: OnlineOrderItem[];
+  note: { id: string; text: string; extraMinutes: number; extraItem: string | null } | null;
+  /** Pemain memilih memenuhi catatan saat menerima. */
+  noteHonored: boolean;
+  /** Nilai menu (setelah diskon event). */
+  value: number;
+  /** Ongkir dari pembeli. */
+  fee: number;
+  status: OnlineOrderStatus;
+  /** Semua menit adalah menit permainan sesi hari itu (bisa > 1440 lewat tengah malam). */
+  createdMinute: number;
+  expiresMinute: number;
+  acceptedMinute: number | null;
+  readyMinute: number | null;
+  /** Ojol: jadwal driver tiba. Kurir: saat berangkat. */
+  pickupMinute: number | null;
+  deliveredMinute: number | null;
+  dueMinute: number | null;
+  tripId: number | null;
+  late: boolean;
+  cold: boolean;
+  cancelReason: string | null;
+}
+
+export interface CourierTrip {
+  id: number;
+  departMinute: number;
+  returnMinute: number;
+  orderIds: number[];
+}
+
+export interface OnlineDayReport {
+  generated: number;
+  accepted: number;
+  delivered: number;
+  late: number;
+  cancelled: number;
+  rejected: number;
+  expired: number;
+  /** Nilai menu yang terkirim. */
+  gross: number;
+  commission: number;
+  /** Ongkir yang masuk kas (kurir sendiri). */
+  feesKept: number;
+  wage: number;
+  ratingChange: number;
+  popularityDelta: number;
+}
+
+export interface OnlineState {
+  /** null = belum memilih cara mengantar (pesanan online belum masuk). */
+  mode: DeliveryMode | null;
+  /** Pemain bisa mematikan pesanan online sementara (tidak ada pesanan baru). */
+  enabled: boolean;
+  /** Harga khusus pesanan online per resep. Tidak ada = ikut harga di tempat. */
+  prices: Record<string, number>;
+  /** Rating kemitraan 0–100. */
+  rating: number;
+  orders: OnlineOrder[];
+  nextId: number;
+  trips: CourierTrip[];
+  today: OnlineDayReport;
+  /** Event pesanan online (terpisah dari event harian). */
+  event: { id: string; day: number } | null;
+  lastEventDay: number;
+  flags: {
+    /** Petunjuk pesanan online pertama sudah ditampilkan. */
+    orderHint: boolean;
+    /** Petunjuk "Upgrade, Promosi, dan Bank kini ada di Usaha" sudah ditampilkan. */
+    barHint: boolean;
+  };
+}
+
+export function emptyOnlineDay(): OnlineDayReport {
+  return { generated: 0, accepted: 0, delivered: 0, late: 0, cancelled: 0, rejected: 0, expired: 0, gross: 0, commission: 0, feesKept: 0, wage: 0, ratingChange: 0, popularityDelta: 0 };
+}
+
+export type BranchStatus = 'penuh' | 'tanpa_produk' | 'tanpa_karyawan' | 'kosong' | 'tutup';
+
+export interface BranchStaff {
+  name: string;
+  plan: WagePlanId;
+  hiredDay: number;
+  /** Pilihan gaji terikat sampai hari ini (mingguan/bulanan). */
+  boundUntil: number;
+  /** Berapa hari berturut-turut gaji telat. */
+  lateStreak: number;
+}
+
+export interface Branch {
+  slot: number;
+  name: string;
+  mapId: string;
+  open: boolean;
+  staff: BranchStaff | null;
+  /** Pernah punya karyawan (merekrut lagi kena biaya). */
+  everHired: boolean;
+  stock: Record<string, StockBatch[]>;
+  upgrades: string[];
+  popularity: number;
+  openedDay: number;
+  lastMoveDay: number;
+  /** Stok di awal hari & kiriman hari ini, untuk rincian terjual/tersisa/terbuang. */
+  dayStart: Record<string, number>;
+  shipped: Record<string, number>;
+}
+
+export interface BranchDayReport {
+  slot: number;
+  name: string;
+  mapId: string;
+  status: BranchStatus;
+  eventId: string | null;
+  staffName: string | null;
+  portions: number;
+  revenue: number;
+  shrink: number;
+  operational: number;
+  wage: number;
+  wageLate: boolean;
+  staffQuit: boolean;
+  net: number;
+  popularityDelta: number;
+  received: Record<string, number>;
+  sold: Record<string, number>;
+  left: Record<string, number>;
+  wasted: Record<string, number>;
+}
+
+export interface BranchesState {
+  list: Branch[];
+  flags: { hint: boolean };
+}
+
+export function createBranchesState(): BranchesState {
+  return { list: [], flags: { hint: false } };
+}
+
+export function createOnlineState(): OnlineState {
+  return {
+    mode: null,
+    enabled: true,
+    prices: {},
+    rating: 60,
+    orders: [],
+    nextId: 1,
+    trips: [],
+    today: emptyOnlineDay(),
+    event: null,
+    lastEventDay: 0,
+    flags: { orderHint: false, barHint: false },
+  };
 }
 
 /** Ringkasan per hari untuk statistik jangka panjang. */
@@ -305,6 +479,10 @@ export interface GameState {
   history: HistoryEntry[];
   /** Cerita kampung (kabar, hubungan, buku resep). */
   story: StoryState;
+  /** Pesanan online & pengantaran (0.13.0). */
+  online: OnlineState;
+  /** Cabang angkringan (0.14.0). */
+  branches: BranchesState;
 }
 
 export const HISTORY_LIMIT = 60;
@@ -353,6 +531,9 @@ export function createInitialState(catalog: Catalog = CATALOG): GameState {
     bank: createEmptyBank(),
     achievements: {},
     story: createStoryState(1),
+    // Pemain baru tidak perlu diberi tahu bahwa tombol pindah ke "Usaha".
+    online: { ...createOnlineState(), flags: { orderHint: false, barHint: true } },
+    branches: createBranchesState(),
   };
 }
 
@@ -409,6 +590,8 @@ export function validateState(state: GameState, catalog: Catalog = CATALOG): voi
     if (!catalog.hasRecipe(id)) throw new Error(`Harga untuk resep tidak dikenal: ${id}`);
     if (!Number.isInteger(price) || price <= 0) throw new Error(`Harga ${id} tidak valid: ${price}`);
   }
+  if (!state.online || !Array.isArray(state.online.orders) || !Number.isFinite(state.online.rating)) throw new Error('Data pesanan online hilang');
+  if (!state.branches || !Array.isArray(state.branches.list)) throw new Error('Data cabang hilang');
   if (!state.story || typeof state.story.news !== 'object' || !Number.isInteger(state.story.startDay)) throw new Error('Data cerita hilang');
   for (const [id, r] of Object.entries(state.story.relations)) {
     if (!Number.isFinite(r.points) || r.points < 0 || ![0, 1, 2, 3].includes(r.stage)) throw new Error(`Hubungan ${id} tidak valid`);

@@ -1,3 +1,4 @@
+import { openBranchPanel } from '../ui/BranchPanel';
 import { LocationPanel } from '../ui/LocationPanel';
 import type { PanelId } from '../core/GameEvents';
 import { BankPanel } from '../ui/BankPanel';
@@ -5,6 +6,7 @@ import { showAchievements } from '../ui/AchievementsPanel';
 import { showEventInfo } from '../ui/EventInfo';
 import { openGuide } from '../ui/GuidePanel';
 import { openStoryPanel, type StoryTab } from '../ui/StoryPanel';
+import { openDeliveryPanel, openOnlineOrderPanel } from '../ui/OnlineOrderPanel';
 import { openDialogue } from '../ui/DialoguePanel';
 import { CHAPTERS, endingById, namedById } from '../data/story';
 import type { StoryNotice } from '../systems/GameActions';
@@ -142,6 +144,13 @@ export class AngkringanScene extends Phaser.Scene {
           showAchievements(this.ctx, ui);
         } else if (panel === 'upgrade') {
           if (phase === 'persiapan') upgrade.open();
+        } else if (panel === 'orders') {
+          this.ctx.bus.emit('story:hint', { show: false, kind: 'order' });
+          openOnlineOrderPanel(this.ctx, ui);
+        } else if (panel === 'delivery') {
+          openDeliveryPanel(this.ctx, ui);
+        } else if (panel === 'branches') {
+          openBranchPanel(this.ctx, ui);
         } else if (panel === 'stats') showStats(this.ctx, ui);
         else kitchen.open();
       }),

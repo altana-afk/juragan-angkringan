@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "plans": [
+    { "id": "harian", "name": "Harian", "amount": 30000, "periodDays": 1, "description": "Kinerja stabil, bisa diganti kapan saja." },
+    { "id": "mingguan", "name": "Mingguan", "amount": 180000, "periodDays": 7, "description": "Lebih murah, terikat satu minggu." },
+    { "id": "bulanan", "name": "Bulanan", "amount": 700000, "periodDays": 30, "description": "Paling murah, terikat satu bulan, tetap dibayar walaupun sepi atau cabang ditutup." }
+  ],
+  "rules": {
+    "rehireCost": 50000,
+    "quitAfterLate": 3,
+    "latePerformance": 0.15,
+    "minPerformance": 0.4,
+    "staffNames": ["Dimas", "Rina", "Ujang", "Tika", "Bagus", "Wulan", "Anto", "Sari"]
+  }
+}

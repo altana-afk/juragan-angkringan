@@ -7,6 +7,8 @@ import { HISTORY_LIMIT, type DayReport, type GameState, type StockBatch } from '
 import type { Catalog } from '../data/catalog';
 import { totalQty } from './InventorySystem';
 import { clampPopularity, nextLoyalty, popularityDelta } from './PopularitySystem';
+import { closeOnlineDay, finishOnlineDay } from './OnlineOrderSystem';
+import { closeBranches } from './BranchSystem';
 
 /** Stok yang akan basi malam ini (kedaluwarsa sebelum hari berikutnya). */
 function expiringTonight(group: Record<string, StockBatch[]>, day: number): { list: [string, number][]; cost: number } {
@@ -32,7 +34,8 @@ function expiringTonight(group: Record<string, StockBatch[]>, day: number): { li
 export const BANKRUPT_AFTER_DAYS = 3;
 
 export function closeDay(draft: GameState, catalog: Catalog): DayReport {
-  void catalog;
+  // Pesanan online yang masih berjalan dituntaskan dulu (pendapatannya masuk omzet hari ini).
+  finishOnlineDay(draft, catalog);
   const l = draft.ledger;
   const day = draft.calendar.day;
   // Sewa/operasional tergantung lokasi (Jalan Kampung Rp10.000, Dekat Kampus Rp15.000).
@@ -50,6 +53,10 @@ export function closeDay(draft: GameState, catalog: Catalog): DayReport {
   const avgSatisfaction = l.customers > 0 ? Math.round(l.satisfactionSum / l.customers) : 0;
   const review = reviewDelta(draft, avgSatisfaction);
   draft.player.popularity = Math.round(clampPopularity(before + delta + review) * 10) / 10;
+  const usedOnline = draft.online.mode !== null || draft.online.today.generated > 0;
+  const online = usedOnline ? closeOnlineDay(draft) : null;
+  const branches = draft.branches.list.length ? closeBranches(draft, catalog) : null;
+  const branchNet = branches ? branches.reduce((s, b) => s + b.net, 0) : 0;
   if (l.customers >= 10 && l.leftEmpty + l.leftWaiting + l.unhappy === 0) draft.stats.perfectDays += 1;
   const bank = processBankAtClose(draft);
   const servedRatio = l.customers > 0 ? (l.served + l.partial * 0.6) / l.customers : 0;
@@ -76,7 +83,10 @@ export function closeDay(draft: GameState, catalog: Catalog): DayReport {
     ingredientCost: l.purchaseTotal,
     promotionCost: l.promotionCost,
     operationalCost: l.operationalCost,
-    netProfit: l.revenue - l.purchaseTotal - l.promotionCost - l.operationalCost + l.bankIncome - l.loanCost - l.moveCost,
+    netProfit:
+      l.revenue - l.purchaseTotal - l.promotionCost - l.operationalCost + l.bankIncome - l.loanCost - l.moveCost +
+      (online ? online.feesKept - online.commission - online.wage : 0) +
+      branchNet,
     costOfSales: Math.round(l.costOfSales),
     grossProfit: Math.round(l.revenue - l.costOfSales),
     topSellers: Object.entries(l.sold).sort(bySold).slice(0, 3),
@@ -107,6 +117,8 @@ export function closeDay(draft: GameState, catalog: Catalog): DayReport {
     moveCost: l.moveCost,
     mapId: draft.mapId,
     event: draft.event ? { ...draft.event, bulk: draft.event.bulk ? { ...draft.event.bulk } : null } : null,
+    online,
+    branches,
   };
   // Bangkrut: kas minus saat tutup 3 hari berturut-turut.
   draft.debtDays = draft.player.money < 0 ? draft.debtDays + 1 : 0;

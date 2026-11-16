@@ -1,0 +1,27 @@
+{
+  "areas": [
+    { "name": "Perumahan Griya Asri", "km": [1.2, 2.0] },
+    { "name": "Kos Putri Melati", "km": [0.4, 0.9] },
+    { "name": "Kantor Kelurahan", "km": [0.8, 1.4] },
+    { "name": "Asrama Mahasiswa", "km": [1.5, 2.6] },
+    { "name": "Ruko Jalan Besar", "km": [0.6, 1.2] },
+    { "name": "Rumah Sakit Sehat", "km": [2.0, 3.2] },
+    { "name": "Gang Kenanga", "km": [0.3, 0.7] }
+  ],
+  "names": ["Dina", "Raka", "Bu Wati", "Pak Darto", "Sinta", "Fajar", "Mbak Lusi", "Yoga", "Nisa", "Om Hari", "Tika", "Bagas", "Ratna", "Arif", "Laras", "Pak Sabar"],
+  "profiles": [
+    { "id": "keluarga", "label": "Makan malam keluarga", "weight": 3, "items": [2, 4], "qty": [1, 3], "drinkChance": 0.6, "favorite": ["makanan"] },
+    { "id": "anak_kos", "label": "Anak kos lapar", "weight": 4, "items": [1, 2], "qty": [1, 2], "drinkChance": 0.5, "favorite": ["makanan", "gorengan"] },
+    { "id": "lembur", "label": "Pekerja lembur", "weight": 2, "items": [1, 3], "qty": [1, 2], "drinkChance": 0.8, "favorite": ["makanan", "minuman"] },
+    { "id": "ngemil", "label": "Teman ngobrol", "weight": 2, "items": [2, 3], "qty": [2, 4], "drinkChance": 0.9, "favorite": ["gorengan", "sate"] }
+  ],
+  "notes": [
+    { "id": "tanpa_sambal", "text": "Tanpa sambal, ya", "extraMinutes": 2 },
+    { "id": "pedas", "text": "Yang pedas banget", "extraMinutes": 2 },
+    { "id": "kurang_manis", "text": "Tehnya kurang manis", "extraMinutes": 1, "needsDrink": true },
+    { "id": "dipisah", "text": "Bungkus dipisah per orang", "extraMinutes": 3 },
+    { "id": "alat_makan", "text": "Minta sendok & tisu", "extraMinutes": 1 },
+    { "id": "tambah_tempe", "text": "Tambah tempe goreng satu", "extraMinutes": 1, "extraItem": "tempe_goreng" }
+  ],
+  "noteChance": 0.35
+}

@@ -9,6 +9,7 @@ import {
   paintMat,
   paintMotorbikes,
   paintPlantPot,
+  paintRiders,
   paintSignBoard,
   paintPlasticChairs,
   paintUmbrellaTable,
@@ -44,5 +45,6 @@ export const ART_JOBS: readonly ArtJob[] = [
   { label: 'Lampu & tiang listrik', build: () => [paintStreetLamp(), paintPowerPole()] },
   { label: 'Pepohonan', build: paintTrees },
   { label: 'Pelanggan', build: paintCustomers },
+  { label: 'Pengantar online', build: paintRiders },
   { label: 'Ikon pesanan', build: paintBubblesAndEmotes },
 ];

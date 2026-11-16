@@ -6,10 +6,15 @@ import { eventById } from '../data/events';
 import { discardIngredient, type DiscardResult } from './StorageSystem';
 import { advanceTutorial, TUTORIAL_DONE } from './TutorialSystem';
 import { buyUpgrade, type UpgradeDef } from './UpgradeSystem';
-import { setPrice } from './PricingSystem';
+import { buyBranchUpgrade, moveBranch, openBranch, setBranchOpen } from './BranchSystem';
+import { changeWagePlan, dismissStaff, hireStaff } from './BranchStaffSystem';
+import { shipToBranch } from './BranchSupplySystem';
+import { branchUpgradeById, wagePlanById, type WagePlanId } from '../data/branches';
+import { setPrice, setOnlinePrice } from './PricingSystem';
 import { WEATHER_EFFECTS, weatherForDay } from './WeatherSystem';
 import { GAME_CONFIG } from '../config/gameConfig';
 import { createEmptyLedger, type DayReport, type GameState } from '../core/GameState';
+import { locationById } from '../data/locations';
 import { buyAd, cancelAd, type AdDef } from './AdvertisingSystem';
 import { closeDay } from './DayCloseSystem';
 import type { SeededRandom } from '../utils/random';
@@ -37,6 +42,10 @@ import {
   type StoryUpdate,
   type TalkResult,
 } from './StorySystem';
+
+import { acceptOrder, dispatchCourier, rejectOrder, resetOnlineDay, setDeliveryMode, tickOnline, type OnlineTickEvent } from './OnlineOrderSystem';
+import { rollOnlineEvent } from './OnlineEventSystem';
+import type { Branch, DeliveryMode, OnlineOrder } from '../core/GameState';
 
 /** Kabar dari sistem cerita untuk UI (bab baru, tahap hubungan naik, akhir cerita). */
 export interface StoryNotice {
@@ -211,6 +220,8 @@ export class GameActions {
         draft.phase = 'persiapan';
         draft.ledger = createEmptyLedger(nextDay);
         draft.event = rollEvent(nextDay, draft.mapId, draft.unlockedRecipes, this.catalog);
+        resetOnlineDay(draft);
+        rollOnlineEvent(draft);
         return {
           wastedProducts: sum(products, 'qty'),
           wastedIngredients: sum(ingredients, 'qty'),
@@ -219,6 +230,91 @@ export class GameActions {
       },
       (r) => `Hari ${this.store.get().calendar.day} dimulai · ${WEATHER_EFFECTS[this.store.get().weather].label}.${this.store.get().event ? ` Event: ${eventById(this.store.get().event!.id).name}!` : ''}${r.wastedProducts + r.wastedIngredients > 0 ? ` Stok basi dibuang (modal ${formatRupiah(r.wasteCost)}).` : ''}`,
     );
+  }
+
+  // ---------- pesanan online ----------
+
+  /** Majukan pesanan online satu menit permainan (dipanggil saat berjualan). */
+  onlineTick(minute: number): OnlineTickEvent[] {
+    const st = this.store.get();
+    if (st.phase !== 'berjualan' || !st.online.mode) return [];
+    let events: OnlineTickEvent[] = [];
+    this.store.update('online-menit', (draft) => {
+      events = tickOnline(draft, this.catalog, minute);
+    });
+    return events;
+  }
+
+  acceptOnline(id: number, honorNote: boolean): ActionResult<OnlineOrder> {
+    return this.run('online-terima', (draft) => ({ ...acceptOrder(draft, id, honorNote) }), (o) => `Pesanan ${o.buyer} diterima.`);
+  }
+
+  rejectOnline(id: number): ActionResult<void> {
+    return this.run('online-tolak', (draft) => rejectOrder(draft, id), () => 'Pesanan ditolak.');
+  }
+
+  /** Kurir sendiri berangkat sekarang dengan pesanan yang sudah siap. */
+  dispatchNow(): ActionResult<OnlineTickEvent[]> {
+    return this.run('online-kirim', (draft) => {
+      if (draft.phase !== 'berjualan') throw new GameRuleError('wrong-phase', 'Kurir hanya mengantar saat berjualan.');
+      const ev = dispatchCourier(draft, this.catalog, draft.calendar.clockMinutes);
+      if (!ev.length) throw new GameRuleError('online-nothing', 'Belum ada pesanan yang siap diantar.');
+      return ev;
+    }, (ev) => ev[ev.length - 1]?.message ?? '');
+  }
+
+  setDeliveryMode(mode: DeliveryMode): ActionResult<DeliveryMode> {
+    return this.run('online-mode', (draft) => {
+      setDeliveryMode(draft, mode);
+      return mode;
+    }, (m) => (m === 'kurir' ? 'Kurir sendiri siap mengantar mulai hari ini.' : 'Kemitraan ojol aktif. Pesanan online mulai masuk saat berjualan.'));
+  }
+
+  // ---------- Cabang (0.14.0) ----------
+  openBranch(mapId: string): ActionResult<Branch> {
+    return this.run('cabang-buka', (draft) => openBranch(draft, mapId), (b) => `${b.name} dibuka di ${locationById(b.mapId).name}! Rekrut karyawan dan kirim stok supaya bisa berjualan.`);
+  }
+
+  setBranchOpen(slot: number, open: boolean): ActionResult<Branch> {
+    return this.run('cabang-status', (draft) => setBranchOpen(draft, slot, open), (b) => (b.open ? `${b.name} dibuka lagi.` : `${b.name} ditutup sementara — tanpa biaya operasional.`));
+  }
+
+  moveBranch(slot: number, mapId: string): ActionResult<Branch> {
+    return this.run('cabang-pindah', (draft) => moveBranch(draft, slot, mapId), (b) => `${b.name} pindah ke ${locationById(b.mapId).name}.`);
+  }
+
+  hireBranchStaff(slot: number, plan: WagePlanId): ActionResult<Branch> {
+    return this.run('cabang-rekrut', (draft) => hireStaff(draft, slot, plan), (b) => `${b.staff!.name} mulai bekerja di ${b.name} (gaji ${wagePlanById(plan).name.toLowerCase()}).`);
+  }
+
+  changeBranchWage(slot: number, plan: WagePlanId): ActionResult<Branch> {
+    return this.run('cabang-gaji', (draft) => changeWagePlan(draft, slot, plan), (b) => `Gaji karyawan ${b.name} jadi ${wagePlanById(plan).name.toLowerCase()}.`);
+  }
+
+  dismissBranchStaff(slot: number): ActionResult<Branch> {
+    return this.run('cabang-berhentikan', (draft) => dismissStaff(draft, slot), (b) => `Karyawan ${b.name} diberhentikan.`);
+  }
+
+  shipToBranch(slot: number, items: Record<string, number>): ActionResult<{ qty: number; fee: number }> {
+    return this.run('cabang-kirim', (draft) => shipToBranch(draft, this.catalog, slot, items), (r) => `${r.qty} porsi dikirim ke cabang${r.fee ? ` (ongkir ${formatRupiah(r.fee)})` : ' (gratis ongkir)'}.`);
+  }
+
+  buyBranchUpgrade(slot: number, upgradeId: string): ActionResult<Branch> {
+    return this.run('cabang-upgrade', (draft) => buyBranchUpgrade(draft, slot, upgradeId), (b) => `${branchUpgradeById(upgradeId).name} terpasang di ${b.name}.`);
+  }
+
+  markBranchHint(): void {
+    if (this.store.get().branches.flags.hint) return;
+    this.store.update('cabang-tanda', (draft) => {
+      draft.branches.flags.hint = true;
+    });
+  }
+
+  markOnlineFlag(flag: 'orderHint' | 'barHint'): void {
+    if (this.store.get().online.flags[flag]) return;
+    this.store.update('online-tanda', (draft) => {
+      draft.online.flags[flag] = true;
+    });
   }
 
   // ---------- cerita ----------
@@ -283,6 +379,21 @@ export class GameActions {
 
   setPrice(recipeId: string, price: number): ActionResult<number> {
     return this.run('atur-harga', (draft) => setPrice(draft, this.catalog.recipe(recipeId), price), (p) => `Harga ${this.catalog.recipe(recipeId).name} jadi ${formatRupiah(p)}.`);
+  }
+
+  /** Harga khusus pesanan online (null = ikut harga di tempat). */
+  setOnlinePrice(recipeId: string, price: number | null): ActionResult<number> {
+    const name = this.catalog.recipe(recipeId).name;
+    return this.run('harga-online', (draft) => setOnlinePrice(draft, this.catalog.recipe(recipeId), price), (p) => (price === null ? `Harga online ${name} ikut harga di tempat.` : `Harga online ${name} jadi ${formatRupiah(p)}.`));
+  }
+
+  /** Nyalakan / matikan pesanan online (pesanan yang sudah diterima tetap diantar). */
+  setOnlineEnabled(enabled: boolean): ActionResult<boolean> {
+    return this.run('online-sakelar', (draft) => {
+      draft.online.enabled = enabled;
+      if (!enabled) for (const o of draft.online.orders) if (o.status === 'menunggu') o.status = 'ditolak';
+      return enabled;
+    }, (on) => (on ? 'Pesanan online dibuka.' : 'Pesanan online ditutup sementara. Pesanan yang sudah diterima tetap diantar.'));
   }
 
   /** Periksa resep yang terbuka (dipanggil setelah memuat save). */

@@ -73,7 +73,7 @@ export function showStats(ctx: GameContext, ui: UIManager): void {
           ],
         }),
         s.lastReport ? el('h3', { className: 'section-title', text: `Laporan terakhir (Hari ${s.lastReport.day})` }) : null,
-        s.lastReport ? renderReport(ctx, s.lastReport) : null,
+        s.lastReport ? renderReport(ctx, s.lastReport, ui) : null,
       ],
     }),
     actions: [{ label: `Pencapaian ${Object.keys(ctx.store.get().achievements).length}/${ACHIEVEMENTS.length}`, onClick: () => { showAchievements(ctx, ui); return false; } }],

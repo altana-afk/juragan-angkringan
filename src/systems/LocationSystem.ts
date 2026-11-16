@@ -84,6 +84,8 @@ export function moveLocation(draft: GameState, catalog: Catalog, locationId: str
   if (draft.phase !== 'persiapan') throw new GameRuleError('wrong-phase', 'Pindah lokasi hanya saat persiapan (sebelum buka).');
   if (draft.mapId === dest.id) throw new GameRuleError('same-location', `Kamu sudah berada di ${dest.name}.`);
   if (draft.lastMoveDay === draft.calendar.day) throw new GameRuleError('moved-today', 'Gerobak sudah dipindah hari ini. Coba lagi besok.');
+  const branchHere = draft.branches.list.find((b) => b.open && b.mapId === dest.id);
+  if (branchHere) throw new GameRuleError('location-used', `${dest.name} sedang dipakai ${branchHere.name}. Satu lokasi hanya untuk satu angkringan yang buka.`);
   if (draft.player.money < dest.moveCost) throw new GameRuleError('money-short', `Biaya pindah ${formatRupiah(dest.moveCost)}, uang kas tidak cukup.`);
   draft.player.money -= dest.moveCost;
   draft.ledger.moveCost += dest.moveCost;

@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "branches": [
+    { "slot": 0, "name": "Cabang 1", "openCost": 1500000, "minLevel": 2, "minPopularity": 40 },
+    { "slot": 1, "name": "Cabang 2", "openCost": 3000000, "minLevel": 3, "minPopularity": 55 },
+    { "slot": 2, "name": "Cabang 3", "openCost": 5000000, "minLevel": 4, "minPopularity": 70 }
+  ],
+  "rules": {
+    "baseOperational": 10000,
+    "startPopularity": 30,
+    "noProductPopularity": -3,
+    "goodDayPopularity": 1,
+    "baseDemand": 14,
+    "demandPerPopularity": 0.45,
+    "rainDemand": 0.8,
+    "shipFee": 5000,
+    "shrinkBase": 0.03,
+    "shrinkPerLate": 0.04,
+    "moveKeepPopularity": 0.7
+  }
+}

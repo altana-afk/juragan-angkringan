@@ -72,7 +72,7 @@ async def flow(browser, name, viewport, mobile):
 
     # upgrade → dunia dibangun ulang
     await page.evaluate("""() => window.__game.registry.get('gameContext').store.update('uji', d => { d.player.money += 2000000; })""")
-    await click('.action-btn:has-text("Upgrade")'); await page.wait_for_selector('.sheet-upgrade')
+    await click('.action-usaha'); await click('.business-item:has-text("Upgrade")'); await page.wait_for_selector('.sheet-upgrade')
     await click('.sheet-upgrade .tab-btn:has-text("Kapasitas")')
     await click('.sheet-upgrade .item-row:has-text("Bangku tambahan") button')
     await page.wait_for_timeout(1500); await page.wait_for_selector('.sheet-upgrade', timeout=20000)
@@ -80,7 +80,7 @@ async def flow(browser, name, viewport, mobile):
     checks['upgrade_terpasang'] = await page.evaluate("() => window.__game.registry.get('gameContext').store.get().upgrades.includes('bangku_tambahan')")
 
     # bank: deposito lalu tarik
-    await click('.action-btn:has-text("Bank")'); await page.wait_for_selector('.sheet-bank')
+    await click('.action-usaha'); await click('.business-item:has-text("Bank")'); await page.wait_for_selector('.sheet-bank')
     await click('.sheet-bank .bank-section:first-of-type .btn-primary'); await page.wait_for_timeout(300)
     checks['deposito'] = await page.evaluate("() => window.__game.registry.get('gameContext').store.get().bank.deposits.length === 1")
     await click('.sheet-bank button[aria-label^="Tarik deposito"]'); await page.wait_for_selector('.modal:has-text("Tarik deposito?")')

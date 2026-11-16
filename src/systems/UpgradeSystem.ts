@@ -3,7 +3,7 @@ import type { GameState } from '../core/GameState';
 import { formatRupiah } from '../utils/formatting';
 import { GameRuleError } from './rules';
 
-export type UpgradeCategory = 'gerobak' | 'peralatan' | 'kapasitas' | 'lingkungan';
+export type UpgradeCategory = 'gerobak' | 'peralatan' | 'kapasitas' | 'lingkungan' | 'online';
 
 /** Efek upgrade. Semua angka dijumlahkan dari upgrade yang dimiliki; `variants` mengganti tampilan objek peta. */
 export interface UpgradeEffects {
@@ -40,6 +40,12 @@ export interface UpgradeEffects {
   seats?: number;
   /** + minat terhadap minuman (0,25 = +25%). */
   drinkAppeal?: number;
+  /** + batas pesanan online per hari (sistem pemesanan). */
+  onlineLimit?: number;
+  /** Perjalanan kurir sendiri lebih cepat (0,25 = 25%). */
+  courierSpeed?: number;
+  /** + menit makanan tetap hangat saat diantar kurir sendiri (kotak termos). */
+  thermal?: number;
   /** id objek peta → varian tampilan */
   variants?: Record<string, string>;
 }
@@ -59,6 +65,7 @@ export const UPGRADE_CATEGORIES: readonly { id: UpgradeCategory; label: string }
   { id: 'peralatan', label: 'Peralatan' },
   { id: 'kapasitas', label: 'Kapasitas' },
   { id: 'lingkungan', label: 'Lingkungan' },
+  { id: 'online', label: 'Pesanan online' },
 ];
 
 export function parseUpgrades(raw: unknown): UpgradeDef[] {
@@ -92,12 +99,12 @@ export interface TotalEffects extends Required<Omit<UpgradeEffects, 'variants'>>
 export function totalEffects(owned: readonly string[]): TotalEffects {
   const t: TotalEffects = {
     businessLevel: 1, satisfaction: 0, arrivalBonus: 0, newCustomerBonus: 0, patience: 0, serviceSpeed: 0,
-    maxCookPortions: 0, productShelfDays: 0, ingredientShelfDays: 0, drinkShelfDays: 0, chilledShelfDays: 0, heatComfort: 0, rainComfort: 0, rainShelter: 0, storage: 0, seats: 0, drinkAppeal: 0, variants: {},
+    maxCookPortions: 0, productShelfDays: 0, ingredientShelfDays: 0, drinkShelfDays: 0, chilledShelfDays: 0, heatComfort: 0, rainComfort: 0, rainShelter: 0, storage: 0, seats: 0, drinkAppeal: 0, onlineLimit: 0, courierSpeed: 0, thermal: 0, variants: {},
   };
   for (const id of owned) {
     const e = upgradeById(id).effects;
     t.businessLevel = Math.max(t.businessLevel, e.businessLevel ?? 1);
-    for (const k of ['satisfaction', 'arrivalBonus', 'newCustomerBonus', 'patience', 'serviceSpeed', 'maxCookPortions', 'productShelfDays', 'ingredientShelfDays', 'drinkShelfDays', 'chilledShelfDays', 'heatComfort', 'rainComfort', 'rainShelter', 'storage', 'seats', 'drinkAppeal'] as const) {
+    for (const k of ['satisfaction', 'arrivalBonus', 'newCustomerBonus', 'patience', 'serviceSpeed', 'maxCookPortions', 'productShelfDays', 'ingredientShelfDays', 'drinkShelfDays', 'chilledShelfDays', 'heatComfort', 'rainComfort', 'rainShelter', 'storage', 'seats', 'drinkAppeal', 'onlineLimit', 'courierSpeed', 'thermal'] as const) {
       t[k] += e[k] ?? 0;
     }
     Object.assign(t.variants, e.variants ?? {});
@@ -149,6 +156,9 @@ export function describeEffects(e: UpgradeEffects): string[] {
   if (e.rainComfort) out.push(`+${e.rainComfort} kepuasan saat hujan`);
   if (e.rainShelter) out.push(`hujan: pengunjung +${Math.round(e.rainShelter * 100)}%`);
   if (e.storage) out.push(`gudang +${e.storage}`);
+  if (e.onlineLimit) out.push(`+${e.onlineLimit} pesanan online/hari`);
+  if (e.courierSpeed) out.push(`kurir ${Math.round(e.courierSpeed * 100)}% lebih cepat`);
+  if (e.thermal) out.push(`antaran hangat +${e.thermal} mnt`);
   if (e.drinkAppeal) out.push(`minuman +${Math.round(e.drinkAppeal * 100)}% diminati`);
   return out;
 }

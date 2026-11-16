@@ -217,7 +217,7 @@ describe('save v9', () => {
     delete old.story;
     (old.calendar as { day: number }).day = 25;
     const s = migrateSave({ version: 8, savedAt: '', state: old });
-    expect(SAVE_VERSION).toBe(9);
+    expect(SAVE_VERSION).toBeGreaterThanOrEqual(9);
     expect(s.story.startDay).toBe(25);
     expect(storyDay(s)).toBe(1);
     expect(pendingNews(s).map((n) => n.id)).toEqual(['gerobak_kosong']);
