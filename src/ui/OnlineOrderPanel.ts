@@ -5,7 +5,7 @@ import { activeTrip, readyForCourier } from '../systems/CourierSystem';
 import { activeOnlineEvent } from '../systems/OnlineEventSystem';
 import { acceptBlocker, acceptedToday, dailyLimit, ratingStars, stockShortfall } from '../systems/OnlineOrderSystem';
 import { formatClock, formatRupiah } from '../utils/formatting';
-import { el } from './dom';
+import { el, keepScroll } from './dom';
 import { itemIcon } from './itemIcon';
 import { PRICE_RULES, onlinePriceOf, priceBounds, priceVerdict, salePriceOf } from '../systems/PricingSystem';
 import { isDrink, sortRecipesForMenu } from '../systems/RecipeSystem';
@@ -211,7 +211,7 @@ export function openOnlineOrderPanel(ctx: GameContext, ui: UIManager): ModalHand
         }),
       );
     }
-    body.replaceChildren(...parts.filter((p): p is HTMLElement => p !== null));
+    keepScroll(body, () => body.replaceChildren(...parts.filter((p): p is HTMLElement => p !== null)));
   };
 
   const off = ctx.bus.on('state:changed', () => {
@@ -280,7 +280,7 @@ export function openDeliveryPanel(ctx: GameContext, ui: UIManager): ModalHandle 
       }),
       ...onlinePriceList(ctx, s, render),
     ];
-    body.replaceChildren(...nodes.filter((n): n is HTMLElement => n !== null));
+    keepScroll(body, () => body.replaceChildren(...nodes.filter((n): n is HTMLElement => n !== null)));
   };
   const off = ctx.bus.on('state:changed', () => {
     if (handle) render();
@@ -395,6 +395,7 @@ function onlinePriceList(ctx: GameContext, s: Readonly<GameState>, rerender: () 
     reset.hidden = !custom;
     return el('div', {
       className: 'recipe-card',
+      attrs: { 'data-anchor': `harga-${r.id}` },
       children: [
         itemIcon(r.icon),
         el('div', {

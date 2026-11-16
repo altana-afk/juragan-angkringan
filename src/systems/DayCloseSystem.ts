@@ -133,6 +133,20 @@ export function closeDay(draft: GameState, catalog: Catalog): DayReport {
     avgSatisfaction,
     popularity: report.popularityAfter,
     money: report.moneyEnd,
+    ingredientCost: report.ingredientCost,
+    operationalCost: report.operationalCost,
+    served: report.served,
+    leftEmpty: report.leftEmpty,
+    topSellers: report.topSellers.slice(0, 3).map(([id, n]) => [id, n] as [string, number]),
+    weather: report.weather,
+    eventId: report.event?.id ?? null,
+    mapId: report.mapId,
+    onlineDelivered: report.online?.delivered ?? 0,
+    onlineNet: report.online ? report.online.gross - report.online.commission + report.online.feesKept - report.online.wage : 0,
+    branchNet: report.branches ? report.branches.reduce((s, b) => s + b.net, 0) : 0,
+    wasteCost: report.wasteCost,
+    // Salinan terpisah supaya laporan berikutnya tidak mengubah riwayat.
+    report: JSON.parse(JSON.stringify(report)) as DayReport,
   });
   if (draft.history.length > HISTORY_LIMIT) draft.history.splice(0, draft.history.length - HISTORY_LIMIT);
   return report;

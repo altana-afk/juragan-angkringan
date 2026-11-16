@@ -362,6 +362,22 @@ export interface HistoryEntry {
   avgSatisfaction: number;
   popularity: number;
   money: number;
+  // ---- Ringkasan tambahan untuk Riwayat penjualan (0.14.1). Tidak ada di riwayat lama. ----
+  ingredientCost?: number;
+  operationalCost?: number;
+  served?: number;
+  leftEmpty?: number;
+  /** 3 menu terlaris: [id resep, porsi]. */
+  topSellers?: [string, number][];
+  weather?: WeatherKind;
+  eventId?: string | null;
+  mapId?: string;
+  onlineDelivered?: number;
+  onlineNet?: number;
+  branchNet?: number;
+  wasteCost?: number;
+  /** Salinan lengkap laporan hari itu (0.14.2) — untuk detail riwayat. Tidak ada di riwayat lama. */
+  report?: DayReport;
 }
 
 export interface LifetimeStats {

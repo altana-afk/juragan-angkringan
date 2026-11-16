@@ -5,7 +5,31 @@ import { getPopularityTier } from '../systems/PopularitySystem';
 import { formatRupiah, formatRupiahShort } from '../utils/formatting';
 import { el } from './dom';
 import { renderReport } from './DaySummary';
+import { renderHistory } from './HistoryPanel';
 import type { UIManager } from './UIManager';
+
+/** Tab Ringkasan / Riwayat di panel Statistik. Riwayat dibuat saat tab pertama kali dibuka. */
+function tabbed(ctx: GameContext, ui: UIManager, summary: HTMLElement): HTMLElement {
+  let history: HTMLElement | null = null;
+  const pane = el('div', { className: 'stats-pane', children: [summary] });
+  const tabs = (['Ringkasan', 'Riwayat'] as const).map((label, i) =>
+    el('button', {
+      className: `stats-tab${i === 0 ? ' is-active' : ''}`,
+      text: label,
+      attrs: { type: 'button', role: 'tab', 'aria-selected': String(i === 0) },
+      onClick: () => {
+        tabs.forEach((t, j) => {
+          t.classList.toggle('is-active', j === i);
+          t.setAttribute('aria-selected', String(j === i));
+        });
+        if (i === 1) history ??= renderHistory(ctx, ui);
+        pane.replaceChildren(i === 0 ? summary : history!);
+        pane.parentElement?.scrollTo?.({ top: 0 });
+      },
+    }),
+  );
+  return el('div', { className: 'stats-body', children: [el('div', { className: 'stats-tabs', attrs: { role: 'tablist' }, children: tabs }), pane] });
+}
 
 /** Panel Statistik: tren 14 hari terakhir, total sepanjang permainan, dan laporan hari terakhir. */
 export function showStats(ctx: GameContext, ui: UIManager): void {
@@ -51,7 +75,7 @@ export function showStats(ctx: GameContext, ui: UIManager): void {
     title: 'Statistik Usaha',
     className: 'sheet sheet-stats',
     closeButton: true,
-    body: el('div', {
+    body: tabbed(ctx, ui, el('div', {
       className: 'report',
       children: [
         el('h3', { className: 'section-title', text: 'Penjualan & keuntungan bersih (14 hari terakhir)' }),
@@ -75,7 +99,7 @@ export function showStats(ctx: GameContext, ui: UIManager): void {
         s.lastReport ? el('h3', { className: 'section-title', text: `Laporan terakhir (Hari ${s.lastReport.day})` }) : null,
         s.lastReport ? renderReport(ctx, s.lastReport, ui) : null,
       ],
-    }),
+    })),
     actions: [{ label: `Pencapaian ${Object.keys(ctx.store.get().achievements).length}/${ACHIEVEMENTS.length}`, onClick: () => { showAchievements(ctx, ui); return false; } }],
   });
 }

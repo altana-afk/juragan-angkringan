@@ -10,6 +10,27 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: readonly ChangelogEntry[] = [
   {
+    version: '0.14.2',
+    title: 'Riwayat hari lebih lengkap',
+    items: [
+      'Detail riwayat hari kini mencatat semua isi laporan: produk terlaris, kurang diminati, kehabisan stok, tersisa, dan terbuang; pelanggan; pesanan online; dan hasil tiap cabang.',
+      'Setiap bagian menampilkan ringkasan singkat di judulnya, jadi tidak perlu dibuka satu per satu untuk tahu isinya.',
+      'Rincian cabang di riwayat hari lengkap: pendapatan, selisih kas, operasional, gaji, dan tiap produk yang diterima, terjual, tersisa, dan terbuang.',
+      'Perbaikan: tab Ringkasan/Riwayat di desktop tidak lagi tembus pandang saat digulir.',
+    ],
+  },
+  {
+    version: '0.14.1',
+    title: 'Riwayat penjualan & gulir lebih nyaman',
+    items: [
+      'Tab Riwayat baru di Statistik: lihat penjualan 7, 30, atau 60 hari terakhir — ringkasan, grafik batang (hari rugi berwarna merah), dan daftar per hari.',
+      'Ketuk batang atau baris hari untuk melihat detailnya: keuangan, menu terlaris, pelanggan, dan kejadian hari itu.',
+      'Di desktop, riwayat tampil berdampingan: daftar hari di kiri, detail hari terpilih di kanan (pindah hari dengan tombol ↑/↓).',
+      'Persiapan Dapur tidak lagi melompat ke atas setelah menekan "+ Tambah" — posisi gulir tetap di menu yang diketuk.',
+      'Pengaturan → Tampilan: sakelar "Gulir otomatis" untuk kembali pindah ke Daftar persiapan setelah menambah menu (bawaan mati).',
+    ],
+  },
+  {
     version: '0.14.0',
     title: 'Cabang Angkringan',
     items: [

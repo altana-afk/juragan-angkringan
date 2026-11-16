@@ -6,7 +6,8 @@ import { PRICE_RULES, priceBounds, priceVerdict, salePriceOf } from '../systems/
 import { nearestExpiry, totalQty } from '../systems/InventorySystem';
 import { aggregateRequirements, describeUnlock, estimatedPortionCost, findShortages, isDrink, maxPortions, sortRecipesForMenu, type CookOrder } from '../systems/RecipeSystem';
 import { formatRupiah } from '../utils/formatting';
-import { el, setText } from './dom';
+import { el, keepScroll, setText } from './dom';
+import { UI_SETTINGS } from '../config/uiSettings';
 import { itemIcon, stepper } from './itemIcon';
 import { expiryText } from './ShopPanel';
 import type { ModalHandle, UIManager } from './UIManager';
@@ -95,8 +96,13 @@ export class KitchenPanel {
     return [...this.plan.entries()].filter(([, p]) => p > 0).map(([recipeId, portions]) => ({ recipeId, portions }));
   }
 
-  private render(): void {
+  /** Render ulang dengan posisi gulir dijaga (perbaikan "scroll reset" di ponsel). */
+  private render(anchor: string | null = null): void {
     if (!this.modal) return;
+    keepScroll(this.planEl.parentElement ?? this.planEl, () => this.renderNow(), anchor);
+  }
+
+  private renderNow(): void {
     const state = this.ctx.store.get();
     // Hapus resep yang (karena data lama) tidak lagi terbuka.
     for (const id of this.plan.keys()) if (!state.unlockedRecipes.includes(id)) this.plan.delete(id);
@@ -122,14 +128,15 @@ export class KitchenPanel {
         attrs: { type: 'button', 'aria-label': `Tambah ${recipe.name} ke daftar persiapan` },
         onClick: () => {
           if (!this.plan.has(recipe.id)) this.plan.set(recipe.id, Math.max(1, Math.min(can, 10)) || 1);
-          this.render();
-          // Daftar persiapan ada di atas: gulir ke sana agar porsi bisa langsung diatur.
-          this.planEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          // Bawaan: tetap di posisi kartu yang diketuk. Jika "Gulir otomatis" aktif, pindah ke daftar persiapan.
+          this.render(`menu-${recipe.id}`);
+          if (UI_SETTINGS.autoScroll) this.planEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         },
       });
       button.disabled = !unlocked || inPlan;
       return el('div', {
         className: `recipe-card${unlocked ? '' : ' is-locked'}`,
+        attrs: { 'data-anchor': `menu-${recipe.id}` },
         children: [
           itemIcon(recipe.icon),
           el('div', {
@@ -225,7 +232,7 @@ export class KitchenPanel {
         const max = maxPortions(state, recipe);
         const step = stepper(recipe.name, portions, (next) => {
           this.plan.set(recipeId, next);
-          this.render();
+          this.render(`plan-${recipeId}`);
         }, maxPortionsPerOrder(this.ctx.store.get()));
         const chips = Object.entries(recipe.ingredients).map(([ingId, per]) => {
           const ing = catalog.ingredient(ingId);
@@ -247,6 +254,7 @@ export class KitchenPanel {
         cookOne.disabled = portions <= 0 || portions > max;
         return el('div', {
           className: 'plan-row',
+          attrs: { 'data-anchor': `plan-${recipeId}` },
           children: [
             el('div', {
               className: 'plan-head',
@@ -259,7 +267,7 @@ export class KitchenPanel {
                   attrs: { type: 'button' },
                   onClick: () => {
                     this.plan.set(recipeId, Math.min(max, maxPortionsPerOrder(this.ctx.store.get())));
-                    this.render();
+                    this.render(`plan-${recipeId}`);
                   },
                 }),
                 el('button', {

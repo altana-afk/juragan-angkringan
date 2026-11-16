@@ -2,6 +2,7 @@ import { GRAPHICS, type GraphicsQuality } from '../config/graphicsSettings';
 import type { AudioSystem } from '../audio/AudioSystem';
 import type { AudioSettings } from '../audio/AudioSettings';
 import { el } from './dom';
+import { UI_SETTINGS } from '../config/uiSettings';
 import type { UIManager } from './UIManager';
 
 const SLIDERS: readonly { key: 'music' | 'sfx' | 'ambience'; label: string }[] = [
@@ -50,6 +51,9 @@ export function openAudioSettings(ui: UIManager, audio: AudioSystem, onGraphics?
       return el('label', { className: 'check-row', children: [input, el('span', { text: q.label }), el('small', { className: 'muted', text: q.hint })] });
     }),
   });
+  const auto = el('input', { attrs: { type: 'checkbox', role: 'switch', 'aria-label': 'Gulir otomatis ke daftar persiapan' } }) as HTMLInputElement;
+  auto.checked = UI_SETTINGS.autoScroll;
+  auto.addEventListener('change', () => UI_SETTINGS.setAutoScroll(auto.checked));
   ui.openModal({
     title: 'Pengaturan',
     className: 'audio-modal',
@@ -61,6 +65,15 @@ export function openAudioSettings(ui: UIManager, audio: AudioSystem, onGraphics?
         el('label', { className: 'check-row', children: [mute, el('span', { text: 'Bisukan semua suara' })] }),
         el('h3', { className: 'settings-heading', text: 'Grafis' }),
         qualityRow,
+        el('h3', { className: 'settings-heading', text: 'Tampilan' }),
+        el('label', {
+          className: 'check-row',
+          children: [
+            auto,
+            el('span', { text: 'Gulir otomatis' }),
+            el('small', { className: 'muted', text: 'setelah "+ Tambah" di Persiapan Dapur, layar pindah ke Daftar persiapan' }),
+          ],
+        }),
         audio.ready ? null : el('p', { className: 'panel-note muted', text: 'Suara aktif setelah kamu menyentuh/klik layar.' }),
       ],
     }),

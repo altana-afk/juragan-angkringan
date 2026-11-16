@@ -1,6 +1,6 @@
 {
   "name": "juragan-angkringan-simulator",
-  "version": "0.14.0",
+  "version": "0.14.2",
   "description": "Game simulasi bisnis angkringan 2D isometrik berbasis web (Phaser 3 + TypeScript + Vite)",
   "scripts": {
     "dev": "vite",

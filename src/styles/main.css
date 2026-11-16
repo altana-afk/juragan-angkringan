@@ -2242,3 +2242,107 @@ button.hud-pill { font: inherit; color: inherit; cursor: pointer; text-align: le
   .branch-section .recipe-card .branch-ship-ctrl { width: 100%; justify-content: flex-end; }
 }
 .branch-section .recipe-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); }
+
+/* ---------- Statistik: tab & Riwayat penjualan 60 hari (0.14.1) ---------- */
+.stats-body { display: flex; flex-direction: column; gap: 10px; }
+.stats-tabs { position: sticky; top: -1px; z-index: 2; display: flex; gap: 4px; padding: 3px; border-radius: 10px; background: rgba(0, 0, 0, 0.35); }
+.stats-tab { flex: 1; min-height: 44px; border: 0; border-radius: 8px; background: transparent; color: var(--c-muted); font: 700 14px/1 var(--font); cursor: pointer; }
+.stats-tab.is-active { background: var(--c-accent); color: #1b1220; }
+.stats-tab:focus-visible, .history-seg-btn:focus-visible, .history-row:focus-visible, .history-bar:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 2px; }
+.history { display: flex; flex-direction: column; gap: 10px; }
+.history-seg { display: flex; gap: 3px; padding: 3px; border-radius: 10px; background: rgba(0, 0, 0, 0.25); }
+.history-seg-btn { flex: 1; min-height: 40px; border: 0; border-radius: 8px; background: transparent; color: var(--c-muted); font: 600 13px/1 var(--font); cursor: pointer; }
+.history-seg-btn.is-active { background: rgba(255, 255, 255, 0.12); color: var(--c-text); }
+.history-tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.history-tile { display: flex; flex-direction: column; gap: 2px; padding: 9px 10px; border-radius: 10px; background: rgba(0, 0, 0, 0.22); min-width: 0; }
+.history-tile-label { font-size: 11px; color: var(--c-muted); }
+.history-tile strong { font: 700 15px/1.2 var(--font-num); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.history-delta { font-size: 11px; min-height: 13px; color: var(--c-muted); }
+.history-delta.is-up { color: var(--c-good); }
+.history-delta.is-down { color: var(--c-bad); }
+.history .is-bad, .history-day .is-bad { color: var(--c-bad); }
+.history .is-good, .history-day .is-good { color: var(--c-good); }
+.history-chart { display: flex; align-items: flex-end; gap: 4px; height: 96px; padding: 8px 6px 0; border-radius: 10px; background: rgba(0, 0, 0, 0.18); }
+.history-chart.is-dense { gap: 1px; }
+.history-bar { position: relative; flex: 1; min-width: 0; height: 100%; padding: 0; border: 0; background: transparent; cursor: pointer; }
+.history-bar::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: var(--h); border-radius: 3px 3px 0 0; background: var(--c-accent); opacity: 0.6; transition: opacity 120ms ease; }
+.history-bar:hover::after, .history-bar:focus-visible::after { opacity: 1; }
+.history-bar.is-neg::after { background: var(--c-bad); opacity: 0.8; }
+.history-axis { display: flex; justify-content: space-between; margin-top: -6px; font-size: 11px; color: var(--c-muted); }
+.history-legend { font-size: 11px; color: var(--c-muted); }
+.history-list { display: flex; flex-direction: column; gap: 6px; }
+.history-row { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 52px; padding: 8px 10px 8px 12px; border: 0; border-radius: 10px; background: rgba(0, 0, 0, 0.22); color: var(--c-text); text-align: left; cursor: pointer; font: inherit; }
+.history-row:hover { background: rgba(0, 0, 0, 0.32); }
+.history-row-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.history-row-date { font-weight: 700; font-size: 14px; }
+.history-row-sub { font-size: 11.5px; color: var(--c-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.history-row-money { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; font-family: var(--font-num); font-size: 13px; white-space: nowrap; }
+.history-row-rev { font-weight: 700; font-size: 14px; }
+.history-row-chev { color: var(--c-muted); font-size: 20px; }
+.history-note { margin: 4px 0 0; text-align: center; font-size: 11px; color: var(--c-muted); }
+.history-day { display: flex; flex-direction: column; gap: 8px; }
+.history-day-head { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-radius: 10px; background: rgba(0, 0, 0, 0.22); }
+.history-day-head strong { font: 700 22px/1.2 var(--font-num); }
+.history-acc { border-radius: 10px; background: rgba(0, 0, 0, 0.18); }
+.history-acc > summary { min-height: 44px; display: flex; align-items: center; padding: 0 12px; font-weight: 700; cursor: pointer; list-style: none; }
+.history-acc > summary::-webkit-details-marker { display: none; }
+.history-acc > summary::after { content: '▾'; margin-left: auto; color: var(--c-muted); transition: transform 150ms ease; }
+.history-acc[open] > summary::after { transform: rotate(180deg); }
+.history-acc > .report-grid { padding: 0 12px 10px; }
+@media (max-width: 380px) {
+  .history-tile strong { font-size: 13.5px; }
+  .history-row-sub { max-width: 150px; }
+}
+
+/* Sheet bertumpuk: setiap latar modal punya konteks tumpukan sendiri, jadi elemen sticky
+   (tab Statistik, judul menu) di modal bawah tidak menembus modal di atasnya. */
+.modal-backdrop { isolation: isolate; }
+.history-acc > .report-grid { grid-template-columns: 1fr; }
+
+/* Riwayat di layar lebar: daftar kiri, detail hari kanan. */
+.sheet-stats:has(.history.is-wide) { width: min(1040px, 100%); }
+.history.is-wide { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(300px, 1fr); gap: 16px; align-items: start; }
+.history-main { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.history-side { position: sticky; top: 52px; max-height: calc(100vh - 220px); overflow: auto; padding: 12px; border-radius: 12px; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--c-border-soft); }
+.history-side-title { margin: 0 0 4px; font: 700 15px/1.3 var(--font); color: var(--c-accent-strong); }
+.history.is-wide .history-chart { height: 120px; }
+.history-row.is-selected { background: rgba(245, 176, 65, 0.16); box-shadow: inset 3px 0 0 var(--c-accent); }
+.history.is-wide .history-row-chev { display: none; }
+.history-bar:hover::after { opacity: 1; }
+.modal.sheet-history-day { background: var(--c-panel-solid); }
+
+/* Tab Statistik menempel dengan latar solid (sebelumnya transparan → grafik tembus di desktop). */
+.stats-tabs { background: var(--c-panel-solid); box-shadow: 0 -12px 0 var(--c-panel-solid), inset 0 0 0 1px rgba(255, 255, 255, 0.06); }
+
+/* ---------- Detail riwayat hari (0.14.2) ---------- */
+.history-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255, 255, 255, 0.07); }
+.history-fact { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.history-fact span { font-size: 11px; color: var(--c-muted); }
+.history-fact strong { font: 700 14px/1.2 var(--font-num); white-space: nowrap; }
+.history-acc > summary { gap: 10px; }
+.history-acc > summary > span:first-child { flex: none; }
+.history-acc-meta { flex: 1; min-width: 0; text-align: right; font: 500 12px/1.2 var(--font); color: var(--c-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.history-acc > summary::after { margin-left: 0; }
+.history-acc-body { display: flex; flex-direction: column; gap: 8px; padding: 0 12px 12px; }
+.history-acc-body > .report-row { margin: 0; }
+.history-total { font-weight: 700; border-top: 1px solid rgba(255, 255, 255, 0.12); padding-top: 6px; }
+.history-chipset { display: flex; flex-direction: column; gap: 5px; }
+.history-chipset-title { font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--c-muted); }
+.history-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.history-chip { display: inline-flex; align-items: baseline; gap: 6px; padding: 4px 9px; border-radius: 6px; background: rgba(255, 255, 255, 0.06); font-size: 12.5px; }
+.history-chip b { font-family: var(--font-num); color: var(--c-text); }
+.history-chip.is-warn b { color: #f5b041; }
+.history-chip.is-bad b { color: var(--c-bad); }
+.history-small { margin: 0; font-size: 12px; line-height: 1.4; }
+.history-branch { display: flex; flex-direction: column; gap: 3px; padding: 8px 10px; border-radius: 8px; background: rgba(255, 255, 255, 0.04); }
+.history-branch-head { display: flex; justify-content: space-between; gap: 8px; font-size: 13.5px; }
+.history-branch { gap: 6px; }
+.history-branch-money { display: flex; flex-wrap: wrap; gap: 2px 12px; font-size: 12px; color: var(--c-muted); }
+.history-branch-table { font-size: 12.5px; background: rgba(0, 0, 0, 0.18); }
+.history-branch-table .branch-tr { padding: 6px 8px; }
+/* Panel samping desktop sempit: tabel cabang jadi kartu seperti di ponsel. */
+.history-side .history-branch-table .branch-th { display: none; }
+.history-side .history-branch-table .branch-tr { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.history-side .history-branch-table .branch-td-name { grid-column: 1 / -1; font-weight: 700; }
+.history-side .history-branch-table .branch-tr span:not(.branch-td-name) { text-align: left; }
+.history-side .history-branch-table .branch-tr span[data-label]::before { content: attr(data-label) ' '; display: block; font-size: 10.5px; color: var(--c-muted); font-family: var(--font); }

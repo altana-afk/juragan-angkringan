@@ -11,7 +11,7 @@ import { totalQty } from '../systems/InventorySystem';
 import { isDrink, sortRecipesForMenu } from '../systems/RecipeSystem';
 import { salePriceOf } from '../systems/PricingSystem';
 import { formatRupiah } from '../utils/formatting';
-import { el } from './dom';
+import { el, keepScroll } from './dom';
 import { CATEGORY_LABEL } from './KitchenPanel';
 import { itemIcon, stepper } from './itemIcon';
 import type { ModalHandle, UIManager } from './UIManager';
@@ -43,7 +43,7 @@ export function openBranchPanel(ctx: GameContext, ui: UIManager, startSlot: numb
   const render = (): void => {
     const s = ctx.store.get();
     const nodes = view.kind === 'list' ? listView(s) : view.kind === 'detail' ? detailView(s, view.slot) : locationView(s, view.slot);
-    body.replaceChildren(...nodes.filter((n): n is HTMLElement => n !== null));
+    keepScroll(body, () => body.replaceChildren(...nodes.filter((n): n is HTMLElement => n !== null)));
   };
 
   // ---------- Daftar slot ----------
@@ -459,6 +459,7 @@ export function openBranchPanel(ctx: GameContext, ui: UIManager, startSlot: numb
       );
       return el('div', {
         className: 'recipe-card',
+        attrs: { 'data-anchor': `kirim-${r.id}` },
         children: [
           itemIcon(r.icon),
           el('div', {
