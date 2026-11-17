@@ -2,7 +2,7 @@ import { GRAPHICS, type GraphicsQuality } from '../config/graphicsSettings';
 import type { AudioSystem } from '../audio/AudioSystem';
 import type { AudioSettings } from '../audio/AudioSettings';
 import { el } from './dom';
-import { analyticsAvailable, analyticsEnabled, setAnalyticsEnabled } from '../analytics/analytics';
+// import { analyticsAvailable, analyticsEnabled, setAnalyticsEnabled } from '../analytics/analytics';
 import { UI_SETTINGS } from '../config/uiSettings';
 import type { UIManager } from './UIManager';
 
