@@ -1,3 +1,4 @@
+import { branchOption, dispatchFromBranch, type OnlineSource } from './BranchOnlineSystem';
 import { GAME_CONFIG } from '../config/gameConfig';
 import type { GameState, OnlineOrder, OnlineOrderItem } from '../core/GameState';
 import { emptyOnlineDay } from '../core/GameState';
@@ -185,12 +186,24 @@ export function acceptBlocker(state: Readonly<GameState>, order: OnlineOrder): s
 
 // ---------- aksi pemain ----------
 
-export function acceptOrder(draft: GameState, id: number, honorNote: boolean): OnlineOrder {
+export function acceptOrder(draft: GameState, id: number, honorNote: boolean, source: OnlineSource = 'utama', catalog?: Catalog): OnlineOrder {
   const o = draft.online.orders.find((x) => x.id === id);
   if (!o) throw new GameRuleError('online-unknown', 'Pesanan tidak ditemukan.');
   const blocker = acceptBlocker(draft, o);
   if (blocker) throw new GameRuleError('online-blocked', blocker);
   const minute = draft.calendar.clockMinutes;
+  if (source !== 'utama') {
+    if (!catalog) throw new Error('catalog wajib untuk pesanan dari cabang');
+    const b = draft.branches.list.find((x) => x.slot === source);
+    if (!b) throw new GameRuleError('online-blocked', 'Cabang tidak ditemukan.');
+    o.noteHonored = o.note !== null && honorNote;
+    const opt = branchOption(draft, catalog, o, b, o.noteHonored);
+    if (!opt.ok) throw new GameRuleError('online-blocked', `${b.name}: ${opt.reason}.`);
+    o.acceptedMinute = minute;
+    dispatchFromBranch(draft, catalog, o, source);
+    draft.online.today.accepted++;
+    return o;
+  }
   const mode = modeById(draft.online.mode!);
   o.status = 'diterima';
   o.noteHonored = o.note !== null && honorNote;
@@ -255,15 +268,21 @@ function takeStock(draft: GameState, catalog: Catalog, o: OnlineOrder): string[]
   return [];
 }
 
+function fromBranchOrder(o: OnlineOrder): boolean {
+  return o.source !== undefined && o.source !== null;
+}
+
 function deliver(draft: GameState, o: OnlineOrder, minute: number): void {
   const mode = modeById(draft.online.mode ?? 'ojol');
   const ev = activeOnlineEvent(draft);
   o.status = 'selesai';
   o.deliveredMinute = minute;
   o.late = o.dueMinute !== null && minute > o.dueMinute;
-  o.cold = o.pickupMinute !== null && minute - o.pickupMinute > hotMinutes(draft);
-  const commission = Math.round(o.value * mode.commission);
-  const fee = mode.keepsFee ? o.fee : 0;
+  o.cold = o.pickupMinute !== null && minute - o.pickupMinute > (fromBranchOrder(o) ? ONLINE_RULES.hotMinutes : hotMinutes(draft));
+  // Dari cabang: diantar sendiri → tanpa komisi, ongkir pembeli masuk kas (biaya antar dibayar saat dikirim).
+  const fromBranch = o.source !== undefined && o.source !== null;
+  const commission = fromBranch ? 0 : Math.round(o.value * mode.commission);
+  const fee = fromBranch || mode.keepsFee ? o.fee : 0;
   draft.player.money += o.value - commission + fee;
   draft.ledger.revenue += o.value;
   draft.stats.totalRevenue += o.value;
@@ -420,7 +439,7 @@ export function closeOnlineDay(draft: GameState): GameState['online']['today'] {
 
 /** Laba bersih pesanan online hari itu (nilai − komisi + ongkir yang masuk − gaji). */
 export function onlineNet(t: GameState['online']['today']): number {
-  return t.gross - t.commission + t.feesKept - t.wage;
+  return t.gross - t.commission + t.feesKept - t.wage - (t.branchFees ?? 0);
 }
 
 /** Mulai hari baru: kosongkan pesanan & perjalanan kemarin. */

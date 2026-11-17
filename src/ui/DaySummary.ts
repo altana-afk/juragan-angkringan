@@ -139,7 +139,8 @@ export function renderReport(ctx: GameContext, r: DayReport, ui?: UIManager): HT
               row('Diterima / selesai', `${r.online.accepted} / ${r.online.delivered}${r.online.late ? ` (${r.online.late} terlambat)` : ''}`),
               row('Batal (stok habis / tak terantar)', String(r.online.cancelled), r.online.cancelled ? 'is-bad' : ''),
               row('Ditolak / tidak dijawab', `${r.online.rejected} / ${r.online.expired}`),
-              row('Pendapatan bersih online', money(r.online.gross - r.online.commission + r.online.feesKept - r.online.wage, r.online.gross - r.online.commission + r.online.feesKept - r.online.wage >= 0 ? '+' : '−'), 'is-good'),
+              r.online.fromBranch ? row('Dikirim dari cabang', `${r.online.fromBranch} (biaya antar ${formatRupiah(r.online.branchFees ?? 0)})`) : null,
+              row('Pendapatan bersih online', money((r.online.gross - r.online.commission + r.online.feesKept - r.online.wage - (r.online.branchFees ?? 0)), (r.online.gross - r.online.commission + r.online.feesKept - r.online.wage - (r.online.branchFees ?? 0)) >= 0 ? '+' : '−'), 'is-good'),
               row('Rating kemitraan', `${r.online.ratingChange >= 0 ? '+' : ''}${Math.round(r.online.ratingChange)} · popularitas ${r.online.popularityDelta >= 0 ? '+' : ''}${r.online.popularityDelta}`),
             ],
           })

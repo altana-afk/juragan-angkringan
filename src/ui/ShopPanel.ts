@@ -19,6 +19,29 @@ export function expiryText(expiresDay: number | null, today: number): string {
   return `sampai Hari ${expiresDay}`;
 }
 
+/** Kategori tab Belanja (maks. 6). Bahan baru yang belum dipetakan masuk "Lainnya". */
+const SHOP_TABS = [
+  { id: 'lauk', label: 'Lauk', items: ['telur', 'tempe', 'tahu', 'sosis', 'bakso', 'ayam', 'ati_ampela', 'usus'] },
+  { id: 'sayur', label: 'Sayur', items: ['cabai', 'bawang', 'jahe', 'jagung', 'pisang'] },
+  { id: 'karbo', label: 'Karbo', items: ['beras', 'mi_instan', 'bihun', 'roti'] },
+  { id: 'bumbu', label: 'Bumbu', items: ['kecap', 'minyak', 'gula'] },
+  { id: 'minuman', label: 'Minuman', items: ['teh', 'kopi', 'sirup', 'susu', 'air_minum', 'air_mineral', 'es_batu', 'jeruk'] },
+  { id: 'lainnya', label: 'Lainnya', items: [] as string[] },
+] as const;
+type TabId = 'semua' | (typeof SHOP_TABS)[number]['id'];
+
+export function shopCategory(ingredientId: string): Exclude<TabId, 'semua'> {
+  return SHOP_TABS.find((t) => (t.items as readonly string[]).includes(ingredientId))?.id ?? 'lainnya';
+}
+
+type ChipId = 'turun' | 'dipakai' | 'menipis' | 'basi';
+const SHOP_CHIPS: { id: ChipId; label: string; hint: string }[] = [
+  { id: 'turun', label: 'Harga turun', hint: 'Harga hari ini lebih murah dari kemarin' },
+  { id: 'dipakai', label: 'Dipakai menu', hint: 'Bahan untuk menu yang kamu jual kemarin atau ada di Daftar persiapan' },
+  { id: 'menipis', label: 'Stok menipis', hint: 'Stok kurang dari satu kemasan' },
+  { id: 'basi', label: 'Cepat basi', hint: 'Masa simpan 2 hari atau kurang' },
+];
+
 interface Row {
   def: IngredientDef;
   stepper: Stepper;
@@ -34,6 +57,11 @@ interface Row {
  */
 export class ShopPanel {
   private readonly cart = new Map<string, number>();
+  /** Filter diingat selama permainan berjalan; keranjang tidak terpengaruh. */
+  private tab: TabId = 'semua';
+  private readonly chips = new Set<ChipId>();
+  private filterBar = el('div', { className: 'shop-filters' });
+  private emptyNote = el('p', { className: 'panel-note muted shop-empty', attrs: { role: 'status' } });
   private modal: ModalHandle | null = null;
   private rows: Row[] = [];
   private offState: (() => void) | null = null;
@@ -83,7 +111,9 @@ export class ShopPanel {
             }),
           ],
         }),
+        this.filterBar,
         list,
+        this.emptyNote,
         lockedCount > 0 ? el('p', { className: 'panel-note muted', text: `${lockedCount} bahan lain tersedia setelah menu barunya terbuka.` }) : null,
       ],
     });
@@ -117,6 +147,7 @@ export class ShopPanel {
       },
     });
     this.offState = this.ctx.bus.on('state:changed', () => this.refresh());
+    this.renderFilters();
     this.refresh();
   }
 
@@ -151,6 +182,85 @@ export class ShopPanel {
     return { def, stepper: step, price, stock, subtotal, root };
   }
 
+  /** Resep yang dianggap "menu pemain": terjual kemarin, atau semua menu terbuka bila belum ada laporan. */
+  private menuIngredients(state: Readonly<GameState>): Set<string> {
+    const r = state.lastReport;
+    const ids = r ? [...r.topSellers.map(([id]) => id), ...r.leastSold.map(([id]) => id)] : [];
+    const recipes = ids.length ? ids : state.unlockedRecipes;
+    const out = new Set<string>();
+    for (const id of recipes) {
+      try {
+        for (const ing of Object.keys(this.ctx.catalog.recipe(id).ingredients)) out.add(ing);
+      } catch {
+        /* resep lama */
+      }
+    }
+    return out;
+  }
+
+  private matches(state: Readonly<GameState>, def: IngredientDef, trend: string, menu: Set<string>): boolean {
+    if (this.tab !== 'semua' && shopCategory(def.id) !== this.tab) return false;
+    const have = totalQty(state.inventory.ingredients[def.id]);
+    for (const c of this.chips) {
+      if (c === 'turun' && trend !== 'turun') return false;
+      if (c === 'dipakai' && !menu.has(def.id)) return false;
+      if (c === 'menipis' && have >= def.packSize) return false;
+      if (c === 'basi' && (def.shelfLifeDays === null || def.shelfLifeDays > 2)) return false;
+    }
+    return true;
+  }
+
+  private renderFilters(): void {
+    const present = new Set(this.rows.map((r) => shopCategory(r.def.id)));
+    const tabs: { id: TabId; label: string }[] = [{ id: 'semua', label: 'Semua' }, ...SHOP_TABS.filter((t) => present.has(t.id))];
+    if (!tabs.some((t) => t.id === this.tab)) this.tab = 'semua';
+    const tabBtns = tabs.map((t) =>
+      el('button', {
+        dataset: { tab: t.id },
+        className: `shop-tab${this.tab === t.id ? ' is-active' : ''}`,
+        text: t.label,
+        attrs: { type: 'button', role: 'tab', 'aria-selected': String(this.tab === t.id) },
+        onClick: () => {
+          this.tab = t.id;
+          this.syncFilterButtons();
+          this.refresh();
+        },
+      }),
+    );
+    const chipBtns = SHOP_CHIPS.map((c) =>
+      el('button', {
+        dataset: { chip: c.id },
+        className: `shop-chip${this.chips.has(c.id) ? ' is-active' : ''}`,
+        text: c.label,
+        attrs: { type: 'button', 'aria-pressed': String(this.chips.has(c.id)), title: c.hint },
+        onClick: () => {
+          if (this.chips.has(c.id)) this.chips.delete(c.id);
+          else this.chips.add(c.id);
+          this.syncFilterButtons();
+          this.refresh();
+        },
+      }),
+    );
+    this.filterBar.replaceChildren(
+      el('div', { className: 'shop-tabs', attrs: { role: 'tablist', 'aria-label': 'Kategori bahan' }, children: tabBtns }),
+      el('div', { className: 'shop-chips', attrs: { role: 'group', 'aria-label': 'Saring status' }, children: chipBtns }),
+    );
+  }
+
+  /** Perbarui tanda aktif tanpa membangun ulang tombol, jadi posisi geser tab/chip tidak kembali ke awal. */
+  private syncFilterButtons(): void {
+    for (const b of this.filterBar.querySelectorAll<HTMLButtonElement>('[data-tab]')) {
+      const on = b.dataset.tab === this.tab;
+      b.classList.toggle('is-active', on);
+      b.setAttribute('aria-selected', String(on));
+    }
+    for (const b of this.filterBar.querySelectorAll<HTMLButtonElement>('[data-chip]')) {
+      const on = this.chips.has(b.dataset.chip as ChipId);
+      b.classList.toggle('is-active', on);
+      b.setAttribute('aria-pressed', String(on));
+    }
+  }
+
   private cartLines(): CartLine[] {
     return [...this.cart.entries()].map(([ingredientId, packs]) => ({ ingredientId, packs }));
   }
@@ -159,6 +269,8 @@ export class ShopPanel {
     if (!this.modal) return;
     const state: Readonly<GameState> = this.ctx.store.get();
     const day = state.calendar.day;
+    const menu = this.menuIngredients(state);
+    let shown = 0;
     for (const row of this.rows) {
       const mult = eventPriceMultipliers(state)[row.def.id] ?? 1;
       const factor = buyPriceFactor(state, row.def.id);
@@ -176,7 +288,21 @@ export class ShopPanel {
       row.stepper.set(packs);
       setText(row.subtotal, packs > 0 ? formatRupiah(p * packs) : '');
       row.root.classList.toggle('in-cart', packs > 0);
+      // Bahan di keranjang tetap tersimpan walau barisnya disembunyikan filter.
+      const visible = this.matches(state, row.def, trend, menu);
+      row.root.hidden = !visible;
+      if (visible) shown++;
     }
+    const hiddenInCart = this.rows.filter((r) => r.root.hidden && (this.cart.get(r.def.id) ?? 0) > 0).length;
+    setText(
+      this.emptyNote,
+      shown === 0
+        ? `Tidak ada bahan yang cocok dengan filter ini.${hiddenInCart ? ` ${hiddenInCart} bahan di keranjang tersembunyi.` : ''}`
+        : hiddenInCart
+          ? `${hiddenInCart} bahan di keranjang tidak terlihat karena filter — tetap ikut dibeli.`
+          : '',
+    );
+    this.emptyNote.hidden = shown > 0 && hiddenInCart === 0;
     const quote = quotePurchase(this.ctx.catalog, this.cartLines(), day, (id) => buyPriceFactor(this.ctx.store.get(), id));
     const remaining = state.player.money - quote.total;
     setText(this.moneyEl, `Kas ${formatRupiah(state.player.money)}`);

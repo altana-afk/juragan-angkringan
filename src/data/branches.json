@@ -16,6 +16,11 @@
     "shipFee": 5000,
     "shrinkBase": 0.03,
     "shrinkPerLate": 0.04,
-    "moveKeepPopularity": 0.7
+    "moveKeepPopularity": 0.7,
+    "onlineReserveMin": 2,
+    "onlineReserveShare": 0.3,
+    "onlineFee": 2000,
+    "onlineFeeMotor": 1000,
+    "onlineSlowNoMotor": 1.3
   }
 }

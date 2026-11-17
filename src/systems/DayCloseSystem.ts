@@ -85,7 +85,7 @@ export function closeDay(draft: GameState, catalog: Catalog): DayReport {
     operationalCost: l.operationalCost,
     netProfit:
       l.revenue - l.purchaseTotal - l.promotionCost - l.operationalCost + l.bankIncome - l.loanCost - l.moveCost +
-      (online ? online.feesKept - online.commission - online.wage : 0) +
+      (online ? online.feesKept - online.commission - online.wage - (online.branchFees ?? 0) : 0) +
       branchNet,
     costOfSales: Math.round(l.costOfSales),
     grossProfit: Math.round(l.revenue - l.costOfSales),
@@ -142,7 +142,7 @@ export function closeDay(draft: GameState, catalog: Catalog): DayReport {
     eventId: report.event?.id ?? null,
     mapId: report.mapId,
     onlineDelivered: report.online?.delivered ?? 0,
-    onlineNet: report.online ? report.online.gross - report.online.commission + report.online.feesKept - report.online.wage : 0,
+    onlineNet: report.online ? report.online.gross - report.online.commission + report.online.feesKept - report.online.wage - (report.online.branchFees ?? 0) : 0,
     branchNet: report.branches ? report.branches.reduce((s, b) => s + b.net, 0) : 0,
     wasteCost: report.wasteCost,
     // Salinan terpisah supaya laporan berikutnya tidak mengubah riwayat.

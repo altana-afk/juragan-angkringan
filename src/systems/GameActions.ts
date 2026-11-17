@@ -9,6 +9,7 @@ import { buyUpgrade, type UpgradeDef } from './UpgradeSystem';
 import { buyBranchUpgrade, moveBranch, openBranch, setBranchOpen } from './BranchSystem';
 import { changeWagePlan, dismissStaff, hireStaff } from './BranchStaffSystem';
 import { shipToBranch } from './BranchSupplySystem';
+import type { OnlineSource } from './BranchOnlineSystem';
 import { branchUpgradeById, wagePlanById, type WagePlanId } from '../data/branches';
 import { setPrice, setOnlinePrice } from './PricingSystem';
 import { WEATHER_EFFECTS, weatherForDay } from './WeatherSystem';
@@ -245,8 +246,12 @@ export class GameActions {
     return events;
   }
 
-  acceptOnline(id: number, honorNote: boolean): ActionResult<OnlineOrder> {
-    return this.run('online-terima', (draft) => ({ ...acceptOrder(draft, id, honorNote) }), (o) => `Pesanan ${o.buyer} diterima.`);
+  acceptOnline(id: number, honorNote: boolean, source: OnlineSource = 'utama'): ActionResult<OnlineOrder> {
+    return this.run(
+      'online-terima',
+      (draft) => ({ ...acceptOrder(draft, id, honorNote, source, this.catalog) }),
+      (o) => (o.source != null ? `Pesanan ${o.buyer} dikirim dari ${this.store.get().branches.list.find((b) => b.slot === o.source)?.name ?? 'cabang'}.` : `Pesanan ${o.buyer} diterima.`),
+    );
   }
 
   rejectOnline(id: number): ActionResult<void> {

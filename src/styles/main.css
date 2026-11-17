@@ -2346,3 +2346,44 @@ button.hud-pill { font: inherit; color: inherit; cursor: pointer; text-align: le
 .history-side .history-branch-table .branch-td-name { grid-column: 1 / -1; font-weight: 700; }
 .history-side .history-branch-table .branch-tr span:not(.branch-td-name) { text-align: left; }
 .history-side .history-branch-table .branch-tr span[data-label]::before { content: attr(data-label) ' '; display: block; font-size: 10.5px; color: var(--c-muted); font-family: var(--font); }
+
+/* ---------- Filter Belanja (0.15.0) ---------- */
+.shop-filters { position: sticky; top: -1px; z-index: 2; display: flex; flex-direction: column; gap: 6px; padding: 6px 0; background: var(--c-panel-solid); }
+.shop-tabs { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; padding: 3px; border-radius: 10px; background: rgba(0, 0, 0, 0.3); scroll-snap-type: x proximity; }
+.shop-tabs::-webkit-scrollbar { display: none; }
+.shop-tab { flex: 1 0 auto; min-height: 44px; padding: 0 14px; border: 0; border-radius: 8px; background: transparent; color: var(--c-muted); font: 700 13px/1 var(--font); cursor: pointer; scroll-snap-align: start; white-space: nowrap; }
+.shop-tab:hover { color: var(--c-text); }
+.shop-tab.is-active { background: var(--c-accent); color: #1b1220; }
+.shop-chips { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+.shop-chips::-webkit-scrollbar { display: none; }
+.shop-chip { flex: none; min-height: 44px; padding: 0 12px; border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 999px; background: transparent; color: var(--c-muted); font: 600 12.5px/1 var(--font); cursor: pointer; white-space: nowrap; }
+.shop-chip.is-active { border-color: var(--c-accent); background: rgba(245, 176, 65, 0.16); color: var(--c-text); }
+.shop-tab:focus-visible, .shop-chip:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 2px; }
+.shop-empty { margin: 4px 0; }
+.item-row[hidden] { display: none; }
+
+/* ---------- Pilih sumber pengiriman pesanan online (0.15.0) ---------- */
+.source-picker { display: flex; flex-direction: column; gap: 8px; padding: 10px; border-radius: 10px; background: rgba(0, 0, 0, 0.2); }
+.source-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.source-title { font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--c-muted); }
+.source-head .btn { min-height: 44px; }
+.source-list { display: flex; flex-direction: column; gap: 6px; }
+.source-opt { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 48px; padding: 6px 12px; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 10px; background: rgba(255, 255, 255, 0.03); color: var(--c-text); text-align: left; font: inherit; cursor: pointer; }
+.source-opt.is-active { border-color: var(--c-accent); background: rgba(245, 176, 65, 0.14); box-shadow: inset 0 0 0 1px var(--c-accent); }
+.source-opt.is-off { opacity: 0.55; cursor: not-allowed; }
+.source-opt:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 2px; }
+.source-opt-name { font-weight: 700; font-size: 14px; }
+.source-opt-meta { font-size: 12px; color: var(--c-muted); text-align: right; }
+.source-more { align-self: flex-start; min-height: 44px; }
+.source-note { margin: 0; font-size: 11.5px; color: var(--c-muted); line-height: 1.4; }
+/* Tabel stok hanya di layar lebar; di ponsel cukup alasan singkat di tiap pilihan. */
+.source-table { display: none; }
+@media (min-width: 900px) and (min-height: 520px) {
+  .source-cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 12px; align-items: start; }
+  .source-table { display: flex; flex-direction: column; border-radius: 8px; overflow: hidden; background: rgba(0, 0, 0, 0.18); font-size: 12.5px; }
+  .source-tr { display: grid; grid-template-columns: minmax(0, 1.4fr) repeat(var(--cols, 2), minmax(0, 1fr)); gap: 6px; padding: 6px 10px; border-top: 1px solid rgba(255, 255, 255, 0.06); }
+  .source-tr span:not(:first-child) { text-align: right; font-family: var(--font-num); }
+  .source-th { border-top: 0; font-weight: 700; color: var(--c-muted); background: rgba(255, 255, 255, 0.04); }
+  .source-tr .is-bad { color: var(--c-bad); }
+}
+@media (min-width: 900px) and (min-height: 520px) { .sheet-online:has(.source-picker) { width: min(860px, 100%); } }

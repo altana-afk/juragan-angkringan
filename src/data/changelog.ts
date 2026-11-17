@@ -10,6 +10,17 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: readonly ChangelogEntry[] = [
   {
+    version: '0.15.0',
+    title: 'Pesanan dari cabang & filter Belanja',
+    items: [
+      'Pesanan online bisa dikirim dari cabang: pilih "Kirim dari" toko utama atau cabang, atau tekan Pilih terbaik untuk sumber tercepat yang stoknya cukup.',
+      'Cabang selalu menyisakan 2 porsi atau 30% stok tiap menu untuk pembeli di tempat, dan butuh karyawan jaga untuk mengantar.',
+      'Kirim dari cabang: tanpa komisi, ongkir pembeli masuk kas, biaya antar Rp2.000 per pesanan (Rp1.000 dengan motor pengantar cabang).',
+      'Di desktop, pilihan sumber tampil berdampingan dengan tabel stok per menu.',
+      'Belanja punya tab kategori (Lauk, Sayur, Karbo, Bumbu, Minuman, Lainnya) dan filter Harga turun, Dipakai menu, Stok menipis, Cepat basi. Keranjang tetap tersimpan saat filter diganti.',
+    ],
+  },
+  {
     version: '0.14.3',
     title: 'Daftar persiapan tetap tersimpan',
     items: [

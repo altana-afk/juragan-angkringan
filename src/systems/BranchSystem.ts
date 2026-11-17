@@ -173,6 +173,9 @@ export function closeBranches(draft: GameState, catalog: Catalog): BranchDayRepo
     const received: Record<string, number> = { ...b.dayStart };
     for (const [id, q] of Object.entries(b.shipped)) received[id] = (received[id] ?? 0) + q;
     const sold: Record<string, number> = {};
+    // Porsi yang sudah diambil pesanan online hari ini ikut dihitung terjual.
+    const online: Record<string, number> = { ...(b.onlineOut ?? {}) };
+    for (const [id, q] of Object.entries(online)) sold[id] = (sold[id] ?? 0) + q;
     let revenue = 0;
     let portions = 0;
     let popDelta = 0;
@@ -239,9 +242,11 @@ export function closeBranches(draft: GameState, catalog: Catalog): BranchDayRepo
       sold,
       left: count(b.stock),
       wasted,
+      online: Object.keys(online).length ? online : undefined,
     });
     b.dayStart = count(b.stock);
     b.shipped = {};
+    b.onlineOut = {};
   }
   return reports;
 }

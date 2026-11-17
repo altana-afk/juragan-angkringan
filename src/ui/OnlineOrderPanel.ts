@@ -3,9 +3,10 @@ import type { GameState, OnlineOrder } from '../core/GameState';
 import { DELIVERY_MODES, ONLINE_RULES, modeById } from '../data/online';
 import { activeTrip, readyForCourier } from '../systems/CourierSystem';
 import { activeOnlineEvent } from '../systems/OnlineEventSystem';
-import { acceptBlocker, acceptedToday, dailyLimit, ratingStars, stockShortfall } from '../systems/OnlineOrderSystem';
+import { acceptBlocker, acceptedToday, dailyLimit, orderNeeds, ratingStars, stockShortfall } from '../systems/OnlineOrderSystem';
 import { formatClock, formatRupiah } from '../utils/formatting';
 import { el, keepScroll } from './dom';
+import { bestSource, branchSourcesUnlocked, sourceOptions, type OnlineSource, type SourceOption } from '../systems/BranchOnlineSystem';
 import { itemIcon } from './itemIcon';
 import { PRICE_RULES, onlinePriceOf, priceBounds, priceVerdict, salePriceOf } from '../systems/PricingSystem';
 import { isDrink, sortRecipesForMenu } from '../systems/RecipeSystem';
@@ -64,6 +65,97 @@ export function openOnlineOrderPanel(ctx: GameContext, ui: UIManager): ModalHand
   const body = el('div', { className: 'online-body' });
   let handle: ModalHandle | null = null;
   const honor = new Map<number, boolean>();
+  /** Sumber pengiriman yang dipilih per pesanan & apakah daftar cabang dibuka penuh. */
+  const sourceSel = new Map<number, OnlineSource>();
+  const showAll = new Set<number>();
+
+  /**
+   * Pilih sumber pengiriman (toko utama / cabang). Ponsel: 3 pilihan teratas + "Lihat semua cabang".
+   * Desktop: dua kolom — pilihan di kiri, tabel stok per menu di kanan.
+   */
+  const sourcePicker = (o: OnlineOrder, honorNote: boolean): { node: HTMLElement; chosen: OnlineSource; options: SourceOption[] } => {
+    const s = ctx.store.get();
+    const options = sourceOptions(s, ctx.catalog, o, honorNote);
+    const best = bestSource(s, ctx.catalog, o, honorNote);
+    let chosen = sourceSel.get(o.id) ?? best ?? 'utama';
+    if (!options.some((x) => x.source === chosen && (x.ok || x.source === 'utama'))) chosen = best ?? 'utama';
+    const expanded = showAll.has(o.id);
+    const visible = expanded ? options : options.slice(0, 3);
+    const optionBtn = (x: SourceOption): HTMLElement =>
+      el('button', {
+        className: `source-opt${x.source === chosen ? ' is-active' : ''}${x.ok ? '' : ' is-off'}`,
+        attrs: { type: 'button', role: 'radio', 'aria-checked': String(x.source === chosen), ...(x.ok || x.source === 'utama' ? {} : { disabled: '' }) },
+        onClick: () => {
+          sourceSel.set(o.id, x.source);
+          render();
+        },
+        children: [
+          el('span', { className: 'source-opt-name', text: x.label }),
+          el('span', { className: 'source-opt-meta', text: x.ok ? `±${x.eta} mnt${x.fee ? ` · antar ${formatRupiah(x.fee)}` : ''}` : (x.reason ?? '') }),
+        ],
+      });
+    const list = el('div', {
+      className: 'source-list',
+      attrs: { role: 'radiogroup', 'aria-label': 'Kirim dari' },
+      children: [
+        ...visible.map(optionBtn),
+        options.length > 3
+          ? el('button', {
+              className: 'link-btn source-more',
+              text: expanded ? 'Sembunyikan' : `Lihat semua cabang (${options.length - 1})`,
+              attrs: { type: 'button' },
+              onClick: () => {
+                if (expanded) showAll.delete(o.id);
+                else showAll.add(o.id);
+                render();
+              },
+            })
+          : null,
+      ].filter((n): n is HTMLElement => n !== null),
+    });
+    const needs = [...orderNeeds(o, honorNote)];
+    const table = el('div', {
+      className: 'source-table',
+      attrs: { role: 'table', 'aria-label': 'Stok per menu tiap sumber' },
+      children: [
+        el('div', { className: 'source-tr source-th', attrs: { role: 'row' }, children: [el('span', { text: 'Menu' }), ...options.map((x) => el('span', { text: x.label }))] }),
+        ...needs.map(([id, n]) =>
+          el('div', {
+            className: 'source-tr',
+            attrs: { role: 'row' },
+            children: [
+              el('span', { text: `${ctx.catalog.recipe(id).name} ×${n}` }),
+              ...options.map((x) => el('span', { className: (x.available[id] ?? 0) < n ? 'is-bad' : '', text: String(x.available[id] ?? 0) })),
+            ],
+          }),
+        ),
+      ],
+    });
+    table.style.setProperty('--cols', String(options.length));
+    const node = el('div', {
+      className: 'source-picker',
+      children: [
+        el('div', {
+          className: 'source-head',
+          children: [
+            el('span', { className: 'source-title', text: 'Kirim dari' }),
+            el('button', {
+              className: 'btn btn-secondary btn-sm',
+              text: 'Pilih terbaik',
+              attrs: { type: 'button', ...(best === null ? { disabled: '' } : {}), title: 'Sumber tercepat dengan stok cukup' },
+              onClick: () => {
+                if (best !== null) sourceSel.set(o.id, best);
+                render();
+              },
+            }),
+          ],
+        }),
+        el('div', { className: 'source-cols', children: [list, table] }),
+        el('p', { className: 'source-note', text: 'Cabang menyisakan 2 porsi atau 30% stok tiap menu untuk pembeli di tempat. Angka tabel = stok yang boleh dipakai.' }),
+      ],
+    });
+    return { node, chosen, options };
+  };
 
   const render = (): void => {
     const s = ctx.store.get();
@@ -111,7 +203,13 @@ export function openOnlineOrderPanel(ctx: GameContext, ui: UIManager): ModalHand
       const honorNote = honor.get(o.id) ?? true;
       const short = stockShortfall(s, o, honorNote).map((id) => ctx.catalog.recipe(id).name);
       const left = Math.max(0, o.expiresMinute - now);
-      const net = Math.round(o.value * (1 - modeById(s.online.mode ?? 'ojol').commission)) + (s.online.mode === 'kurir' ? o.fee : 0);
+      const picker = branchSourcesUnlocked(s) && s.online.mode ? sourcePicker(o, honorNote) : null;
+      const chosen: OnlineSource = picker?.chosen ?? 'utama';
+      const net =
+        chosen === 'utama'
+          ? Math.round(o.value * (1 - modeById(s.online.mode ?? 'ojol').commission)) + (s.online.mode === 'kurir' ? o.fee : 0)
+          : o.value + o.fee - (picker?.options.find((x) => x.source === chosen)?.fee ?? 0);
+      const chosenOk = chosen === 'utama' || (picker?.options.find((x) => x.source === chosen)?.ok ?? false);
       parts.push(
         el('article', {
           className: `online-card is-pending${left <= 3 ? ' is-urgent' : ''}`,
@@ -143,7 +241,8 @@ export function openOnlineOrderPanel(ctx: GameContext, ui: UIManager): ModalHand
                   ],
                 })
               : null,
-            short.length ? el('p', { className: 'panel-warning', text: `Stok kurang: ${short.join(', ')}. Masak dulu, atau pesanan bisa batal & rating turun.` }) : null,
+            picker?.node ?? null,
+            short.length && chosen === 'utama' ? el('p', { className: 'panel-warning', text: `Stok kurang: ${short.join(', ')}. Masak dulu, atau pesanan bisa batal & rating turun.` }) : null,
             blocker ? el('p', { className: 'item-meta online-blocker', text: blocker }) : null,
             el('div', {
               className: 'online-actions',
@@ -158,10 +257,10 @@ export function openOnlineOrderPanel(ctx: GameContext, ui: UIManager): ModalHand
                 }),
                 el('button', {
                   className: 'btn btn-primary btn-sm',
-                  text: 'Terima',
-                  attrs: { type: 'button', ...(blocker ? { disabled: '' } : {}) },
+                  text: chosen === 'utama' ? 'Terima' : `Kirim dari ${s.branches.list.find((b) => b.slot === chosen)?.name ?? 'cabang'}`,
+                  attrs: { type: 'button', ...(blocker || !chosenOk ? { disabled: '' } : {}) },
                   onClick: () => {
-                    const r = ctx.actions.acceptOnline(o.id, honorNote);
+                    const r = ctx.actions.acceptOnline(o.id, honorNote, chosen);
                     ctx.notify(r.message, r.ok ? 'success' : 'error');
                   },
                 }),
@@ -188,7 +287,16 @@ export function openOnlineOrderPanel(ctx: GameContext, ui: UIManager): ModalHand
           el('article', {
             className: 'online-card',
             children: [
-              el('div', { className: 'online-card-head', children: [el('strong', { text: o.buyer }), el('span', { className: 'guide-badge tone-good', text: STATUS[o.status] })] }),
+              el('div', {
+                className: 'online-card-head',
+                children: [
+                  el('strong', { text: o.buyer }),
+                  el('span', {
+                    className: 'guide-badge tone-good',
+                    text: o.source != null ? `${STATUS[o.status]} · dari ${s.branches.list.find((b) => b.slot === o.source)?.name ?? 'cabang'}` : STATUS[o.status],
+                  }),
+                ],
+              }),
               el('div', { className: 'online-items', text: itemsText(ctx, o) }),
               el('div', { className: 'item-meta', text: `${o.km.toFixed(1)} km · ${eta} · janji tiba ${formatClock(o.dueMinute ?? now)}` }),
               short.length ? el('p', { className: 'panel-warning', text: `Stok ${short.join(', ')} kurang! Masak sebelum dijemput.` }) : null,

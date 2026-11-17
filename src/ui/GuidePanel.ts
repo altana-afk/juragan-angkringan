@@ -233,6 +233,7 @@ function tabPanduan(): HTMLElement[] {
         'Setiap cabang buka membayar sewa lokasi + Rp10.000 dan gaji karyawan setiap hari. Tutup cabang yang tidak dipakai supaya tidak rugi.',
         'Gaji harian Rp30.000, mingguan Rp180.000 (±Rp25.700/hari, terikat 7 hari), bulanan Rp700.000 (±Rp23.300/hari, terikat 30 hari). Gaji telat menurunkan kinerja; telat 3× berturut-turut karyawan keluar.',
         'Satu lokasi hanya untuk satu angkringan yang buka. Cabang mengikuti event harian di lokasinya.',
+        'Pesanan online bisa dikirim dari cabang yang punya karyawan jaga. Cabang menyisakan 2 porsi atau 30% stok tiap menu untuk pembeli di tempat. Biaya antar Rp2.000 per pesanan (Rp1.000 dengan motor cabang), tanpa komisi, ongkir pembeli masuk kas.',
       ],
     }),
     card({

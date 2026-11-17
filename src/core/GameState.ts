@@ -221,6 +221,8 @@ export interface OnlineOrder {
   late: boolean;
   cold: boolean;
   cancelReason: string | null;
+  /** Sumber pengiriman (0.15.0): slot cabang, atau tidak ada/null = toko utama. */
+  source?: number | null;
 }
 
 export interface CourierTrip {
@@ -246,6 +248,9 @@ export interface OnlineDayReport {
   wage: number;
   ratingChange: number;
   popularityDelta: number;
+  /** Pesanan yang dikirim dari cabang & biaya antar cabang (0.15.0). */
+  fromBranch?: number;
+  branchFees?: number;
 }
 
 export interface OnlineState {
@@ -304,6 +309,8 @@ export interface Branch {
   /** Stok di awal hari & kiriman hari ini, untuk rincian terjual/tersisa/terbuang. */
   dayStart: Record<string, number>;
   shipped: Record<string, number>;
+  /** Porsi yang diambil pesanan online hari ini (0.15.0). */
+  onlineOut?: Record<string, number>;
 }
 
 export interface BranchDayReport {
@@ -326,6 +333,8 @@ export interface BranchDayReport {
   sold: Record<string, number>;
   left: Record<string, number>;
   wasted: Record<string, number>;
+  /** Porsi yang terkirim lewat pesanan online (sudah termasuk di `sold`). */
+  online?: Record<string, number>;
 }
 
 export interface BranchesState {
