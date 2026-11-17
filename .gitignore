@@ -6,3 +6,4 @@ release/
 .vite/
 coverage/
 runing.md
+.env

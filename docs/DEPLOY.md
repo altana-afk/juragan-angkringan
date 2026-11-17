@@ -139,3 +139,15 @@ Daftar cek di perangkat nyata setelah deploy:
 - Versi cache = hash isi build, jadi setiap build yang berbeda otomatis menjadi update.
 - Saat dijalankan sebagai aplikasi terpasang, game meminta *persistent storage* agar save tidak dihapus
   browser ketika memori HP penuh.
+
+## Google Analytics 4 (opsional)
+
+Kode ada di `src/analytics/analytics.ts`. Analytics hanya aktif jika ID pengukuran diisi, **tidak** di localhost atau `?debug`, dan pemain tidak mematikannya di Pengaturan → "Kirim statistik anonim".
+
+1. Buka <https://analytics.google.com> → Admin → Buat properti → Platform **Web** → isi alamat situs game → salin **Measurement ID** (`G-XXXXXXX`).
+2. GitHub Pages: repo → Settings → Secrets and variables → Actions → tab **Variables** → New repository variable `VITE_GA_ID` = ID tadi. Push berikutnya otomatis memakai ID ini.
+3. Build manual (itch.io / Netlify): buat file `.env` dari `.env.example` dan isi `VITE_GA_ID`, lalu `npm run build`.
+
+Event yang dikirim: `game_open`, `game_new`, `game_continue`, `sales_start`, `day_end` (hari, pendapatan, laba, pelanggan, kepuasan, popularitas, lokasi, cuaca, jumlah cabang, mode online), `upgrade_buy`, `branch_open`, `location_move`, `achievement_unlock`, `panel_open`, `bankrupt`. Waktu bermain dan jumlah pemain dicatat otomatis oleh GA4 (Engagement time, Active users).
+
+Agar parameter `day_end` bisa dipakai di laporan: Admin → Custom definitions → buat dimensi/metrik kustom untuk `day`, `net_profit`, `revenue`, `location`, dll.

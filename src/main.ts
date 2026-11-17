@@ -11,6 +11,7 @@ import { UI_REGISTRY_KEY, UIManager } from './ui/UIManager';
 import { AUDIO_REGISTRY_KEY, AudioSystem } from './audio/AudioSystem';
 import { attachSoundDirector } from './audio/SoundDirector';
 import { initPwa } from './pwa/pwa';
+import { initAnalytics } from './analytics/analytics';
 
 function requireElement(id: string): HTMLElement {
   const node = document.getElementById(id);
@@ -32,6 +33,7 @@ function bootstrap(): Phaser.Game {
   // PWA: offline + tombol "Pasang game". Dipanggil sedini mungkin agar prompt install tidak terlewat.
   initPwa((message, kind, durationMs) => ctx.notify(message, kind, durationMs));
   const ui = new UIManager(requireElement('ui-root'), ctx.bus);
+  initAnalytics(ctx);
   const audio = new AudioSystem();
   attachSoundDirector(ctx, audio, requireElement('ui-root'));
 

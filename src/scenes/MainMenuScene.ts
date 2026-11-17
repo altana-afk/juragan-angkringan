@@ -1,3 +1,4 @@
+import { track } from '../analytics/analytics';
 import { openAudioSettings } from '../ui/AudioSettingsPanel';
 import * as Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
@@ -86,8 +87,10 @@ export class MainMenuScene extends Phaser.Scene {
         this.menu.renderSaveButtons();
         return;
       }
+      track('game_continue', { day: ctx.store.get().calendar.day });
     } else {
       ctx.startNewGame();
+      track('game_new');
     }
     this.starting = true;
     this.menu.setBusy(true);
