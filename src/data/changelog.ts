@@ -17,7 +17,7 @@ export const CHANGELOG: readonly ChangelogEntry[] = [
       'Cabang selalu menyisakan 2 porsi atau 30% stok tiap menu untuk pembeli di tempat, dan butuh karyawan jaga untuk mengantar.',
       'Kirim dari cabang: tanpa komisi, ongkir pembeli masuk kas, biaya antar Rp2.000 per pesanan (Rp1.000 dengan motor pengantar cabang).',
       'Di desktop, pilihan sumber tampil berdampingan dengan tabel stok per menu.',
-      'Belanja punya tab kategori (Lauk, Sayur, Karbo, Bumbu, Minuman, Lainnya) dan filter Harga turun, Dipakai menu, Stok menipis, Cepat basi. Keranjang tetap tersimpan saat filter diganti.',
+      'Belanja punya tab kategori (Lauk, Sayur, Karbo, Bumbu, Minuman, Lainnya) dan filter Harga turun, Daftar persiapan (bahan untuk menu di Daftar persiapan), Stok menipis, Cepat basi. Keranjang tetap tersimpan saat filter diganti.',
     ],
   },
   {

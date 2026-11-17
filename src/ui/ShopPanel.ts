@@ -1,3 +1,4 @@
+import { PREP_PLAN } from './KitchenPanel';
 import { buyPriceFactor, eventPriceMultipliers } from '../systems/EventSystem';
 import type { GameContext } from '../core/GameContext';
 import type { GameState } from '../core/GameState';
@@ -37,7 +38,7 @@ export function shopCategory(ingredientId: string): Exclude<TabId, 'semua'> {
 type ChipId = 'turun' | 'dipakai' | 'menipis' | 'basi';
 const SHOP_CHIPS: { id: ChipId; label: string; hint: string }[] = [
   { id: 'turun', label: 'Harga turun', hint: 'Harga hari ini lebih murah dari kemarin' },
-  { id: 'dipakai', label: 'Dipakai menu', hint: 'Bahan untuk menu yang kamu jual kemarin atau ada di Daftar persiapan' },
+  { id: 'dipakai', label: 'Daftar persiapan', hint: 'Bahan yang dibutuhkan menu di Daftar persiapan (Persiapan Dapur)' },
   { id: 'menipis', label: 'Stok menipis', hint: 'Stok kurang dari satu kemasan' },
   { id: 'basi', label: 'Cepat basi', hint: 'Masa simpan 2 hari atau kurang' },
 ];
@@ -182,13 +183,10 @@ export class ShopPanel {
     return { def, stepper: step, price, stock, subtotal, root };
   }
 
-  /** Resep yang dianggap "menu pemain": terjual kemarin, atau semua menu terbuka bila belum ada laporan. */
-  private menuIngredients(state: Readonly<GameState>): Set<string> {
-    const r = state.lastReport;
-    const ids = r ? [...r.topSellers.map(([id]) => id), ...r.leastSold.map(([id]) => id)] : [];
-    const recipes = ids.length ? ids : state.unlockedRecipes;
+  /** Bahan untuk menu yang ada di Daftar persiapan (Persiapan Dapur). */
+  private menuIngredients(_state: Readonly<GameState>): Set<string> {
     const out = new Set<string>();
-    for (const id of recipes) {
+    for (const id of PREP_PLAN.keys()) {
       try {
         for (const ing of Object.keys(this.ctx.catalog.recipe(id).ingredients)) out.add(ing);
       } catch {
@@ -297,7 +295,7 @@ export class ShopPanel {
     setText(
       this.emptyNote,
       shown === 0
-        ? `Tidak ada bahan yang cocok dengan filter ini.${hiddenInCart ? ` ${hiddenInCart} bahan di keranjang tersembunyi.` : ''}`
+        ? `${this.chips.has('dipakai') && PREP_PLAN.size === 0 ? 'Daftar persiapan masih kosong — tambahkan menu di Persiapan Dapur dulu.' : 'Tidak ada bahan yang cocok dengan filter ini.'}${hiddenInCart ? ` ${hiddenInCart} bahan di keranjang tersembunyi.` : ''}`
         : hiddenInCart
           ? `${hiddenInCart} bahan di keranjang tidak terlihat karena filter — tetap ikut dibeli.`
           : '',

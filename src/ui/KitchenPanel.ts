@@ -23,9 +23,12 @@ export const CATEGORY_LABEL: Record<RecipeDef['category'], string> = {
  * Panel Persiapan (dapur): pilih produk, tentukan porsi, lihat kebutuhan bahan & yang kurang,
  * lalu masak. Daftar persiapan tetap tersimpan selama sesi meskipun panel ditutup.
  */
+/** Daftar persiapan (resep → porsi), dibagi dengan Belanja untuk filter "Untuk daftar persiapan". */
+export const PREP_PLAN = new Map<string, number>();
+
 export class KitchenPanel {
   /** Daftar persiapan: id resep → porsi (urutan sesuai saat ditambahkan). */
-  private readonly plan = new Map<string, number>();
+  private readonly plan = PREP_PLAN;
   private modal: ModalHandle | null = null;
   private offState: (() => void) | null = null;
   private readonly menuEl = el('div', { className: 'recipe-grid' });
