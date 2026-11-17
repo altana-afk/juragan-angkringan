@@ -55,9 +55,9 @@ export function openAudioSettings(ui: UIManager, audio: AudioSystem, onGraphics?
   const auto = el('input', { attrs: { type: 'checkbox', role: 'switch', 'aria-label': 'Gulir otomatis ke daftar persiapan' } }) as HTMLInputElement;
   auto.checked = UI_SETTINGS.autoScroll;
   auto.addEventListener('change', () => UI_SETTINGS.setAutoScroll(auto.checked));
-  const stats = el('input', { attrs: { type: 'checkbox', role: 'switch', 'aria-label': 'Kirim statistik anonim' } }) as HTMLInputElement;
-  stats.checked = analyticsEnabled();
-  stats.addEventListener('change', () => setAnalyticsEnabled(stats.checked));
+  // const stats = el('input', { attrs: { type: 'checkbox', role: 'switch', 'aria-label': 'Kirim statistik anonim' } }) as HTMLInputElement;
+  // stats.checked = analyticsEnabled();
+  // stats.addEventListener('change', () => setAnalyticsEnabled(stats.checked));
   ui.openModal({
     title: 'Pengaturan',
     className: 'audio-modal',
@@ -78,16 +78,16 @@ export function openAudioSettings(ui: UIManager, audio: AudioSystem, onGraphics?
             el('small', { className: 'muted', text: 'setelah "+ Tambah" di Persiapan Dapur, layar pindah ke Daftar persiapan' }),
           ],
         }),
-        analyticsAvailable()
-          ? el('label', {
-              className: 'check-row',
-              children: [
-                stats,
-                el('span', { text: 'Kirim statistik anonim' }),
-                el('small', { className: 'muted', text: 'jumlah pemain, lama bermain & hasil hari (Google Analytics), tanpa data pribadi' }),
-              ],
-            })
-          : null,
+        // analyticsAvailable()
+        //   ? el('label', {
+        //       className: 'check-row',
+        //       children: [
+        //         stats,
+        //         el('span', { text: 'Kirim statistik anonim' }),
+        //         el('small', { className: 'muted', text: 'jumlah pemain, lama bermain & hasil hari (Google Analytics), tanpa data pribadi' }),
+        //       ],
+        //     })
+        //   : null,
         audio.ready ? null : el('p', { className: 'panel-note muted', text: 'Suara aktif setelah kamu menyentuh/klik layar.' }),
       ],
     }),
