@@ -1,4 +1,5 @@
 import raw from './locations.json';
+import { getMap } from '../world/maps';
 
 /** Lokasi usaha: peta + sifat gameplay yang membuatnya unik. */
 export interface LocationDef {
@@ -42,11 +43,30 @@ export function parseLocations(data: unknown): LocationDef[] {
   });
 }
 
-export const LOCATIONS: readonly LocationDef[] = parseLocations(raw);
+/** Semua lokasi di locations.json, termasuk yang petanya belum selesai dibuat di editor peta. */
+export const ALL_LOCATIONS: readonly LocationDef[] = parseLocations(raw);
+
+/**
+ * Peta siap dimainkan: punya gerobak dan jalur pelanggan (kursi, antrean, titik datang).
+ * Lokasi baru dari editor peta yang belum lengkap disembunyikan dari permainan sampai petanya selesai.
+ */
+function playable(l: LocationDef): boolean {
+  try {
+    const map = getMap(l.mapId);
+    const ok = map.customers !== null && map.customers.seats.length > 0 && map.objects.some((o) => o.id === 'cart');
+    if (!ok && import.meta.env?.DEV) console.warn(`[Lokasi] "${l.id}" disembunyikan: peta belum punya gerobak (cart) dan jalur pelanggan.`);
+    return ok;
+  } catch {
+    return false;
+  }
+}
+
+/** Lokasi yang bisa dipilih pemain. */
+export const LOCATIONS: readonly LocationDef[] = ALL_LOCATIONS.filter(playable);
 export const DEFAULT_LOCATION = 'main-street';
 
 export function locationById(id: string): LocationDef {
-  const l = LOCATIONS.find((x) => x.id === id);
+  const l = ALL_LOCATIONS.find((x) => x.id === id);
   if (!l) throw new Error(`Lokasi "${id}" tidak dikenal`);
   return l;
 }
