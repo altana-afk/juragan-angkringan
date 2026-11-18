@@ -1,3 +1,6 @@
+import { openLeaderboard } from './LeaderboardPanel';
+import type { CloudSync } from '../cloud/CloudSync';
+import { openAccountPanel } from './AccountPanel';
 import { GAME_CONFIG } from '../config/gameConfig';
 import { CATALOG } from '../data/catalog';
 import { hasUnseenChangelog, openChangelog } from './ChangelogPanel';
@@ -18,6 +21,8 @@ export interface MainMenuActions {
   onToggleFullscreen: () => void;
   /** Buka pengaturan suara. */
   onAudioSettings: () => void;
+  /** Akun & simpan di awan (null jika belum diatur). */
+  cloud: CloudSync | null;
   /** Ringkasan simpanan yang ada, atau null. */
   getSave: () => SaveSummary | null;
   /** False jika browser tidak bisa menyimpan progres. */
@@ -43,6 +48,16 @@ export class MainMenuUI implements UIComponent {
     attrs: { type: 'button', title: 'Apa yang baru (catatan pembaruan)', 'aria-label': 'Apa yang baru' },
     children: [el('span', { text: '📜', attrs: { 'aria-hidden': 'true' } }), el('span', { className: 'changelog-dot', attrs: { 'aria-hidden': 'true' } })],
     onClick: () => this.showChangelog(),
+  });
+
+  /** Tombol Akun di pojok kanan atas (sebelah 📜). */
+  private readonly accountButton = el('button', {
+    className: 'changelog-btn account-btn',
+    attrs: { type: 'button', title: 'Akun — simpan progres di akun', 'aria-label': 'Akun' },
+    children: [el('span', { text: '👤', attrs: { 'aria-hidden': 'true' } }), el('span', { className: 'account-dot', attrs: { 'aria-hidden': 'true' } })],
+    onClick: () => {
+      if (this.actions.cloud) openAccountPanel(this.ui, this.actions.cloud);
+    },
   });
 
   constructor(
@@ -106,9 +121,19 @@ export class MainMenuUI implements UIComponent {
         }),
         el('p', { className: 'menu-footer', text: `v${GAME_CONFIG.version} · ${GAME_CONFIG.stage}` }),
         this.changelogButton,
+        ...(this.actions.cloud?.available ? [this.accountButton] : []),
       ],
     });
-    this.minorActions.append(guide, fullscreen, sound, about);
+    const cloud = this.actions.cloud;
+    const leaderboard = cloud?.available
+      ? el('button', {
+          className: 'btn btn-secondary btn-guide',
+          attrs: { type: 'button', title: 'Peringkat pemain: hari terlama, pendapatan 1 hari, kas terbanyak' },
+          children: [el('span', { text: '🏆', attrs: { 'aria-hidden': 'true' } }), el('span', { text: 'Leaderboard' })],
+          onClick: () => openLeaderboard(this.ui, cloud),
+        })
+      : null;
+    this.minorActions.append(guide, ...(leaderboard ? [leaderboard] : []), fullscreen, sound, about);
     ui.layers.screen.append(this.root);
     this.renderSaveButtons();
     this.renderInstallButton();
@@ -120,6 +145,12 @@ export class MainMenuUI implements UIComponent {
       // Muncul sendiri sekali setiap ada versi baru; setelah itu hanya lewat ikon 📜.
       if (hasUnseenChangelog() && !this.ui.hasOpenModal()) this.showChangelog();
     });
+  }
+
+  /** Tanda hijau di ikon akun saat sudah masuk. */
+  setSignedIn(on: boolean): void {
+    this.accountButton.classList.toggle('is-signed-in', on);
+    this.accountButton.title = on ? 'Akun — progres tersimpan di akun' : 'Akun — masuk untuk menyimpan progres di akun';
   }
 
   /** Tombol utama tergantung ada/tidaknya simpanan. */

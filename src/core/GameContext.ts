@@ -25,6 +25,8 @@ export class GameContext {
   readonly persistentStorage: boolean;
   /** Autosave hanya aktif selama sesi permainan berlangsung (bukan di menu utama). */
   private autosaveEnabled = false;
+  /** Akun & simpan di awan (diisi di main.ts; null jika Firebase belum diatur). */
+  cloud: import('../cloud/CloudSync').CloudSync | null = null;
   private saveTimer: ReturnType<typeof setTimeout> | null = null;
   private warnedSaveFailure = false;
 
@@ -88,6 +90,11 @@ export class GameContext {
       if (error instanceof SaveError) return { ok: false, message: error.message };
       throw error;
     }
+  }
+
+  /** Permainan sedang berjalan (bukan di menu utama). */
+  get autosaveRunning(): boolean {
+    return this.autosaveEnabled;
   }
 
   /** Keluar ke menu utama: simpan dulu, lalu matikan autosave. */

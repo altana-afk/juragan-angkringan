@@ -1,0 +1,46 @@
+{
+  "id": "dekat-stadion-bola",
+  "name": "Dekat stadion bola",
+  "width": 24,
+  "height": 24,
+  "legend": {
+    "g": "grass",
+    "d": "dirt",
+    "p": "paving",
+    "s": "sidewalk",
+    "a": "asphalt",
+    "m": "asphaltCenter",
+    "z": "zebra",
+    "c": "concrete"
+  },
+  "tiles": [
+    "ggggggggggggggaaaggggggg",
+    "ggggggggggggggaaaggggggg",
+    "pggggdgdggdgggaaaggggggg",
+    "ppgggdgdggggggaaaggggggg",
+    "pppggggddgdgggaaaggggggg",
+    "pppggdgdgdggggaaaggggggg",
+    "ppppggddgdggggaaaggggggg",
+    "pppppgggggggggaaaggggggg",
+    "ppppppggggggggaaaggggggg",
+    "cccccgggggggggaaaggggggg",
+    "ccccgggppgggggzzzggggggg",
+    "cccccgpppgggggzzzggggggg",
+    "pccpcggpppggggzzzggggggg",
+    "aaaaaaaaaaazzzaaaggggggg",
+    "aaaaaaaaaaazzzaaaggggggg",
+    "aaaaaaaaaaazzzaaaggggggg",
+    "pppppggpppppppzzzggggggg",
+    "ppppgggpppppppzzzggggggg",
+    "ppppgggpppppppzzzggggggg",
+    "ppppgggpppppppaaaggggggg",
+    "ppppggggpppgppaaaggggggg",
+    "ppppggggggggggaaaggggggg",
+    "ppppggggggggggaaaggggggg",
+    "pppppgggggggggaaaggggggg"
+  ],
+  "objects": [],
+  "anchors": {
+    "cameraHome": { "x": 12, "y": 12 }
+  }
+}

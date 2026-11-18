@@ -1,9 +1,12 @@
 /**
  * Definisi jenis objek dunia (properti, bangunan, karakter statis).
- * Ukuran alas dalam unit (16 unit = 1 ubin). Tekstur digambar oleh src/graphics/art.
+ * Ukuran alas dalam unit (16 unit = 1 ubin). Tekstur bawaan digambar oleh src/graphics/art;
+ * objek kustom (gambar PNG dari editor peta) didaftarkan dari src/data/customObjects.json.
  */
+import customObjectsJson from '../data/customObjects.json';
+import { parseCustomObjects, type CustomObjectDef } from './customObjects';
 
-export type ObjectTypeId =
+export type BuiltinObjectTypeId =
   | 'cart'
   | 'canopy'
   | 'stove'
@@ -33,6 +36,11 @@ export type ObjectTypeId =
   | 'carousel'
   | 'string_lights';
 
+/** Id objek kustom selalu diawali "c_" (mis. c_gerobak_bakso). */
+export type CustomObjectTypeId = `c_${string}`;
+
+export type ObjectTypeId = BuiltinObjectTypeId | CustomObjectTypeId;
+
 /**
  * Cara menentukan urutan gambar:
  * - center: berdasarkan titik tengah alas (umumnya benar untuk objek di tanah).
@@ -53,16 +61,20 @@ export interface ObjectTypeDef {
   /** Menghalangi jalan pelanggan (dipakai AI di Stage 3). */
   readonly blocking: boolean;
   readonly fx?: readonly ObjectFx[];
+  /** Pelanggan bisa duduk di atasnya; lift = tinggi dudukan (piksel). */
+  readonly seat?: { readonly lift?: number };
+  /** Data gambar untuk objek kustom (PNG). */
+  readonly custom?: CustomObjectDef;
 }
 
 const def = (d: ObjectTypeDef): ObjectTypeDef => d;
 
-export const OBJECT_TYPES: Readonly<Record<ObjectTypeId, ObjectTypeDef>> = {
+const BUILTIN_OBJECT_TYPES: Readonly<Record<BuiltinObjectTypeId, ObjectTypeDef>> = {
   cart: def({ id: 'cart', label: 'Gerobak angkringan', footprint: { w: 32, d: 14 }, depthMode: 'center', variants: ['basic', 'standar', 'modern', 'premium'], blocking: true }),
   canopy: def({ id: 'canopy', label: 'Tenda terpal', footprint: { w: 52, d: 34 }, depthMode: 'front', variants: ['orange', 'lights'], blocking: false }),
   stove: def({ id: 'stove', label: 'Anglo & ceret', footprint: { w: 12, d: 14 }, depthMode: 'center', variants: ['anglo'], blocking: true, fx: ['fire', 'smoke'] }),
-  bench_x: def({ id: 'bench_x', label: 'Bangku panjang', footprint: { w: 32, d: 6 }, depthMode: 'center', variants: ['wood', 'premium'], blocking: false }),
-  bench_y: def({ id: 'bench_y', label: 'Bangku panjang', footprint: { w: 6, d: 32 }, depthMode: 'center', variants: ['wood', 'premium'], blocking: false }),
+  bench_x: def({ id: 'bench_x', label: 'Bangku panjang', footprint: { w: 32, d: 6 }, depthMode: 'center', variants: ['wood', 'premium'], blocking: false, seat: {} }),
+  bench_y: def({ id: 'bench_y', label: 'Bangku panjang', footprint: { w: 6, d: 32 }, depthMode: 'center', variants: ['wood', 'premium'], blocking: false, seat: {} }),
   mat: def({ id: 'mat', label: 'Tikar lesehan', footprint: { w: 28, d: 28 }, depthMode: 'ground', variants: ['striped'], blocking: false }),
   low_table: def({ id: 'low_table', label: 'Meja lesehan', footprint: { w: 14, d: 10 }, depthMode: 'center', variants: ['wood'], blocking: true }),
   street_lamp: def({ id: 'street_lamp', label: 'Lampu jalan', footprint: { w: 4, d: 4 }, depthMode: 'center', variants: ['default'], blocking: true }),
@@ -88,8 +100,54 @@ export const OBJECT_TYPES: Readonly<Record<ObjectTypeId, ObjectTypeDef>> = {
   seller: def({ id: 'seller', label: 'Penjual', footprint: { w: 0, d: 0 }, depthMode: 'center', variants: ['default'], blocking: false, fx: ['idle'] }),
 };
 
+/** Variant tunggal untuk objek kustom. */
+export const CUSTOM_VARIANT = 'default';
+
+export function customObjectTypeDef(c: CustomObjectDef): ObjectTypeDef {
+  return {
+    id: c.id,
+    label: c.label,
+    footprint: c.footprint,
+    depthMode: c.depthMode,
+    variants: [CUSTOM_VARIANT],
+    blocking: c.blocking,
+    ...(c.seating ? { seat: { lift: c.seatLift } } : {}),
+    custom: c,
+  };
+}
+
+const registry: Record<string, ObjectTypeDef> = { ...BUILTIN_OBJECT_TYPES };
+for (const c of parseCustomObjects(customObjectsJson)) registry[c.id] = customObjectTypeDef(c);
+
+/** Jenis objek bawaan, diakses langsung (mis. OBJECT_TYPES.cart). Untuk id apa pun pakai objectType(). */
+export const OBJECT_TYPES = registry as Readonly<Record<BuiltinObjectTypeId, ObjectTypeDef>>;
+
+/** Definisi jenis objek (bawaan atau kustom). Id harus sudah dicek dengan isObjectTypeId. */
+export function objectType(id: ObjectTypeId): ObjectTypeDef {
+  const d = registry[id];
+  if (!d) throw new Error(`Jenis objek "${id}" tidak dikenal`);
+  return d;
+}
+
 export function isObjectTypeId(value: string): value is ObjectTypeId {
-  return Object.prototype.hasOwnProperty.call(OBJECT_TYPES, value);
+  return Object.prototype.hasOwnProperty.call(registry, value);
+}
+
+export function isCustomObjectTypeId(value: string): value is CustomObjectTypeId {
+  return value.startsWith('c_');
+}
+
+export function listObjectTypeIds(): ObjectTypeId[] {
+  return Object.keys(registry) as ObjectTypeId[];
+}
+
+/** Daftarkan / perbarui objek kustom saat aplikasi berjalan (dipakai editor peta). */
+export function registerCustomObjectType(c: CustomObjectDef): void {
+  registry[c.id] = customObjectTypeDef(c);
+}
+
+export function unregisterCustomObjectType(id: string): void {
+  if (isCustomObjectTypeId(id)) delete registry[id];
 }
 
 /** Kunci tekstur Phaser untuk sebuah objek & varian. */

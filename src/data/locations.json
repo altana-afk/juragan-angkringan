@@ -216,6 +216,31 @@
         "Bising: pelanggan −1 menit sabar",
         "Bahan +8%, sewa Rp22.000/hari"
       ]
+    },
+    {
+      "id": "dekat-stadion-bola",
+      "mapId": "dekat-stadion-bola",
+      "name": "Dekat stadion bola",
+      "tagline": "dekat stadion",
+      "description": "",
+      "rent": 12000,
+      "weekday": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "typeWeights": {},
+      "budgetFactor": 1,
+      "lateNight": 1,
+      "perks": [],
+      "moveCost": 25000,
+      "hours": [],
+      "patience": 0,
+      "ingredientPriceFactor": 1
     }
   ]
 }

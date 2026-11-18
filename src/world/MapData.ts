@@ -1,5 +1,5 @@
 import type { Point } from '../iso/IsoMath';
-import { OBJECT_TYPES, isObjectTypeId, type ObjectTypeId } from './objectTypes';
+import { objectType, isObjectTypeId, type ObjectTypeId } from './objectTypes';
 import { TERRAINS, isTerrainId, type TerrainDef, type TerrainId } from './terrain';
 
 export interface MapObjectData {
@@ -118,7 +118,7 @@ export function parseMapData(raw: unknown): MapData {
     if (typeof type !== 'string' || !isObjectTypeId(type)) {
       throw new MapDataError(id, `objek #${index} memiliki type tidak dikenal: ${String(type)}`);
     }
-    const typeDef = OBJECT_TYPES[type];
+    const typeDef = objectType(type);
     const x = readNumber(entry, 'x', id, `objek #${index}`);
     const y = readNumber(entry, 'y', id, `objek #${index}`);
     const footW = typeDef.footprint.w / 16;
@@ -196,7 +196,7 @@ export function activeObjects(
     .filter((o) => !o.requires || owned.includes(o.requires))
     .map((o) => {
       const v = variants[o.id] ?? variants[o.type];
-      return v && OBJECT_TYPES[o.type].variants.includes(v) ? { ...o, variant: v } : o;
+      return v && objectType(o.type).variants.includes(v) ? { ...o, variant: v } : o;
     });
 }
 

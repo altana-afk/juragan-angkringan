@@ -1,18 +1,16 @@
-import mainStreet from '../data/maps/main-street.json';
-import kampus from '../data/maps/kampus.json';
-import pasar from '../data/maps/pasar.json';
-import stasiun from '../data/maps/stasiun.json';
-import pasarMalam from '../data/maps/pasar-malam.json';
 import { parseMapData, type MapData } from './MapData';
 
-/** Daftar peta yang tersedia (data JSON di src/data/maps). */
-const RAW_MAPS: Record<string, unknown> = {
-  'main-street': mainStreet,
-  kampus,
-  pasar,
-  stasiun,
-  'pasar-malam': pasarMalam,
-};
+/**
+ * Semua peta di src/data/maps/*.json terdaftar otomatis (id = nama file).
+ * Peta baru dari editor peta (npm run editor) langsung ikut tanpa mengubah kode.
+ */
+const FILES = import.meta.glob<{ default: unknown }>('../data/maps/*.json', { eager: true });
+
+const RAW_MAPS: Record<string, unknown> = {};
+for (const [path, mod] of Object.entries(FILES)) {
+  const id = path.slice(path.lastIndexOf('/') + 1, -'.json'.length);
+  RAW_MAPS[id] = mod.default;
+}
 
 const cache = new Map<string, MapData>();
 

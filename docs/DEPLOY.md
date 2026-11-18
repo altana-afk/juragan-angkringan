@@ -151,3 +151,25 @@ Kode ada di `src/analytics/analytics.ts`. Analytics hanya aktif jika ID pengukur
 Event yang dikirim: `game_open`, `game_new`, `game_continue`, `sales_start`, `day_end` (hari, pendapatan, laba, pelanggan, kepuasan, popularitas, lokasi, cuaca, jumlah cabang, mode online), `upgrade_buy`, `branch_open`, `location_move`, `achievement_unlock`, `panel_open`, `bankrupt`. Waktu bermain dan jumlah pemain dicatat otomatis oleh GA4 (Engagement time, Active users).
 
 Agar parameter `day_end` bisa dipakai di laporan: Admin → Custom definitions → buat dimensi/metrik kustom untuk `day`, `net_profit`, `revenue`, `location`, dll.
+
+## Akun & simpan di awan (Firebase, opsional)
+
+Pemain bisa memilih masuk dengan **Google** atau **email + kata sandi** lewat ikon 👤 di menu utama, supaya progres tersimpan di akun dan bisa dilanjutkan di perangkat lain. Tanpa login, save tetap di LocalStorage seperti biasa. Tombol Akun hanya muncul jika konfigurasi Firebase diisi. Kode: `src/cloud/`.
+
+1. Buka <https://console.firebase.google.com> → **Add project** (Google Analytics di sini boleh dimatikan).
+2. **Build → Authentication → Get started → Sign-in method**: aktifkan **Google** (isi email dukungan) dan **Email/Password**.
+3. **Authentication → Settings → Authorized domains**: tambahkan domain game, mis. `altana-afk.github.io` (juga domain itch.io/Netlify jika dipakai).
+4. **Build → Firestore Database → Create database** (mode produksi, lokasi `asia-southeast2` Jakarta). Tab **Rules**: tempel isi file `firestore.rules` → **Publish**.
+5. **Project settings (⚙) → General → Your apps → Web (</>)** → daftarkan app → salin `apiKey`, `authDomain`, `projectId`, `appId`.
+6. GitHub repo → Settings → Secrets and variables → Actions → **Variables**: buat `VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_AUTH_DOMAIN`, `VITE_FIREBASE_PROJECT_ID`, `VITE_FIREBASE_APP_ID`. Lalu di `.github/workflows/deploy-pages.yml`, pada langkah `npm run check`, tambahkan keempatnya di bagian `env:`.
+7. Build manual: isi variabel yang sama di `.env` (lihat `.env.example`).
+
+Nilai konfigurasi web Firebase bukan rahasia (memang dikirim ke browser); keamanan data dijaga oleh aturan Firestore: setiap pemain hanya bisa membaca/menulis `saves/{uid}` miliknya.
+
+Cara kerja sinkron: saat login, save di perangkat dibandingkan dengan save di akun — jika keduanya ada dan berbeda, pemain memilih yang dipakai (yang lain dicadangkan di perangkat). Selama bermain, save diunggah paling cepat setiap 30 detik, saat kembali ke menu, dan saat tab/aplikasi ditutup.
+
+### Pengaman save & username (paket gratis)
+
+- **Segel save:** setiap save diberi segel (`seal` di file save, `sig` di Firestore). Save yang diedit manual di LocalStorage tetap bisa dimainkan tetapi ditandai `tampered: true` (untuk dikecualikan dari leaderboard). Di Firestore, aturan menolak unggahan yang segelnya tidak cocok atau angkanya tidak masuk akal, dan save akun yang diubah lewat Console diabaikan game. Ini pengaman tanpa server: orang yang membongkar kode game masih bisa memalsukan; untuk leaderboard yang benar-benar aman dibutuhkan validasi server (Cloud Functions, paket Blaze).
+- **Username:** `users/{uid}` (profil publik: `username`, `usernameLower`, `changedAt`) dan `usernames/{nama_huruf_kecil}` (`uid`) sebagai kunci keunikan. Aturan menjamin satu nama satu akun, format 3–16 huruf/angka/_, dan ganti paling cepat 30 hari sekali.
+- **Setiap kali `firestore.rules` berubah, tempel ulang ke Firebase Console → Firestore → Rules → Publish.**

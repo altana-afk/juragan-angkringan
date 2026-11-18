@@ -2,6 +2,7 @@ import * as Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
 import { ART_JOBS } from '../graphics/art/catalog';
 import { FX_KEYS } from '../graphics/art/effects';
+import { queueCustomImages, registerCustomArt } from '../graphics/customArt';
 import { registerArt } from '../graphics/TextureFactory';
 import { getMap } from '../world/maps';
 import { ensureGroundTexture, ensureWorldAnimations } from '../world/WorldBuilder';
@@ -19,6 +20,11 @@ export class LoadingScene extends Phaser.Scene {
 
   constructor() {
     super(SCENES.loading);
+  }
+
+  /** PNG objek kustom buatan editor peta (aset lain dibuat prosedural). */
+  preload(): void {
+    queueCustomImages(this.load);
   }
 
   create(): void {
@@ -44,6 +50,7 @@ export class LoadingScene extends Phaser.Scene {
     if (this.jobIndex >= this.totalJobs) {
       // Cahaya & pendar memakai filter halus; aset lain tetap tajam (pixel art).
       for (const key of [FX_KEYS.light, FX_KEYS.glow]) this.textures.get(key).setFilter(Phaser.Textures.FilterMode.LINEAR);
+      registerCustomArt(this.textures);
       ensureWorldAnimations(this.anims);
       this.scene.start(SCENES.mainMenu);
     }

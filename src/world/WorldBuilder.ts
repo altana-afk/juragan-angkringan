@@ -3,13 +3,14 @@ import { totalEffects } from '../systems/UpgradeSystem';
 import * as Phaser from 'phaser';
 import { bakeGround, GROUND_BASE_DEPTH } from '../graphics/art/ground';
 import { FX_KEYS } from '../graphics/art/effects';
+import { customAnimKey, customObjectDefs } from '../graphics/customArt';
 import { applyAnchor, getArtInfo, hasArt, registerGround } from '../graphics/TextureFactory';
 import { isInsideMap, mapWorldBounds, tileToWorld, worldToTile, type Point, type Rect } from '../iso/IsoMath';
 import { hashString } from '../utils/random';
 import { DEPTH, entityDepth, objectDepth } from './depth';
 import type { WorldLight } from './LightingSystem';
 import { terrainAt, type MapData, type MapObjectData } from './MapData';
-import { OBJECT_TYPES, objectTextureKey } from './objectTypes';
+import { objectType, objectTextureKey } from './objectTypes';
 
 /** Ruang di atas peta untuk objek tinggi (tiang listrik, pohon) — piksel. */
 const WORLD_EXTRA_TOP = 120;
@@ -60,6 +61,18 @@ export function ensureWorldAnimations(anims: Phaser.Animations.AnimationManager)
       repeat: -1,
     });
   }
+  // Objek kustom beranimasi (lebih dari satu frame).
+  for (const def of customObjectDefs()) {
+    const key = customAnimKey(def.id);
+    if (def.frames < 2) continue;
+    if (anims.exists(key)) anims.remove(key);
+    anims.create({
+      key,
+      frames: Array.from({ length: def.frames }, (_, i) => ({ key: objectTextureKey(def.id, 'default', i) })),
+      frameRate: 1000 / def.frameMs,
+      repeat: -1,
+    });
+  }
 }
 
 /**
@@ -79,7 +92,7 @@ export function buildWorld(scene: Phaser.Scene, map: MapData, upgrades: readonly
   const poles: { obj: MapObjectData; anchors: Point[] }[] = [];
 
   for (const obj of activeObjects(map.objects, upgrades, totalEffects(upgrades).variants)) {
-    const def = OBJECT_TYPES[obj.type];
+    const def = objectType(obj.type);
     const pos = tileToWorld(obj.x, obj.y);
     const isCharacter = obj.type === 'seller';
     const key = isCharacter ? objectTextureKey(obj.type, obj.variant, 0) : objectTextureKey(obj.type, obj.variant);
@@ -89,6 +102,10 @@ export function buildWorld(scene: Phaser.Scene, map: MapData, upgrades: readonly
     if (def.fx?.includes('idle')) {
       const sprite = scene.add.sprite(pos.x, pos.y, key);
       sprite.play({ key: ANIM_KEYS.sellerIdle, startFrame: hashString(obj.id) % 2 });
+      display = sprite;
+    } else if (def.custom && def.custom.frames > 1 && scene.anims.exists(customAnimKey(def.id))) {
+      const sprite = scene.add.sprite(pos.x, pos.y, key);
+      sprite.play({ key: customAnimKey(def.id), startFrame: hashString(obj.id) % def.custom.frames });
       display = sprite;
     } else {
       display = scene.add.image(pos.x, pos.y, key);

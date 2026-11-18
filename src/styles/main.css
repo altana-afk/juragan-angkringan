@@ -2387,3 +2387,78 @@ button.hud-pill { font: inherit; color: inherit; cursor: pointer; text-align: le
   .source-tr .is-bad { color: var(--c-bad); }
 }
 @media (min-width: 900px) and (min-height: 520px) { .sheet-online:has(.source-picker) { width: min(860px, 100%); } }
+
+/* ---------- Akun (simpan di awan) ---------- */
+.account-btn { right: calc(var(--safe-right, 0px) + 72px); }
+.account-dot { position: absolute; top: 6px; right: 6px; width: 10px; height: 10px; border-radius: 50%; background: var(--c-good); box-shadow: 0 0 0 2px var(--c-panel-solid); display: none; }
+.account-btn.is-signed-in .account-dot { display: block; }
+.account { display: flex; flex-direction: column; gap: 12px; max-width: 420px; margin: 0 auto; width: 100%; }
+.account-google { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; background: #fff; color: #1f1f1f; border: 1px solid #dadce0; font-weight: 700; }
+.account-google:hover { background: #f4f4f4; }
+.account-g { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: #4285f4; color: #fff; font: 700 13px/1 Arial, sans-serif; }
+.account-or { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--c-muted); }
+.account-or::before, .account-or::after { content: ''; flex: 1; height: 1px; background: rgba(255, 255, 255, 0.12); }
+.account-switch { display: flex; gap: 4px; padding: 3px; border-radius: 10px; background: rgba(0, 0, 0, 0.3); }
+.account-form { display: flex; flex-direction: column; gap: 8px; }
+.account-input { min-height: 48px; padding: 0 12px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.18); background: rgba(0, 0, 0, 0.3); color: var(--c-text); font: 500 16px/1 var(--font); }
+.account-input:focus { outline: 2px solid var(--c-accent); outline-offset: 1px; }
+.account-form .btn { min-height: 48px; }
+.account-forgot { align-self: flex-start; min-height: 44px; }
+.account-msg { margin: 0; font-size: 13px; color: var(--c-good); }
+.account-msg.is-bad { color: var(--c-bad); }
+.account-card { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 12px; background: rgba(0, 0, 0, 0.25); }
+.account-avatar { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--c-accent); color: #1b1220; font: 700 20px/1 var(--font); flex: none; }
+.account-who { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.account-who span { font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.account-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.account-actions .btn { flex: 1; min-height: 44px; }
+.account-small { font-size: 12px; line-height: 1.4; }
+.account-label { font-weight: 700; font-size: 14px; }
+.account-name { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; border-radius: 12px; background: rgba(0, 0, 0, 0.2); }
+.account-name .btn { min-height: 44px; }
+.account-name-edit { padding: 12px; border-radius: 12px; background: rgba(0, 0, 0, 0.2); }
+.account-name-edit.is-required { border: 1px solid var(--c-accent); }
+
+/* ---------- Leaderboard ---------- */
+.lb { display: flex; flex-direction: column; gap: 10px; }
+.lb-tabs .shop-tab { font-size: 13px; }
+.lb-desc { margin: 0; font-size: 12.5px; color: var(--c-muted); }
+.lb-list { display: flex; flex-direction: column; gap: 4px; min-height: 120px; }
+.lb-row { display: grid; grid-template-columns: 36px minmax(0, 1fr) auto; align-items: center; gap: 10px; min-height: 44px; padding: 6px 12px; border-radius: 10px; background: rgba(0, 0, 0, 0.22); }
+.lb-rank { font: 700 14px/1 var(--font-num); color: var(--c-muted); text-align: center; }
+.lb-name { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lb-value { font: 700 14px/1 var(--font-num); white-space: nowrap; }
+.lb-row.is-top-1 .lb-rank { color: #ffcf4a; }
+.lb-row.is-top-2 .lb-rank { color: #d9dde3; }
+.lb-row.is-top-3 .lb-rank { color: #e0985a; }
+.lb-row.is-top .lb-rank { font-size: 17px; }
+.lb-row.is-me { background: rgba(245, 176, 65, 0.18); box-shadow: inset 0 0 0 1px var(--c-accent); }
+.lb-state { margin: 16px 0; text-align: center; }
+.lb-foot { position: sticky; bottom: 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px; border-radius: 10px; background: var(--c-panel-solid); border: 1px solid var(--c-border-soft); font-size: 13px; }
+.lb-foot:empty { display: none; }
+.lb-foot .btn { min-height: 44px; }
+.lb-me { font: 700 15px/1.2 var(--font-num); color: var(--c-accent-strong); }
+.lb .is-bad { color: var(--c-bad); }
+
+/* ---------- Pencarian bahan (Belanja) ---------- */
+.shop-search { position: relative; display: flex; align-items: center; min-height: 44px; border-radius: 10px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.12); }
+.shop-search:focus-within { border-color: var(--c-accent); box-shadow: 0 0 0 1px var(--c-accent); }
+.shop-search-icon { width: 36px; flex: none; text-align: center; font-size: 18px; color: var(--c-muted); }
+.shop-search-input { flex: 1; min-width: 0; height: 44px; padding: 0 4px 0 0; border: 0; background: transparent; color: var(--c-text); font: 500 16px/1 var(--font); outline: none; }
+.shop-search-input::placeholder { color: var(--c-muted); }
+.shop-search-input::-webkit-search-cancel-button { display: none; }
+.shop-search-clear { flex: none; width: 44px; height: 44px; border: 0; background: transparent; color: var(--c-muted); font-size: 22px; cursor: pointer; }
+.shop-search-clear:hover { color: var(--c-text); }
+.shop-search-clear[hidden] { display: none; }
+.shop-search-kbd { display: none; }
+/* Saat mencari, tab kategori diabaikan — tampilkan redup supaya jelas. */
+.shop-filters.is-searching .shop-tabs { opacity: 0.45; }
+@media (min-width: 900px) and (min-height: 520px) {
+  .shop-filters { display: grid; grid-template-columns: minmax(220px, 300px) minmax(0, 1fr); grid-template-areas: 'search tabs' 'chips chips'; align-items: center; column-gap: 10px; }
+  .shop-search { grid-area: search; }
+  .shop-filters .shop-tabs { grid-area: tabs; }
+  .shop-filters .shop-chips { grid-area: chips; }
+  .shop-search-input { font-size: 14px; }
+  .shop-search-kbd { display: inline-grid; place-items: center; width: 22px; height: 22px; margin-right: 10px; border-radius: 5px; border: 1px solid rgba(255, 255, 255, 0.2); color: var(--c-muted); font: 600 12px/1 var(--font); }
+  .shop-search:focus-within .shop-search-kbd, .shop-search-clear:not([hidden]) + .shop-search-kbd { display: none; }
+}

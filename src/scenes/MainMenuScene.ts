@@ -1,3 +1,4 @@
+import { openAccountPanel } from '../ui/AccountPanel';
 import { track } from '../analytics/analytics';
 import { openAudioSettings } from '../ui/AudioSettingsPanel';
 import * as Phaser from 'phaser';
@@ -45,11 +46,27 @@ export class MainMenuScene extends Phaser.Scene {
         if (audio) openAudioSettings(ui, audio, (lowPower) => ctx.bus.emit('settings:graphics-changed', { lowPower }));
       },
       getSave: () => ctx.saves.summary(),
+      cloud: ctx.cloud,
       persistent: ctx.persistentStorage,
     });
 
     this.cameras.main.fadeIn(500, 20, 15, 31);
+    // Progres dari akun dimuat / status login berubah → perbarui tombol Lanjutkan & ikon akun.
+    const offCloud = ctx.bus.on('cloud:save-replaced', () => this.menu.renderSaveButtons());
+    let askedName = false;
+    const offUser =
+      ctx.cloud?.onChange(() => {
+        this.menu.setSignedIn(Boolean(ctx.cloud?.user));
+        // Baru login & belum punya username → minta sekali (mis. setelah login lewat redirect).
+        if (ctx.cloud?.needsUsername && !askedName && !ui.hasOpenModal()) {
+          askedName = true;
+          openAccountPanel(ui, ctx.cloud);
+        }
+      }) ?? (() => undefined);
+    this.menu.setSignedIn(Boolean(ctx.cloud?.user));
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      offCloud();
+      offUser();
       this.menu.destroy();
       this.lighting.destroy();
       this.world.destroy();

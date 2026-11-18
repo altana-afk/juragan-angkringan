@@ -12,6 +12,7 @@ import { AUDIO_REGISTRY_KEY, AudioSystem } from './audio/AudioSystem';
 import { attachSoundDirector } from './audio/SoundDirector';
 import { initPwa } from './pwa/pwa';
 import { initAnalytics } from './analytics/analytics';
+import { CloudSync } from './cloud/CloudSync';
 
 function requireElement(id: string): HTMLElement {
   const node = document.getElementById(id);
@@ -34,6 +35,7 @@ function bootstrap(): Phaser.Game {
   initPwa((message, kind, durationMs) => ctx.notify(message, kind, durationMs));
   const ui = new UIManager(requireElement('ui-root'), ctx.bus);
   initAnalytics(ctx);
+  ctx.cloud = new CloudSync(ctx, ui);
   const audio = new AudioSystem();
   attachSoundDirector(ctx, audio, requireElement('ui-root'));
 

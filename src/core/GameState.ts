@@ -399,6 +399,12 @@ export interface LifetimeStats {
   bulkDelivered: number;
   /** Hari tanpa satu pun pelanggan kecewa (min. 10 rombongan). */
   perfectDays: number;
+  /** Rekor leaderboard (0.15.1): pendapatan terbanyak dalam satu hari (toko + cabang) & kas tertinggi saat tutup hari. */
+  bestDayRevenue?: number;
+  /** Laba bersih terbesar & rugi terbesar (angka positif) dalam satu hari. */
+  bestDayProfit?: number;
+  worstDayLoss?: number;
+  peakMoney?: number;
 }
 
 /** Status satu kabar kampung yang sudah sampai ke pemain. */
@@ -469,6 +475,8 @@ export interface GameSettings {
 }
 
 export interface GameState {
+  /** Save pernah diubah di luar game (segel tidak cocok) — tidak boleh masuk leaderboard. */
+  tampered?: boolean;
   player: PlayerState;
   calendar: CalendarState;
   weather: WeatherKind;

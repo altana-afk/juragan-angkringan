@@ -382,3 +382,25 @@ Implementasi `claude/rencana-0.12.0.md` dengan isi cerita dari `claude/alur-ceri
 
 Ketujuh stage dari dokumen desain selesai. Ide lanjutan: lebih banyak peta/lokasi, event acak harian
 (razia, pesanan rombongan), pencapaian, dan aset sprite buatan tangan menggantikan grafis prosedural.
+
+## Alat: Editor Peta ✅
+
+Editor visual untuk membuat & mengubah peta, simpan langsung ke project. Panduan: `docs/MAP-EDITOR.md`.
+
+- `npm run editor` → `http://localhost:5180/tools/map-editor/` (server khusus, hanya localhost; tidak ikut build game).
+- Gambar ubin & objek memakai generator art game yang sama; urutan kedalaman sama dengan `WorldBuilder`.
+- Alat: Pilih (seret, pilih area, panah, gandakan), Tanah (kuas 1–5, kotak, ember, ambil warna), Objek (28 jenis, varian, "muncul setelah upgrade"), Titik (kursi + jalur, jalur datang, antrean, pintu masuk, kamera).
+- Tab Peta (nama, id, ubah ukuran dengan geser isi, daftar objek), Lokasi (daftarkan ke `locations.json`: sewa, pengali hari, tipe pelanggan, jam khusus, keunggulan), Cek (error dari `parseMapData` + peringatan, misalnya jumlah kursi upgrade).
+- Simpan: validasi ulang di server, cadangan otomatis ke `tools/map-editor/backups/`, hanya entri lokasi yang berubah yang ditulis ulang, editor tidak termuat ulang sendiri setelah menyimpan. Ada Unduh JSON, urungkan/ulangi, draf cadangan di browser.
+- `src/world/maps.ts` kini memakai `import.meta.glob`: peta baru di `src/data/maps/` langsung terdaftar.
+- Verifikasi: 23 test baru (`tests/mapEditor.test.ts`), semua peta bawaan tetap sama setelah dibuka & disimpan ulang; uji browser semua alat + simpan + peta baru dimuat di game tanpa error.
+
+## Alat: Studio Objek (objek buatan sendiri) ✅
+
+Bagian dari editor peta (alat Objek → **+ Objek baru**). Panduan & cara mengaktifkan AI: `docs/MAP-EDITOR.md`.
+
+- Editor piksel: pensil, hapus, ember, pipet, garis, kotak, geser, cermin X, kuas 1–3 px, palet game, undo/redo, impor PNG (lembar frame dipecah otomatis), unduh PNG.
+- Buat dari deskripsi dengan mesin yang bisa dipilih: prosedural bawaan (offline, 16 jenis bentuk + warna/ukuran/efek dari kata kunci), OpenAI, Google Gemini, atau tool pixel asset sendiri (HTTP generik). Kunci API di `.env.local`, hanya dibaca server editor. Hasil AI otomatis dibuang latarnya, diperkecil, dan disesuaikan ke palet game; semua hasil bisa diedit.
+- Animasi beberapa frame (ms per frame), alas & titik pijak, urutan gambar, menghalangi jalan, bisa jadi tempat duduk (tinggi dudukan), lampu malam (warna, jangkauan, terang, kedip, pendar).
+- Game: `objectTypes.ts` kini punya registri objek kustom (`objectType(id)`, id `c_...`), PNG dimuat di LoadingScene (`src/graphics/customArt.ts`), animasi & lampu ikut WorldBuilder, pelanggan duduk di objek kustom bertanda tempat duduk (CustomerLayer).
+- Verifikasi: 287 test lulus (27 baru di `tests/customObjects.test.ts`), uji klik studio di browser (termasuk mesin AI tiruan), objek kustom tampil di game tanpa error.

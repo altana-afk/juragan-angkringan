@@ -10,6 +10,20 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: readonly ChangelogEntry[] = [
   {
+    version: '0.16.0',
+    title: 'Akun & Leaderboard',
+    items: [
+      'Leaderboard baru di menu utama dengan 5 kategori: hari terlama, pendapatan, laba, dan rugi terbesar dalam satu hari, serta kas terbanyak.',
+      'Rekormu terkirim otomatis setelah masuk akun dan memilih username. Peringkatmu tampil walau di luar 50 besar.',
+      'Belanja Bahan punya kolom pencarian nama bahan (di desktop tekan / untuk langsung mencari).',
+      'Ikon 👤 baru di menu utama: masuk dengan Google atau email supaya progres tersimpan di akun dan bisa dilanjutkan di HP atau komputer lain.',
+      'Tidak wajib login — tanpa akun, progres tetap tersimpan di perangkat ini seperti biasa.',
+      'Jika progres di akun dan di perangkat berbeda, kamu bisa memilih mana yang dipakai.',
+      'Pilih username unik setelah masuk akun — nanti tampil di leaderboard. Username bisa diganti 30 hari sekali.',
+      'Save kini disegel: save yang diubah di luar game ditandai dan tidak akan masuk leaderboard.',
+    ],
+  },
+  {
     version: '0.15.0',
     title: 'Pesanan dari cabang & filter Belanja',
     items: [

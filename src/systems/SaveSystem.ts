@@ -1,3 +1,4 @@
+import { quickSeal } from './saveSeal';
 import { createEmptyBank, createEmptyLedger, createInitialState, createOnlineState, createBranchesState, createStoryState, validateState, type GameState } from '../core/GameState';
 import { CATALOG, type Catalog } from '../data/catalog';
 
@@ -20,6 +21,8 @@ export interface SaveFile {
   version: number;
   savedAt: string;
   state: GameState;
+  /** Segel isi `state` (lihat saveSeal.ts). Save lama tidak punya. */
+  seal?: string;
 }
 
 export interface SaveSummary {
@@ -155,6 +158,14 @@ export function migrateSave(raw: unknown): GameState {
   return state as unknown as GameState;
 }
 
+/** Segel cocok dengan isi state? Save lama tanpa segel dianggap utuh. */
+export function sealIntact(text: string): boolean {
+  const m = /"seal":"([^"]*)","state":/.exec(text.slice(0, 200));
+  if (!m) return !/"seal":/.test(text.slice(0, 200));
+  const at = text.indexOf('"state":') + 8;
+  return quickSeal(text.slice(at, text.length - 1)) === m[1];
+}
+
 export class SaveSystem {
   constructor(
     private readonly storage: StorageLike,
@@ -162,8 +173,8 @@ export class SaveSystem {
   ) {}
 
   serialize(state: Readonly<GameState>, now = new Date()): string {
-    const file: SaveFile = { version: SAVE_VERSION, savedAt: now.toISOString(), state: structuredClone(state) as GameState };
-    return JSON.stringify(file);
+    const stateText = JSON.stringify(state);
+    return `{"version":${SAVE_VERSION},"savedAt":${JSON.stringify(now.toISOString())},"seal":${JSON.stringify(quickSeal(stateText))},"state":${stateText}}`;
   }
 
   /** Simpan state. Mengembalikan false jika penyimpanan browser menolak (penuh / diblokir). */
@@ -205,6 +216,8 @@ export class SaveSystem {
     } catch (error) {
       throw new SaveError(`Data simpanan tidak valid: ${(error as Error).message}`);
     }
+    // Isi diubah di luar game → tandai permanen (tidak boleh masuk leaderboard), permainan tetap jalan.
+    if (!sealIntact(text)) state.tampered = true;
     return state;
   }
 
@@ -219,6 +232,42 @@ export class SaveSystem {
     } catch {
       return null;
     }
+  }
+
+  /** Teks save mentah (untuk sinkron akun). */
+  exportText(): string | null {
+    try {
+      return this.storage.getItem(SAVE_KEY);
+    } catch {
+      return null;
+    }
+  }
+
+  /** Ringkasan dari teks save mana pun (mis. save di akun). */
+  static summarize(text: string): SaveSummary | null {
+    try {
+      const file = JSON.parse(text) as Partial<SaveFile>;
+      const state = file.state;
+      if (!state?.calendar || !state.player) return null;
+      return { day: state.calendar.day, money: state.player.money, savedAt: file.savedAt ?? '' };
+    } catch {
+      return null;
+    }
+  }
+
+  /** Ganti save di perangkat dengan teks lain (divalidasi dulu; save lama dicadangkan). */
+  importText(text: string): void {
+    let raw: unknown;
+    try {
+      raw = JSON.parse(text);
+    } catch {
+      throw new SaveError('Data akun rusak (bukan JSON yang valid).');
+    }
+    const state = migrateSave(raw);
+    validateState(state, this.catalog);
+    const old = this.exportText();
+    if (old !== null) this.storage.setItem(`${SAVE_KEY}:cadangan`, old);
+    this.storage.setItem(SAVE_KEY, text);
   }
 
   /** Simpan salinan data rusak lalu hapus, agar pemain bisa mulai lagi tanpa kehilangan bukti. */

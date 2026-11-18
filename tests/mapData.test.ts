@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import mainStreet from '../src/data/maps/main-street.json';
 import { maxElevation, parseMapData, terrainAt } from '../src/world/MapData';
-import { OBJECT_TYPES } from '../src/world/objectTypes';
+import { objectType } from '../src/world/objectTypes';
 
 const tinyMap = () => ({
   id: 'kecil',
@@ -31,7 +31,7 @@ describe('peta main-street', () => {
 
   it('semua objek berada di dalam peta', () => {
     for (const o of map.objects) {
-      const def = OBJECT_TYPES[o.type];
+      const def = objectType(o.type);
       expect(o.x).toBeGreaterThanOrEqual(0);
       expect(o.y).toBeGreaterThanOrEqual(0);
       expect(o.x + def.footprint.w / 16).toBeLessThanOrEqual(map.width + 1e-6);

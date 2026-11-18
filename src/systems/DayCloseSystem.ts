@@ -148,6 +148,12 @@ export function closeDay(draft: GameState, catalog: Catalog): DayReport {
     // Salinan terpisah supaya laporan berikutnya tidak mengubah riwayat.
     report: JSON.parse(JSON.stringify(report)) as DayReport,
   });
+  // Rekor untuk leaderboard (save lama: mulai dari nilai tertinggi di riwayat).
+  const dayRevenue = report.revenue + (report.branches ?? []).reduce((n, b) => n + b.revenue, 0);
+  draft.stats.bestDayRevenue = Math.max(draft.stats.bestDayRevenue ?? Math.max(0, ...draft.history.map((h) => h.revenue)), dayRevenue);
+  draft.stats.bestDayProfit = Math.max(draft.stats.bestDayProfit ?? Math.max(0, ...draft.history.map((h) => h.netProfit)), report.netProfit);
+  draft.stats.worstDayLoss = Math.max(draft.stats.worstDayLoss ?? Math.max(0, ...draft.history.map((h) => -h.netProfit)), -report.netProfit);
+  draft.stats.peakMoney = Math.max(draft.stats.peakMoney ?? Math.max(0, ...draft.history.map((h) => h.money)), report.moneyEnd);
   if (draft.history.length > HISTORY_LIMIT) draft.history.splice(0, draft.history.length - HISTORY_LIMIT);
   return report;
 }

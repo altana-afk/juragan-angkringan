@@ -1,11 +1,12 @@
 {
   "name": "juragan-angkringan-simulator",
-  "version": "0.15.0",
+  "version": "0.16.0",
   "description": "Game simulasi bisnis angkringan 2D isometrik berbasis web (Phaser 3 + TypeScript + Vite)",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
+    "editor": "vite --config vite.editor.config.ts",
     "pack:itch": "npm run build && node scripts/pack-itch.mjs",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
@@ -15,6 +16,7 @@
   },
   "license": "UNLICENSED",
   "dependencies": {
+    "firebase": "^12.19.0",
     "phaser": "^3.90.0"
   },
   "devDependencies": {

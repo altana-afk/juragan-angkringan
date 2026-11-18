@@ -36,7 +36,8 @@ function pwaServiceWorker(): Plugin {
       publicDir = config.publicDir;
     },
     generateBundle(_options, bundle) {
-      const built = Object.keys(bundle).filter((file) => !file.endsWith('.map'));
+      // Modul akun (Firebase) tidak di-precache: hanya diunduh pemain yang membuka menu Akun.
+      const built = Object.keys(bundle).filter((file) => !file.endsWith('.map') && !/firebase/.test(file));
       const publicFiles = listPublicFiles(publicDir);
       const urls = ['./', ...new Set(['index.html', ...built, ...publicFiles])].sort();
 
@@ -78,7 +79,7 @@ export default defineConfig({
       output: {
         // Phaser dipisah ke chunk sendiri: jarang berubah → tetap tersimpan di cache browser
         // saat kode game diperbarui, sehingga pembaruan hanya mengunduh ±200 kB.
-        advancedChunks: { groups: [{ name: 'phaser', test: /node_modules[\\/]phaser/ }] },
+        advancedChunks: { groups: [{ name: 'phaser', test: /node_modules[\\/]phaser/ }, { name: 'firebase', test: /node_modules[\\/](firebase|@firebase)/ }] },
       },
     },
   },

@@ -5,7 +5,7 @@ import { tileToWorld } from '../iso/IsoMath';
 import type { Group, Member, SimEvent } from '../systems/SalesSimulation';
 import { formatRupiah } from '../utils/formatting';
 import { DEPTH, entityDepth, objectDepth } from './depth';
-import { OBJECT_TYPES } from './objectTypes';
+import { objectType } from './objectTypes';
 import { terrainAt, type MapData, type SeatAnchor } from './MapData';
 
 /** Tinggi dudukan bangku (px dunia): pinggul pelanggan duduk sejajar papan bangku. */
@@ -255,18 +255,19 @@ export class CustomerLayer {
     this.scene.tweens.add({ targets: label, y: p.y - 46, alpha: 0, duration: 1400, ease: 'Sine.easeOut', onComplete: () => label.destroy() });
   }
 
-  /** Bangku di bawah kursi (jika ada): tinggi dudukan & depth tepat di atas bangku. Lesehan → null. */
+  /** Tempat duduk di bawah kursi (jika ada): tinggi dudukan & depth tepat di atasnya. Lesehan → null. */
   private seatSupport(seat: SeatAnchor): { lift: number; depth: number } | null {
     if (this.supportCache.has(seat.id)) return this.supportCache.get(seat.id) ?? null;
     let result: { lift: number; depth: number } | null = null;
     for (const o of this.map.objects) {
-      if (o.type !== 'bench_x' && o.type !== 'bench_y') continue;
-      const def = OBJECT_TYPES[o.type];
+      const def = objectType(o.type);
+      // Bangku bawaan & objek kustom yang ditandai "bisa jadi tempat duduk".
+      if (!def.seat) continue;
       const w = def.footprint.w / 16;
       const d = def.footprint.d / 16;
       const pad = 0.2;
       if (seat.x >= o.x - pad && seat.x <= o.x + w + pad && seat.y >= o.y - pad && seat.y <= o.y + d + pad) {
-        result = { lift: SEAT_LIFT_PX, depth: objectDepth(def, o.x, o.y) + 1 };
+        result = { lift: def.seat.lift ?? SEAT_LIFT_PX, depth: objectDepth(def, o.x, o.y) + 1 };
         break;
       }
     }

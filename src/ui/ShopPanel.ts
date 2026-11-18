@@ -21,6 +21,17 @@ export function expiryText(expiresDay: number | null, today: number): string {
 }
 
 /** Kategori tab Belanja (maks. 6). Bahan baru yang belum dipetakan masuk "Lainnya". */
+/** Huruf kecil tanpa tanda baca/aksen untuk pencarian. */
+function normalize(s: string): string {
+  return s
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9 ]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 const SHOP_TABS = [
   { id: 'lauk', label: 'Lauk', items: ['telur', 'tempe', 'tahu', 'sosis', 'bakso', 'ayam', 'ati_ampela', 'usus'] },
   { id: 'sayur', label: 'Sayur', items: ['cabai', 'bawang', 'jahe', 'jagung', 'pisang'] },
@@ -62,6 +73,26 @@ export class ShopPanel {
   private tab: TabId = 'semua';
   private readonly chips = new Set<ChipId>();
   private filterBar = el('div', { className: 'shop-filters' });
+  /** Kata kunci pencarian (mencari di semua kategori; chip status tetap berlaku). */
+  private query = '';
+  private readonly searchInput = el('input', {
+    className: 'shop-search-input',
+    attrs: { type: 'search', placeholder: 'Cari bahan…', 'aria-label': 'Cari nama bahan', autocomplete: 'off', spellcheck: 'false', enterkeyhint: 'search' },
+  }) as HTMLInputElement;
+  private readonly searchClear = el('button', {
+    className: 'shop-search-clear',
+    text: '×',
+    attrs: { type: 'button', 'aria-label': 'Hapus pencarian', hidden: '' },
+    onClick: () => {
+      this.setQuery('');
+      this.searchInput.focus();
+    },
+  });
+  private readonly searchBox = el('div', {
+    className: 'shop-search',
+    children: [el('span', { className: 'shop-search-icon', text: '⌕', attrs: { 'aria-hidden': 'true' } }), this.searchInput, this.searchClear, el('kbd', { className: 'shop-search-kbd', text: '/', attrs: { 'aria-hidden': 'true', title: 'Tekan / untuk mencari' } })],
+  });
+  private offKeys: (() => void) | null = null;
   private emptyNote = el('p', { className: 'panel-note muted shop-empty', attrs: { role: 'status' } });
   private modal: ModalHandle | null = null;
   private rows: Row[] = [];
@@ -78,6 +109,15 @@ export class ShopPanel {
     private readonly ui: UIManager,
   ) {
     this.buyBtn.addEventListener('click', () => this.buy());
+    this.searchInput.addEventListener('input', () => this.setQuery(this.searchInput.value));
+    this.searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && this.query) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.setQuery('');
+      }
+      if (e.key === 'Enter') this.searchInput.blur();
+    });
     this.clearBtn.addEventListener('click', () => {
       this.cart.clear();
       this.refresh();
@@ -144,10 +184,21 @@ export class ShopPanel {
         this.modal = null;
         this.offState?.();
         this.offState = null;
+        this.offKeys?.();
+        this.offKeys = null;
         this.ctx.bus.emit('ui:panel-closed', { panel: 'shop' });
       },
     });
     this.offState = this.ctx.bus.on('state:changed', () => this.refresh());
+    // Desktop: tekan "/" untuk langsung mencari; Esc di kolom cari mengosongkan dulu sebelum menutup panel.
+    const onKey = (e: KeyboardEvent): void => {
+      if (e.key === '/' && document.activeElement !== this.searchInput && !(document.activeElement instanceof HTMLInputElement)) {
+        e.preventDefault();
+        this.searchInput.focus();
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    this.offKeys = () => document.removeEventListener('keydown', onKey);
     this.renderFilters();
     this.refresh();
   }
@@ -196,8 +247,20 @@ export class ShopPanel {
     return out;
   }
 
+  private setQuery(q: string): void {
+    this.query = q;
+    if (this.searchInput.value !== q) this.searchInput.value = q;
+    this.searchClear.hidden = q === '';
+    this.filterBar.classList.toggle('is-searching', q.trim() !== '');
+    this.refresh();
+  }
+
   private matches(state: Readonly<GameState>, def: IngredientDef, trend: string, menu: Set<string>): boolean {
-    if (this.tab !== 'semua' && shopCategory(def.id) !== this.tab) return false;
+    const q = normalize(this.query);
+    if (q) {
+      // Pencarian mengabaikan tab kategori supaya bahan selalu ketemu.
+      if (!normalize(def.name).includes(q) && !def.id.replace(/_/g, ' ').includes(q)) return false;
+    } else if (this.tab !== 'semua' && shopCategory(def.id) !== this.tab) return false;
     const have = totalQty(state.inventory.ingredients[def.id]);
     for (const c of this.chips) {
       if (c === 'turun' && trend !== 'turun') return false;
@@ -240,6 +303,7 @@ export class ShopPanel {
       }),
     );
     this.filterBar.replaceChildren(
+      this.searchBox,
       el('div', { className: 'shop-tabs', attrs: { role: 'tablist', 'aria-label': 'Kategori bahan' }, children: tabBtns }),
       el('div', { className: 'shop-chips', attrs: { role: 'group', 'aria-label': 'Saring status' }, children: chipBtns }),
     );
@@ -295,7 +359,7 @@ export class ShopPanel {
     setText(
       this.emptyNote,
       shown === 0
-        ? `${this.chips.has('dipakai') && PREP_PLAN.size === 0 ? 'Daftar persiapan masih kosong — tambahkan menu di Persiapan Dapur dulu.' : 'Tidak ada bahan yang cocok dengan filter ini.'}${hiddenInCart ? ` ${hiddenInCart} bahan di keranjang tersembunyi.` : ''}`
+        ? `${this.chips.has('dipakai') && PREP_PLAN.size === 0 ? 'Daftar persiapan masih kosong — tambahkan menu di Persiapan Dapur dulu.' : (this.query.trim() ? `Tidak ada bahan bernama "${this.query.trim()}".` : 'Tidak ada bahan yang cocok dengan filter ini.')}${hiddenInCart ? ` ${hiddenInCart} bahan di keranjang tersembunyi.` : ''}`
         : hiddenInCart
           ? `${hiddenInCart} bahan di keranjang tidak terlihat karena filter — tetap ikut dibeli.`
           : '',

@@ -48,6 +48,8 @@ export interface GameEvents {
   'ui:pause-menu-closed': void;
 
   'game:return-to-menu': void;
+  /** Save di perangkat diganti dengan save dari akun. */
+  'cloud:save-replaced': void;
 
   'system:toggle-fullscreen': void;
   'system:fullscreen-changed': { active: boolean };
