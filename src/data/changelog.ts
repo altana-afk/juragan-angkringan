@@ -11,16 +11,17 @@ export interface ChangelogEntry {
 export const CHANGELOG: readonly ChangelogEntry[] = [
   {
     version: '0.16.0',
-    title: 'Akun & Leaderboard',
+    title: 'Siapa juragan paling jago di kampung?',
     items: [
-      'Leaderboard baru di menu utama dengan 5 kategori: hari terlama, pendapatan, laba, dan rugi terbesar dalam satu hari, serta kas terbanyak.',
-      'Rekormu terkirim otomatis setelah masuk akun dan memilih username. Peringkatmu tampil walau di luar 50 besar.',
-      'Belanja Bahan punya kolom pencarian nama bahan (di desktop tekan / untuk langsung mencari).',
-      'Ikon 👤 baru di menu utama: masuk dengan Google atau email supaya progres tersimpan di akun dan bisa dilanjutkan di HP atau komputer lain.',
-      'Tidak wajib login — tanpa akun, progres tetap tersimpan di perangkat ini seperti biasa.',
-      'Jika progres di akun dan di perangkat berbeda, kamu bisa memilih mana yang dipakai.',
-      'Pilih username unik setelah masuk akun — nanti tampil di leaderboard. Username bisa diganti 30 hari sekali.',
-      'Save kini disegel: save yang diubah di luar game ditandai dan tidak akan masuk leaderboard.',
+      'Sekarang ada Leaderboard di menu utama. Adu rekor dengan pemain lain di 5 kategori: hari terlama, pendapatan, laba, dan rugi terbesar dalam satu hari, plus kas terbanyak.',
+      'Ya, rugi terbesar juga ada papannya. Kalau dagangan lagi apes, setidaknya bisa jadi juara di situ.',
+      'Masuk lewat ikon 👤 pakai akun Google atau email, lalu pilih username. Rekormu terkirim sendiri setiap progres tersimpan, dan peringkatmu tetap kelihatan walau belum masuk 50 besar.',
+      'Progres ikut tersimpan di akun. Ganti HP atau main di laptop? Masuk dengan akun yang sama, lanjutkan dari hari terakhir.',
+      'Kalau progres di akun dan di perangkat berbeda, kamu yang memilih mana yang dipakai. Yang tidak dipilih tetap dicadangkan.',
+      'Tidak mau login? Tidak apa-apa. Progres tetap tersimpan di perangkat seperti biasa, hanya rekormu tidak masuk leaderboard.',
+      'Username bisa diganti 30 hari sekali dan tidak bisa kembar dengan pemain lain.',
+      'Supaya adil, save yang diubah di luar game ditandai dan rekornya tidak dihitung di leaderboard.',
+      'Belanja Bahan punya kolom pencarian. Ketik "teh", langsung ketemu. Di desktop, tekan / untuk mulai mencari.',
     ],
   },
   {
