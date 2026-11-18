@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Editor Peta · Juragan Angkringan</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Crect width='16' height='16' rx='3' fill='%23140f1f'/%3E%3Crect x='2' y='3' width='12' height='3' fill='%23d9643a'/%3E%3Crect x='4' y='3' width='2' height='3' fill='%23f1dcb0'/%3E%3Crect x='8' y='3' width='2' height='3' fill='%23f1dcb0'/%3E%3Crect x='12' y='3' width='2' height='3' fill='%23f1dcb0'/%3E%3Crect x='3' y='6' width='1' height='6' fill='%23c2a25a'/%3E%3Crect x='12' y='6' width='1' height='6' fill='%23c2a25a'/%3E%3Crect x='7' y='7' width='2' height='2' fill='%23ffd27a'/%3E%3Crect x='2' y='10' width='12' height='3' fill='%238a5a34'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="./editor.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <h1 class="brand">Editor Peta <span class="brand-sub">Juragan Angkringan</span></h1>
+
+      <div class="topbar-group">
+        <label class="sr-only" for="map-picker">Peta yang disunting</label>
+        <select id="map-picker" class="map-picker"></select>
+        <button type="button" class="btn" id="btn-new">Peta baru…</button>
+      </div>
+
+      <div class="topbar-group" role="group" aria-label="Riwayat">
+        <button type="button" class="btn" id="btn-undo" title="Urungkan (Ctrl+Z)">Urungkan</button>
+        <button type="button" class="btn" id="btn-redo" title="Ulangi (Ctrl+Y)">Ulangi</button>
+      </div>
+
+      <div class="topbar-group" role="group" aria-label="Tampilan">
+        <button type="button" class="btn btn-square" id="btn-zoom-out" aria-label="Perkecil" title="Perkecil (−)">−</button>
+        <output id="zoom-label" class="zoom-label" aria-live="polite">200%</output>
+        <button type="button" class="btn btn-square" id="btn-zoom-in" aria-label="Perbesar" title="Perbesar (+)">+</button>
+        <button type="button" class="btn" id="btn-fit" title="Pas layar (0)">Pas layar</button>
+      </div>
+
+      <div class="topbar-save">
+        <span id="save-state" class="save-state" aria-live="polite"></span>
+        <button type="button" class="btn" id="btn-download">Unduh JSON</button>
+        <a class="btn" href="/" target="_blank" rel="noopener">Buka game</a>
+        <button type="button" class="btn btn-primary" id="btn-save" title="Ctrl+S">Simpan ke project</button>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <aside class="rail" aria-label="Alat dan lapisan">
+        <div class="rail-tools" role="toolbar" aria-label="Alat">
+          <button type="button" class="tool" data-tool="select" aria-pressed="true"><span>Pilih</span><kbd>V</kbd></button>
+          <button type="button" class="tool" data-tool="terrain" aria-pressed="false"><span>Tanah</span><kbd>B</kbd></button>
+          <button type="button" class="tool" data-tool="object" aria-pressed="false"><span>Objek</span><kbd>O</kbd></button>
+          <button type="button" class="tool" data-tool="anchor" aria-pressed="false"><span>Titik</span><kbd>P</kbd></button>
+        </div>
+        <div class="rail-layers" role="group" aria-label="Lapisan">
+          <p class="rail-title">Lapisan</p>
+          <button type="button" class="layer" data-layer="grid" aria-pressed="false">Grid</button>
+          <button type="button" class="layer" data-layer="footprints" aria-pressed="false">Alas</button>
+          <button type="button" class="layer" data-layer="anchors" aria-pressed="true">Titik</button>
+          <button type="button" class="layer" data-layer="upgrades" aria-pressed="true">Upgrade</button>
+        </div>
+        <div class="rail-snap">
+          <label class="rail-title" for="snap">Snap</label>
+          <select id="snap">
+            <option value="0.05">0,05</option>
+            <option value="0.25">0,25</option>
+            <option value="0.5">0,5</option>
+            <option value="1">1 ubin</option>
+          </select>
+        </div>
+      </aside>
+
+      <main class="stage" aria-label="Kanvas peta">
+        <canvas id="canvas" tabindex="0" aria-label="Peta isometrik. Gunakan alat di kiri; panah menggeser pilihan, Delete menghapus."></canvas>
+        <div id="loading" class="loading" role="status">Menyiapkan aset game…</div>
+      </main>
+
+      <aside class="panel" aria-label="Pengaturan">
+        <div class="tabs" role="tablist" aria-label="Panel">
+          <button type="button" role="tab" id="tab-edit" aria-controls="pane-edit" aria-selected="true">Sunting</button>
+          <button type="button" role="tab" id="tab-map" aria-controls="pane-map" aria-selected="false" tabindex="-1">Peta</button>
+          <button type="button" role="tab" id="tab-location" aria-controls="pane-location" aria-selected="false" tabindex="-1">Lokasi</button>
+          <button type="button" role="tab" id="tab-check" aria-controls="pane-check" aria-selected="false" tabindex="-1">Cek <span id="check-badge" class="badge" hidden></span></button>
+        </div>
+        <section id="pane-edit" role="tabpanel" aria-labelledby="tab-edit" class="pane"></section>
+        <section id="pane-map" role="tabpanel" aria-labelledby="tab-map" class="pane" hidden></section>
+        <section id="pane-location" role="tabpanel" aria-labelledby="tab-location" class="pane" hidden></section>
+        <section id="pane-check" role="tabpanel" aria-labelledby="tab-check" class="pane" hidden></section>
+      </aside>
+    </div>
+
+    <footer class="statusbar">
+      <span id="status-coords" class="status-coords">–</span>
+      <span id="status-msg" class="status-msg" aria-live="polite"></span>
+      <span id="status-hint" class="status-hint"></span>
+    </footer>
+
+    <dialog id="dlg-new" class="dialog" aria-labelledby="dlg-new-title">
+      <form method="dialog" id="form-new">
+        <h2 id="dlg-new-title">Peta baru</h2>
+        <div class="field">
+          <label for="new-name">Nama peta</label>
+          <input id="new-name" required maxlength="60" placeholder="mis. Alun-Alun Kidul" />
+        </div>
+        <div class="field">
+          <label for="new-id">Id file</label>
+          <input id="new-id" required pattern="[a-z0-9]+(-[a-z0-9]+)*" placeholder="alun-alun-kidul" />
+          <p class="help">Jadi nama file <code>src/data/maps/&lt;id&gt;.json</code>. Huruf kecil, angka, tanda hubung.</p>
+        </div>
+        <fieldset class="field">
+          <legend>Mulai dari</legend>
+          <label class="radio"><input type="radio" name="new-from" value="copy" checked /> Salinan peta yang ada</label>
+          <select id="new-template" aria-label="Peta yang disalin"></select>
+          <label class="radio"><input type="radio" name="new-from" value="blank" /> Kosong</label>
+        </fieldset>
+        <div class="field-row" id="new-blank-fields">
+          <div class="field">
+            <label for="new-w">Lebar</label>
+            <input id="new-w" type="number" min="4" max="64" value="24" />
+          </div>
+          <div class="field">
+            <label for="new-h">Tinggi</label>
+            <input id="new-h" type="number" min="4" max="64" value="24" />
+          </div>
+          <div class="field">
+            <label for="new-base">Tanah dasar</label>
+            <select id="new-base"></select>
+          </div>
+        </div>
+        <p class="form-error" id="new-error" role="alert"></p>
+        <div class="dialog-actions">
+          <button type="button" class="btn" value="cancel" data-close>Batal</button>
+          <button type="submit" class="btn btn-primary" value="ok">Buat peta</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="dlg-resize" class="dialog" aria-labelledby="dlg-resize-title">
+      <form method="dialog" id="form-resize">
+        <h2 id="dlg-resize-title">Ubah ukuran peta</h2>
+        <div class="field-row">
+          <div class="field">
+            <label for="rs-w">Lebar</label>
+            <input id="rs-w" type="number" min="4" max="64" />
+          </div>
+          <div class="field">
+            <label for="rs-h">Tinggi</label>
+            <input id="rs-h" type="number" min="4" max="64" />
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="rs-dx">Geser isi X</label>
+            <input id="rs-dx" type="number" min="-64" max="64" value="0" />
+          </div>
+          <div class="field">
+            <label for="rs-dy">Geser isi Y</label>
+            <input id="rs-dy" type="number" min="-64" max="64" value="0" />
+          </div>
+          <div class="field">
+            <label for="rs-fill">Isi ubin baru</label>
+            <select id="rs-fill"></select>
+          </div>
+        </div>
+        <p class="help">Geser isi = tambah ruang di sisi kiri/atas. Contoh: lebar 24 → 28 dan geser X 4 menambah 4 kolom di kiri. Objek yang keluar batas dihapus.</p>
+        <div class="dialog-actions">
+          <button type="button" class="btn" data-close>Batal</button>
+          <button type="submit" class="btn btn-primary">Terapkan</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>

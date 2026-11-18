@@ -1,0 +1,86 @@
+rules_version = '2';
+// Juragan Angkringan — aturan database (paket gratis, tanpa server).
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------- Save pemain: saves/{uid} ----------
+    // Hanya pemilik yang bisa membaca/menulis. Setiap unggahan wajib punya segel `sig`
+    // = SHA-256("juragan-angkringan:segel:v1" + text) — edit manual lewat Console/REST tanpa
+    // menghitung ulang segel akan ditolak. Angka ringkasan juga dibatasi agar tetap masuk akal.
+    function validSave(d) {
+      return d.keys().hasOnly(['text', 'day', 'money', 'savedAt', 'version', 'sig', 'updatedAt'])
+        && d.text is string && d.text.size() < 900000
+        && d.day is int && d.day >= 1 && d.day <= 100000
+        && (d.money is int || d.money is float)
+        && d.money <= 10000000 + d.day * 5000000
+        && d.sig is string
+        && d.sig == hashing.sha256('juragan-angkringan:segel:v1' + d.text).toHexString().lower()
+        && d.updatedAt == request.time;
+    }
+    match /saves/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow create, update: if request.auth != null && request.auth.uid == uid && validSave(request.resource.data);
+      allow delete: if false;
+    }
+
+    // ---------- Leaderboard: scores/{uid} ----------
+    // Rekor terbaik per akun. Siapa pun boleh membaca; hanya pemilik yang menulis, dengan syarat:
+    // nama = username profilnya, angka masuk akal, rekor tidak pernah turun,
+    // dan hari tidak bertambah lebih cepat dari 1 hari permainan per 20 detik nyata.
+    function validScore(d) {
+      return d.keys().hasOnly(['username', 'longestDay', 'bestDayRevenue', 'bestDayProfit', 'worstDayLoss', 'peakMoney', 'updatedAt'])
+        && d.username == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.username
+        && d.longestDay is int && d.longestDay >= 1 && d.longestDay <= 100000
+        && d.bestDayRevenue is int && d.bestDayRevenue >= 0 && d.bestDayRevenue <= 100000000
+        && d.bestDayProfit is int && d.bestDayProfit >= 0 && d.bestDayProfit <= d.bestDayRevenue + 50000000
+        && d.worstDayLoss is int && d.worstDayLoss >= 0 && d.worstDayLoss <= 100000000
+        && d.peakMoney is int && d.peakMoney >= 0 && d.peakMoney <= 10000000 + d.longestDay * 5000000
+        && d.updatedAt == request.time;
+    }
+    match /scores/{uid} {
+      allow read: if true;
+      allow create: if request.auth != null && request.auth.uid == uid && validScore(request.resource.data);
+      allow update: if request.auth != null && request.auth.uid == uid && validScore(request.resource.data)
+        && request.resource.data.longestDay >= resource.data.longestDay
+        && request.resource.data.bestDayRevenue >= resource.data.bestDayRevenue
+        && request.resource.data.bestDayProfit >= resource.data.get('bestDayProfit', 0)
+        && request.resource.data.worstDayLoss >= resource.data.get('worstDayLoss', 0)
+        && request.resource.data.peakMoney >= resource.data.peakMoney
+        && request.resource.data.longestDay - resource.data.longestDay
+           <= 1 + (request.time - resource.data.updatedAt).seconds() / 20;
+      allow delete: if false;
+    }
+
+    // ---------- Username unik ----------
+    // users/{uid}: profil publik (dibaca leaderboard). usernames/{nama_kecil}: kunci keunikan.
+    function validName(name) {
+      return name is string && name.matches('^[A-Za-z0-9_]{3,16}$');
+    }
+    match /users/{uid} {
+      allow read: if true;
+      allow create, update: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['username', 'usernameLower', 'changedAt'])
+        && validName(request.resource.data.username)
+        && request.resource.data.usernameLower == request.resource.data.username.lower()
+        && request.resource.data.changedAt == request.time
+        // Ganti username paling cepat 30 hari sekali.
+        && (resource == null || request.time > resource.data.changedAt + duration.value(30, 'd'))
+        // Nama harus benar-benar dimiliki akun ini di usernames/.
+        && getAfter(/databases/$(database)/documents/usernames/$(request.resource.data.usernameLower)).data.uid == uid;
+      allow delete: if false;
+    }
+    match /usernames/{name} {
+      allow read: if true;
+      allow create: if request.auth != null
+        && name.matches('^[a-z0-9_]{3,16}$')
+        && request.resource.data.keys().hasOnly(['uid'])
+        && request.resource.data.uid == request.auth.uid
+        && getAfter(/databases/$(database)/documents/users/$(request.auth.uid)).data.usernameLower == name;
+      // Melepas nama lama hanya oleh pemiliknya, saat profil sudah pindah ke nama lain.
+      allow delete: if request.auth != null
+        && resource.data.uid == request.auth.uid
+        && getAfter(/databases/$(database)/documents/users/$(request.auth.uid)).data.usernameLower != name;
+      allow update: if false;
+    }
+  }
+}

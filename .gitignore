@@ -7,9 +7,6 @@ release/
 coverage/
 runing.md
 .env
-tools/map-editor
 tools/map-editor/backups/
 .env.local
 .env.*.local
-firestore.rules
-docs/
