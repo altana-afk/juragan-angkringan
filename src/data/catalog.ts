@@ -1,5 +1,12 @@
-import ingredientsJson from './ingredients.json';
-import recipesJson from './recipes.json';
+import ingredientsJsonBase from './ingredients.json';
+import ingredientsJsonEn from '../i18n/en/data/ingredients.json';
+import recipesJsonBase from './recipes.json';
+import recipesJsonEn from '../i18n/en/data/recipes.json';
+import { localizeData } from '../i18n/i18n';
+
+// Teks data dalam bahasa aktif (tumpangan terjemahan Inggris di src/i18n/en/data/).
+const ingredientsJson = localizeData(ingredientsJsonBase, ingredientsJsonEn);
+const recipesJson = localizeData(recipesJsonBase, recipesJsonEn);
 
 /** Bentuk ikon pixel art (digambar oleh src/graphics/art/itemIcons.ts). */
 export const ICON_SHAPES = [

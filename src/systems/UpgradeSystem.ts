@@ -1,7 +1,12 @@
-import upgradesJson from '../data/upgrades.json';
+import upgradesJsonBase from '../data/upgrades.json';
+import upgradesJsonEn from '../i18n/en/data/upgrades.json';
 import type { GameState } from '../core/GameState';
 import { formatRupiah } from '../utils/formatting';
 import { GameRuleError } from './rules';
+import { localizeData, tr } from '../i18n/i18n';
+
+// Teks data dalam bahasa aktif (tumpangan terjemahan Inggris di src/i18n/en/data/).
+const upgradesJson = localizeData(upgradesJsonBase, upgradesJsonEn);
 
 export type UpgradeCategory = 'gerobak' | 'peralatan' | 'kapasitas' | 'lingkungan' | 'online';
 
@@ -46,6 +51,8 @@ export interface UpgradeEffects {
   courierSpeed?: number;
   /** + menit makanan tetap hangat saat diantar kurir sendiri (kotak termos). */
   thermal?: number;
+  /** Kucing peliharaan: mencegah kucing liar mencuri dagangan (0.18.0). */
+  petCat?: number;
   /** id objek peta → varian tampilan */
   variants?: Record<string, string>;
 }
@@ -61,11 +68,11 @@ export interface UpgradeDef {
 }
 
 export const UPGRADE_CATEGORIES: readonly { id: UpgradeCategory; label: string }[] = [
-  { id: 'gerobak', label: 'Gerobak' },
-  { id: 'peralatan', label: 'Peralatan' },
-  { id: 'kapasitas', label: 'Kapasitas' },
-  { id: 'lingkungan', label: 'Lingkungan' },
-  { id: 'online', label: 'Pesanan online' },
+  { id: 'gerobak', label: tr('Gerobak') },
+  { id: 'peralatan', label: tr('Peralatan') },
+  { id: 'kapasitas', label: tr('Kapasitas') },
+  { id: 'lingkungan', label: tr('Lingkungan') },
+  { id: 'online', label: tr('Pesanan online') },
 ];
 
 export function parseUpgrades(raw: unknown): UpgradeDef[] {
@@ -87,7 +94,7 @@ export const UPGRADES: readonly UpgradeDef[] = parseUpgrades(upgradesJson);
 
 export function upgradeById(id: string): UpgradeDef {
   const u = UPGRADES.find((x) => x.id === id);
-  if (!u) throw new GameRuleError('upgrade-unknown', `Upgrade "${id}" tidak dikenal`);
+  if (!u) throw new GameRuleError('upgrade-unknown', tr('Upgrade "{id}" tidak dikenal', { id }));
   return u;
 }
 
@@ -99,12 +106,12 @@ export interface TotalEffects extends Required<Omit<UpgradeEffects, 'variants'>>
 export function totalEffects(owned: readonly string[]): TotalEffects {
   const t: TotalEffects = {
     businessLevel: 1, satisfaction: 0, arrivalBonus: 0, newCustomerBonus: 0, patience: 0, serviceSpeed: 0,
-    maxCookPortions: 0, productShelfDays: 0, ingredientShelfDays: 0, drinkShelfDays: 0, chilledShelfDays: 0, heatComfort: 0, rainComfort: 0, rainShelter: 0, storage: 0, seats: 0, drinkAppeal: 0, onlineLimit: 0, courierSpeed: 0, thermal: 0, variants: {},
+    maxCookPortions: 0, productShelfDays: 0, ingredientShelfDays: 0, drinkShelfDays: 0, chilledShelfDays: 0, heatComfort: 0, rainComfort: 0, rainShelter: 0, storage: 0, seats: 0, drinkAppeal: 0, onlineLimit: 0, courierSpeed: 0, thermal: 0, petCat: 0, variants: {},
   };
   for (const id of owned) {
     const e = upgradeById(id).effects;
     t.businessLevel = Math.max(t.businessLevel, e.businessLevel ?? 1);
-    for (const k of ['satisfaction', 'arrivalBonus', 'newCustomerBonus', 'patience', 'serviceSpeed', 'maxCookPortions', 'productShelfDays', 'ingredientShelfDays', 'drinkShelfDays', 'chilledShelfDays', 'heatComfort', 'rainComfort', 'rainShelter', 'storage', 'seats', 'drinkAppeal', 'onlineLimit', 'courierSpeed', 'thermal'] as const) {
+    for (const k of ['satisfaction', 'arrivalBonus', 'newCustomerBonus', 'patience', 'serviceSpeed', 'maxCookPortions', 'productShelfDays', 'ingredientShelfDays', 'drinkShelfDays', 'chilledShelfDays', 'heatComfort', 'rainComfort', 'rainShelter', 'storage', 'seats', 'drinkAppeal', 'onlineLimit', 'courierSpeed', 'thermal', 'petCat'] as const) {
       t[k] += e[k] ?? 0;
     }
     Object.assign(t.variants, e.variants ?? {});
@@ -118,19 +125,19 @@ export const effectsOf = (state: Readonly<GameState>): TotalEffects => totalEffe
 /** Alasan upgrade belum bisa dibeli (kosong = bisa). */
 export function upgradeBlockers(state: Readonly<GameState>, u: UpgradeDef): string[] {
   const reasons: string[] = [];
-  if (state.upgrades.includes(u.id)) return ['Sudah dimiliki'];
-  for (const r of u.requires.upgrades ?? []) if (!state.upgrades.includes(r)) reasons.push(`Butuh ${upgradeById(r).name}`);
-  if (u.requires.popularity !== undefined && state.player.popularity < u.requires.popularity) reasons.push(`Popularitas ≥ ${u.requires.popularity}`);
-  if (u.requires.day !== undefined && state.calendar.day < u.requires.day) reasons.push(`Mulai Hari ${u.requires.day}`);
-  if (state.player.money < u.cost) reasons.push(`Kurang ${formatRupiah(u.cost - state.player.money)}`);
+  if (state.upgrades.includes(u.id)) return [tr('Sudah dimiliki')];
+  for (const r of u.requires.upgrades ?? []) if (!state.upgrades.includes(r)) reasons.push(tr('Butuh {name}', { name: upgradeById(r).name }));
+  if (u.requires.popularity !== undefined && state.player.popularity < u.requires.popularity) reasons.push(tr('Popularitas ≥ {popularity}', { popularity: u.requires.popularity }));
+  if (u.requires.day !== undefined && state.calendar.day < u.requires.day) reasons.push(tr('Mulai Hari {day}', { day: u.requires.day }));
+  if (state.player.money < u.cost) reasons.push(tr('Kurang {0}', { 0: formatRupiah(u.cost - state.player.money) }));
   return reasons;
 }
 
 export function buyUpgrade(draft: GameState, id: string): UpgradeDef {
   const u = upgradeById(id);
-  if (draft.phase !== 'persiapan') throw new GameRuleError('wrong-phase', 'Upgrade hanya bisa dibeli saat persiapan.');
+  if (draft.phase !== 'persiapan') throw new GameRuleError('wrong-phase', tr('Upgrade hanya bisa dibeli saat persiapan.'));
   const blockers = upgradeBlockers(draft, u);
-  if (blockers.length) throw new GameRuleError('upgrade-blocked', `${u.name}: ${blockers.join(', ')}.`);
+  if (blockers.length) throw new GameRuleError('upgrade-blocked', tr('{name}: {1}.', { name: u.name, 1: blockers.join(', ') }));
   draft.player.money -= u.cost;
   draft.upgrades.push(u.id);
   draft.ledger.upgradeCost += u.cost;
@@ -140,25 +147,26 @@ export function buyUpgrade(draft: GameState, id: string): UpgradeDef {
 /** Ringkas efek upgrade untuk ditampilkan. */
 export function describeEffects(e: UpgradeEffects): string[] {
   const out: string[] = [];
-  if (e.businessLevel) out.push(`Level usaha ${e.businessLevel}`);
-  if (e.seats) out.push(`+${e.seats} kursi`);
-  if (e.arrivalBonus) out.push(`+${Math.round(e.arrivalBonus * 100)}% pelanggan`);
-  if (e.newCustomerBonus) out.push('pelanggan baru ↑');
-  if (e.satisfaction) out.push(`+${e.satisfaction} kepuasan`);
-  if (e.patience) out.push(`+${e.patience} mnt kesabaran`);
-  if (e.serviceSpeed) out.push(`layanan ${Math.round(e.serviceSpeed * 100)}% lebih cepat`);
-  if (e.maxCookPortions) out.push(`+${e.maxCookPortions} porsi/masak`);
-  if (e.productShelfDays) out.push(`produk awet +${e.productShelfDays} hari`);
-  if (e.ingredientShelfDays) out.push(`bahan awet +${e.ingredientShelfDays} hari`);
-  if (e.drinkShelfDays) out.push(`minuman awet +${e.drinkShelfDays} hari`);
-  if (e.chilledShelfDays) out.push(`es & bahan dingin +${e.chilledShelfDays} hari`);
-  if (e.heatComfort) out.push(`+${e.heatComfort} kepuasan saat panas`);
-  if (e.rainComfort) out.push(`+${e.rainComfort} kepuasan saat hujan`);
-  if (e.rainShelter) out.push(`hujan: pengunjung +${Math.round(e.rainShelter * 100)}%`);
-  if (e.storage) out.push(`gudang +${e.storage}`);
-  if (e.onlineLimit) out.push(`+${e.onlineLimit} pesanan online/hari`);
-  if (e.courierSpeed) out.push(`kurir ${Math.round(e.courierSpeed * 100)}% lebih cepat`);
-  if (e.thermal) out.push(`antaran hangat +${e.thermal} mnt`);
-  if (e.drinkAppeal) out.push(`minuman +${Math.round(e.drinkAppeal * 100)}% diminati`);
+  if (e.businessLevel) out.push(tr('Level usaha {businessLevel}', { businessLevel: e.businessLevel }));
+  if (e.seats) out.push(tr('+{seats} kursi', { seats: e.seats }));
+  if (e.arrivalBonus) out.push(tr('+{0}% pelanggan', { 0: Math.round(e.arrivalBonus * 100) }));
+  if (e.newCustomerBonus) out.push(tr('pelanggan baru ↑'));
+  if (e.satisfaction) out.push(tr('+{satisfaction} kepuasan', { satisfaction: e.satisfaction }));
+  if (e.patience) out.push(tr('+{patience} mnt kesabaran', { patience: e.patience }));
+  if (e.serviceSpeed) out.push(tr('layanan {0}% lebih cepat', { 0: Math.round(e.serviceSpeed * 100) }));
+  if (e.maxCookPortions) out.push(tr('+{maxCookPortions} porsi/masak', { maxCookPortions: e.maxCookPortions }));
+  if (e.productShelfDays) out.push(tr('produk awet +{productShelfDays} hari', { productShelfDays: e.productShelfDays }));
+  if (e.ingredientShelfDays) out.push(tr('bahan awet +{ingredientShelfDays} hari', { ingredientShelfDays: e.ingredientShelfDays }));
+  if (e.drinkShelfDays) out.push(tr('minuman awet +{drinkShelfDays} hari', { drinkShelfDays: e.drinkShelfDays }));
+  if (e.chilledShelfDays) out.push(tr('es & bahan dingin +{chilledShelfDays} hari', { chilledShelfDays: e.chilledShelfDays }));
+  if (e.heatComfort) out.push(tr('+{heatComfort} kepuasan saat panas', { heatComfort: e.heatComfort }));
+  if (e.rainComfort) out.push(tr('+{rainComfort} kepuasan saat hujan', { rainComfort: e.rainComfort }));
+  if (e.rainShelter) out.push(tr('hujan: pengunjung +{0}%', { 0: Math.round(e.rainShelter * 100) }));
+  if (e.storage) out.push(tr('gudang +{storage}', { storage: e.storage }));
+  if (e.onlineLimit) out.push(tr('+{onlineLimit} pesanan online/hari', { onlineLimit: e.onlineLimit }));
+  if (e.courierSpeed) out.push(tr('kurir {0}% lebih cepat', { 0: Math.round(e.courierSpeed * 100) }));
+  if (e.thermal) out.push(tr('antaran hangat +{thermal} mnt', { thermal: e.thermal }));
+  if (e.petCat) out.push(tr('menghalau kucing liar'));
+  if (e.drinkAppeal) out.push(tr('minuman +{0}% diminati', { 0: Math.round(e.drinkAppeal * 100) }));
   return out;
 }

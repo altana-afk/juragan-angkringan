@@ -7,6 +7,7 @@ import { formatRupiah } from '../utils/formatting';
 import { DEPTH, entityDepth, objectDepth } from './depth';
 import { objectType } from './objectTypes';
 import { terrainAt, type MapData, type SeatAnchor } from './MapData';
+import { tr } from '../i18n/i18n';
 
 /** Tinggi dudukan bangku (px dunia): pinggul pelanggan duduk sejajar papan bangku. */
 const SEAT_LIFT_PX = 6;
@@ -227,12 +228,13 @@ export class CustomerLayer {
   handleEvents(events: readonly SimEvent[]): void {
     for (const e of events) {
       if (e.type === 'pay' && e.amount > 0) {
-        this.floatText(e.group, `+${formatRupiah(e.amount)}`, '#ffe08a');
+        this.floatText(e.group, tr('+{amount}', { amount: formatRupiah(e.amount) }), '#ffe08a');
         this.coinBurst(e.group, Math.min(5, 1 + Math.floor(e.amount / 10_000)));
       }
-      else if (e.type === 'order' && e.outcome.kind === 'left-empty') this.floatText(e.group, 'Habis!', '#ff8a7a');
-      else if (e.type === 'walk-away' && e.reason === 'full') this.floatText(e.group, 'Penuh!', '#ff8a7a');
-      else if (e.type === 'walk-away' && e.reason === 'impatient') this.floatText(e.group, 'Kelamaan…', '#ff8a7a');
+      else if (e.type === 'order' && e.outcome.kind === 'left-empty') this.floatText(e.group, tr('Habis!'), '#ff8a7a');
+      else if (e.type === 'walk-away' && e.reason === 'full') this.floatText(e.group, tr('Penuh!'), '#ff8a7a');
+      else if (e.type === 'walk-away' && e.reason === 'impatient') this.floatText(e.group, tr('Kelamaan…'), '#ff8a7a');
+      else if (e.type === 'walk-away' && e.reason === 'scared') this.floatText(e.group, tr('Takut…'), '#ff8a7a');
     }
   }
 

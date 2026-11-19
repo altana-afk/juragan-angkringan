@@ -8,6 +8,7 @@ import { overpricePenalty, salePriceOf } from './PricingSystem';
 import { effectsOf } from './UpgradeSystem';
 import { consumeStock, totalQty } from './InventorySystem';
 import { GameRuleError } from './rules';
+import { tr } from '../i18n/i18n';
 
 export type OrderOutcomeKind = 'served' | 'partial' | 'left-empty';
 
@@ -112,7 +113,7 @@ export function resolveOrder(
 export function applySale(draft: GameState, outcome: OrderOutcome): void {
   for (const line of outcome.sold) {
     const have = totalQty(draft.inventory.products[line.recipeId]);
-    if (have < line.qty) throw new GameRuleError('product-short', `Stok ${line.recipeId} tidak cukup untuk dijual`);
+    if (have < line.qty) throw new GameRuleError('product-short', tr('Stok {recipeId} tidak cukup untuk dijual', { recipeId: line.recipeId }));
   }
   let cost = 0;
   for (const line of outcome.sold) {

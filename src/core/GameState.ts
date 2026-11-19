@@ -90,6 +90,8 @@ export interface DayLedger {
   loanCost: number;
   /** Biaya pindah lokasi hari ini. */
   moveCost: number;
+  /** Uang keamanan yang dibayar ke ormas hari ini (0.18.0). Tidak ada di catatan lama. */
+  securityCost?: number;
 }
 
 /** Event acak hari ini (beserta pesanan borongan jika ada). */
@@ -182,6 +184,8 @@ export interface DayReport {
   online?: OnlineDayReport | null;
   /** Hasil cabang hari ini (0.14.0). */
   branches?: BranchDayReport[] | null;
+  /** Tantangan kampung hari itu (0.18.0). */
+  challenges?: ChallengeDayReport | null;
 }
 
 // ---------- Pesanan online (0.13.0) ----------
@@ -516,9 +520,75 @@ export interface GameState {
   online: OnlineState;
   /** Cabang angkringan (0.14.0). */
   branches: BranchesState;
+  /** Tantangan kampung: kucing liar, ODGJ, ormas, dan kenalan nakes/polisi (0.18.0). */
+  challenges: ChallengeState;
 }
 
 export const HISTORY_LIMIT = 60;
+
+// ---------- Tantangan kampung (0.18.0) ----------
+
+export type ChallengeKind = 'kucing' | 'odgj' | 'ormas';
+export type AllyKind = 'nakes' | 'polisi';
+
+/** Satu kejadian tantangan untuk laporan hari. */
+export interface ChallengeLogEntry {
+  kind: ChallengeKind;
+  /** Menit permainan kejadian. */
+  minute: number;
+  /** Ringkasan hasil, mis. 'dicuri', 'dicegah', 'halus', 'warga', 'gagal', 'bayar', 'usir', 'kalah', 'ditangkap', 'pergi'. */
+  result: string;
+  /** Uang yang keluar (ormas). */
+  cost: number;
+  /** Porsi yang hilang/diberikan: id resep → jumlah. */
+  portions: Record<string, number>;
+}
+
+export type ChallengeStatus = 'menunggu' | 'datang' | 'selesai';
+
+/** Rencana tantangan untuk satu hari berjualan. */
+export interface ChallengeDay {
+  day: number;
+  /** Menit kedatangan kucing liar (tiap entri = satu kali datang). */
+  cats: number[];
+  odgj: { minute: number; status: ChallengeStatus } | null;
+  ormas: { minute: number; amount: number; status: ChallengeStatus } | null;
+  log: ChallengeLogEntry[];
+}
+
+export interface AllyState {
+  /** Hati 0–5. Penuh = mampir ke semua lokasi & menolong saat tantangan. */
+  heart: number;
+  talks: number;
+  lastTalkDay: number;
+  lastVisitDay: number;
+}
+
+export interface ChallengeState {
+  today: ChallengeDay | null;
+  lastOdgjDay: number;
+  lastOrmasDay: number;
+  allies: Record<string, AllyState>;
+  stats: { catsStolen: number; catsBlocked: number; odgjCalmed: number; ormasPaid: number; ormasRepelled: number; arrests: number; totalPaid: number };
+  flags: { hint: boolean };
+}
+
+export function createChallengeState(): ChallengeState {
+  return {
+    today: null,
+    lastOdgjDay: 0,
+    lastOrmasDay: 0,
+    allies: {},
+    stats: { catsStolen: 0, catsBlocked: 0, odgjCalmed: 0, ormasPaid: 0, ormasRepelled: 0, arrests: 0, totalPaid: 0 },
+    flags: { hint: false },
+  };
+}
+
+/** Ringkasan tantangan di laporan hari. */
+export interface ChallengeDayReport {
+  log: ChallengeLogEntry[];
+  cost: number;
+}
 
 export function createEmptyBank(): BankState {
   return { deposits: [], loan: null, nextId: 1, totalInterestEarned: 0, totalInterestPaid: 0, depositsMatured: 0, loansRepaid: 0 };
@@ -567,6 +637,7 @@ export function createInitialState(catalog: Catalog = CATALOG): GameState {
     // Pemain baru tidak perlu diberi tahu bahwa tombol pindah ke "Usaha".
     online: { ...createOnlineState(), flags: { orderHint: false, barHint: true } },
     branches: createBranchesState(),
+    challenges: createChallengeState(),
   };
 }
 
@@ -625,6 +696,10 @@ export function validateState(state: GameState, catalog: Catalog = CATALOG): voi
   }
   if (!state.online || !Array.isArray(state.online.orders) || !Number.isFinite(state.online.rating)) throw new Error('Data pesanan online hilang');
   if (!state.branches || !Array.isArray(state.branches.list)) throw new Error('Data cabang hilang');
+  if (!state.challenges || typeof state.challenges.allies !== 'object') throw new Error('Data tantangan hilang');
+  for (const [id, a] of Object.entries(state.challenges.allies)) {
+    if (!Number.isInteger(a.heart) || a.heart < 0 || a.heart > 5) throw new Error(`Hati ${id} tidak valid`);
+  }
   if (!state.story || typeof state.story.news !== 'object' || !Number.isInteger(state.story.startDay)) throw new Error('Data cerita hilang');
   for (const [id, r] of Object.entries(state.story.relations)) {
     if (!Number.isFinite(r.points) || r.points < 0 || ![0, 1, 2, 3].includes(r.stage)) throw new Error(`Hubungan ${id} tidak valid`);

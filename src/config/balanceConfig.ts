@@ -1,4 +1,5 @@
 import type { WeatherKind } from '../core/GameState';
+import { tr } from '../i18n/i18n';
 
 export interface PopularityTierConfig {
   readonly id: string;
@@ -30,18 +31,18 @@ export const BALANCE_CONFIG = {
     missedPortion: 0.05,
   },
   popularityTiers: [
-    { id: 'unknown', min: 0, max: 19, label: 'Tidak dikenal', description: 'Pelanggan sangat sedikit' },
-    { id: 'emerging', min: 20, max: 39, label: 'Mulai dikenal', description: 'Pelanggan mulai berdatangan' },
-    { id: 'popular', min: 40, max: 59, label: 'Cukup populer', description: 'Pelanggan semakin ramai' },
-    { id: 'famous', min: 60, max: 79, label: 'Terkenal', description: 'Pelanggan ramai' },
-    { id: 'very-famous', min: 80, max: 94, label: 'Sangat terkenal', description: 'Pelanggan sangat ramai' },
-    { id: 'legendary', min: 95, max: 100, label: 'Legendaris', description: 'Angkringan menjadi tujuan favorit' },
+    { id: 'unknown', min: 0, max: 19, label: tr('Tidak dikenal'), description: tr('Pelanggan sangat sedikit') },
+    { id: 'emerging', min: 20, max: 39, label: tr('Mulai dikenal'), description: tr('Pelanggan mulai berdatangan') },
+    { id: 'popular', min: 40, max: 59, label: tr('Cukup populer'), description: tr('Pelanggan semakin ramai') },
+    { id: 'famous', min: 60, max: 79, label: tr('Terkenal'), description: tr('Pelanggan ramai') },
+    { id: 'very-famous', min: 80, max: 94, label: tr('Sangat terkenal'), description: tr('Pelanggan sangat ramai') },
+    { id: 'legendary', min: 95, max: 100, label: tr('Legendaris'), description: tr('Angkringan menjadi tujuan favorit') },
   ] satisfies readonly PopularityTierConfig[],
 } as const;
 
 export const WEATHER_LABELS: Record<WeatherKind, string> = {
-  cerah: 'Cerah',
-  berawan: 'Berawan',
-  hujan: 'Hujan',
-  panas: 'Panas terik',
+  cerah: tr('Cerah'),
+  berawan: tr('Berawan'),
+  hujan: tr('Hujan'),
+  panas: tr('Panas terik'),
 };

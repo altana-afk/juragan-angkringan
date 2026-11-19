@@ -309,15 +309,27 @@ export function paintTrees(): ArtEntry[] {
  * Gedung kampus tiga lantai memanjang menghadap jalan: dinding krem bergaris bata, deretan jendela,
  * lobi berpilar di tengah, papan nama "KAMPUS", dan jam dinding. Hanya ada di peta "Dekat Kampus".
  */
-export function paintCampus(): ArtEntry {
+/** Gedung bertingkat: kampus (bawaan), rumah sakit jiwa, dan markas besar polisi (0.18.0). */
+const CAMPUS_LOOKS: Record<string, { wall: number; brick: number; sign: number; text: string }> = {
+  default: { wall: 0xe6dcc4, brick: 0xb55a3c, sign: 0x1f4e79, text: 'KAMPUS' },
+  rsj: { wall: 0xeef3ee, brick: 0x3f9a7a, sign: 0x2e7d5b, text: 'RSJ' },
+  mabes: { wall: 0xd9cdb4, brick: 0x6a5233, sign: 0x2b3550, text: 'MABES' },
+};
+
+export function paintCampusVariants(): ArtEntry[] {
+  return Object.keys(CAMPUS_LOOKS).map((v) => paintCampus(v));
+}
+
+export function paintCampus(variant = 'default'): ArtEntry {
+  const look = CAMPUS_LOOKS[variant] ?? (CAMPUS_LOOKS.default as { wall: number; brick: number; sign: number; text: string });
   const w = 64;
   const d = 176;
   const H = 70;
-  const wall = 0xe6dcc4;
-  const brick = 0xb55a3c;
+  const wall = look.wall;
+  const brick = look.brick;
   const lights: LightAnchor[] = [];
   const art = paintIsoSprite({ footW: w, footD: d, height: H + 20, margin: 16 }, (p) => {
-    const rng = new SeededRandom('campus');
+    const rng = new SeededRandom(`campus-${variant}`);
     p.box(0, 0, 0, w, d, H, wall, { noise: 0.025, seed: 801, top: false });
     p.top(0, 0, H, w, d, shade(wall, 0.7));
     // parapet & atap teknis
@@ -350,14 +362,14 @@ export function paintCampus(): ArtEntry {
     p.box(w, lobbyA, 20, 12, lobbyB - lobbyA, 3, 0xd9d2c0);
     for (const y of [lobbyA + 1, lobbyA + 15, lobbyB - 17, lobbyB - 3]) p.box(w + 8, y, 0, 2.5, 2.5, 20, PAL.white);
     // papan nama di atas lobi
-    p.box(w + 0.5, lobbyA + 2, 34, 2, lobbyB - lobbyA - 4, 9, 0x1f4e79);
-    p.textXCentered(w + 2.6, lobbyA + 2, lobbyB - lobbyA - 4, 41, 'KAMPUS', PAL.white);
+    p.box(w + 0.5, lobbyA + 2, 34, 2, lobbyB - lobbyA - 4, 9, look.sign);
+    p.textXCentered(w + 2.6, lobbyA + 2, lobbyB - lobbyA - 4, 41, look.text, PAL.white);
     // jam dinding
     p.box(w + 0.3, d / 2 - 3, 58, 1, 6, 6, PAL.white);
     p.faceX(w + 1.35, d / 2 - 0.5, 60, 1, 3, PAL.black);
     lights.push({ x: w + 12, y: d / 2, z: 18, radius: 90, color: 0xfff1d6, intensity: 0.9, flicker: 0.01 });
   });
-  return { key: objectTextureKey('campus', 'default'), art, meta: { lights } };
+  return { key: objectTextureKey('campus', variant), art, meta: { lights } };
 }
 
 const STALL_TARPS: Record<string, Color> = { merah: 0xc8423a, biru: 0x2f6fb0, hijau: 0x3f8f4a, kuning: 0xe0a92e };

@@ -1,0 +1,9 @@
+{
+  "upgrades": [
+    { "id": "lemari_pendingin", "name": "Display cooler", "description": "Food sent to the branch keeps 1 day longer, so less of it spoils." },
+    { "id": "pelatihan_karyawan", "name": "Staff training", "description": "Staff performance +15% without raising wages." },
+    { "id": "kasir_buku", "name": "Cash register & ledger", "description": "Cash shortfalls shrink by 60%." },
+    { "id": "papan_promosi", "name": "Local promo board", "description": "Branch buyers +15% and branch popularity +0.5 per fully open day." },
+    { "id": "motor_cabang", "name": "Branch delivery motorbike", "description": "The branch also takes online orders (+20% sales) and stock shipped to the branch is free." }
+  ]
+}

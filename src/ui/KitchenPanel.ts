@@ -11,12 +11,13 @@ import { UI_SETTINGS } from '../config/uiSettings';
 import { itemIcon, stepper } from './itemIcon';
 import { expiryText } from './ShopPanel';
 import type { ModalHandle, UIManager } from './UIManager';
+import { tr } from '../i18n/i18n';
 
 export const CATEGORY_LABEL: Record<RecipeDef['category'], string> = {
-  makanan: 'Makanan',
-  gorengan: 'Gorengan',
-  sate: 'Sate & bakaran',
-  minuman: 'Minuman',
+  makanan: tr('Makanan'),
+  gorengan: tr('Gorengan'),
+  sate: tr('Sate & bakaran'),
+  minuman: tr('Minuman'),
 };
 
 /**
@@ -33,13 +34,13 @@ export class KitchenPanel {
   private offState: (() => void) | null = null;
   private readonly menuEl = el('div', { className: 'recipe-grid' });
   private menuFilter: 'semua' | 'makanan' | 'minuman' = 'semua';
-  private readonly filterEl = el('div', { className: 'menu-filter', attrs: { role: 'group', 'aria-label': 'Saring menu' } });
+  private readonly filterEl = el('div', { className: 'menu-filter', attrs: { role: 'group', 'aria-label': tr('Saring menu') } });
   private readonly planEl = el('div', { className: 'plan-list' });
   private readonly stockEl = el('div', { className: 'product-stock' });
   private readonly summaryEl = el('div', { className: 'panel-note' });
   private readonly warning = el('p', { className: 'panel-warning', attrs: { role: 'alert' } });
-  private readonly cookAllBtn = el('button', { className: 'btn btn-primary', text: 'Masak semua', attrs: { type: 'button' } });
-  private readonly clearBtn = el('button', { className: 'btn btn-secondary', text: 'Kosongkan daftar', attrs: { type: 'button' } });
+  private readonly cookAllBtn = el('button', { className: 'btn btn-primary', text: tr('Masak semua'), attrs: { type: 'button' } });
+  private readonly clearBtn = el('button', { className: 'btn btn-secondary', text: tr('Kosongkan daftar'), attrs: { type: 'button' } });
 
   constructor(
     private readonly ctx: GameContext,
@@ -61,11 +62,11 @@ export class KitchenPanel {
     const body = el('div', {
       className: 'kitchen-body',
       children: [
-        el('h3', { className: 'section-title', text: 'Daftar persiapan' }),
+        el('h3', { className: 'section-title', text: tr('Daftar persiapan') }),
         this.planEl,
-        el('div', { className: 'menu-head', children: [el('h3', { className: 'section-title', text: 'Menu' }), this.filterEl] }),
+        el('div', { className: 'menu-head', children: [el('h3', { className: 'section-title', text: tr('Menu') }), this.filterEl] }),
         this.menuEl,
-        el('h3', { className: 'section-title', text: 'Siap dijual' }),
+        el('h3', { className: 'section-title', text: tr('Siap dijual') }),
         this.stockEl,
       ],
     });
@@ -74,7 +75,7 @@ export class KitchenPanel {
       children: [this.summaryEl, this.warning, el('div', { className: 'panel-buttons', children: [this.clearBtn, this.cookAllBtn] })],
     });
     this.modal = this.ui.openModal({
-      title: 'Persiapan Dapur',
+      title: tr('Persiapan Dapur'),
       className: 'sheet sheet-kitchen',
       closeButton: true,
       body,
@@ -127,8 +128,8 @@ export class KitchenPanel {
       const can = unlocked ? maxPortions(state, recipe) : 0;
       const button = el('button', {
         className: 'btn btn-secondary btn-sm',
-        text: inPlan ? 'Di daftar ✓' : '+ Tambah',
-        attrs: { type: 'button', 'aria-label': `Tambah ${recipe.name} ke daftar persiapan` },
+        text: inPlan ? tr('Di daftar ✓') : tr('+ Tambah'),
+        attrs: { type: 'button', 'aria-label': tr('Tambah {name} ke daftar persiapan', { name: recipe.name }) },
         onClick: () => {
           if (!this.plan.has(recipe.id)) this.plan.set(recipe.id, Math.max(1, Math.min(can, 10)) || 1);
           // Bawaan: tetap di posisi kartu yang diketuk. Jika "Gulir otomatis" aktif, pindah ke daftar persiapan.
@@ -148,9 +149,9 @@ export class KitchenPanel {
               el('div', { className: 'item-name', text: recipe.name }),
               el('div', { className: 'item-meta', text: CATEGORY_LABEL[recipe.category] }),
               unlocked
-                ? el('div', { className: 'item-meta', text: `Modal ±${formatRupiah(cost)} · untung ${margin}%` })
-                : el('div', { className: 'item-meta lock-text', text: `🔒 ${describeUnlock(recipe.unlock)}` }),
-              unlocked ? el('div', { className: `item-meta ${can === 0 ? 'is-bad' : ''}`, text: can > 0 ? `Bahan cukup untuk ${can} porsi` : 'Bahan belum ada' }) : null,
+                ? el('div', { className: 'item-meta', text: tr('Modal ±{cost} · untung {margin}%', { cost: formatRupiah(cost), margin }) })
+                : el('div', { className: 'item-meta lock-text', text: tr('🔒 {unlock}', { unlock: describeUnlock(recipe.unlock) }) }),
+              unlocked ? el('div', { className: `item-meta ${can === 0 ? 'is-bad' : ''}`, text: can > 0 ? tr('Bahan cukup untuk {can} porsi', { can }) : tr('Bahan belum ada') }) : null,
               unlocked ? this.priceControl(state, recipe) : null,
             ],
           }),
@@ -163,17 +164,17 @@ export class KitchenPanel {
     const open = shown.filter((r) => state.unlockedRecipes.includes(r.id));
     const locked = shown.filter((r) => !state.unlockedRecipes.includes(r.id));
     const group = (title: string, list: RecipeDef[], extra = ''): HTMLElement[] =>
-      list.length ? [el('div', { className: `recipe-group-title${extra}`, text: `${title} · ${list.length}` }), ...list.map(card)] : [];
+      list.length ? [el('div', { className: `recipe-group-title${extra}`, text: tr('{title} · {length}', { title, length: list.length }) }), ...list.map(card)] : [];
     this.menuEl.replaceChildren(
-      ...group('Makanan', open.filter((r) => !isDrink(r))),
-      ...group('Minuman', open.filter(isDrink)),
-      ...group('🔒 Masih terkunci', locked, ' is-locked'),
+      ...group(tr('Makanan'), open.filter((r) => !isDrink(r))),
+      ...group(tr('Minuman'), open.filter(isDrink)),
+      ...group(tr('🔒 Masih terkunci'), locked, ' is-locked'),
     );
   }
 
   /** Tombol saring Semua / Makanan / Minuman agar pemain ponsel tidak perlu menggulir jauh. */
   private renderFilter(): void {
-    const opts = [['semua', 'Semua'], ['makanan', 'Makanan'], ['minuman', 'Minuman']] as const;
+    const opts = [['semua', tr('Semua')], ['makanan', tr('Makanan')], ['minuman', tr('Minuman')]] as const;
     this.filterEl.replaceChildren(
       ...opts.map(([id, label]) =>
         el('button', {
@@ -201,16 +202,16 @@ export class KitchenPanel {
       if (!res.ok) this.ctx.notify(res.message, 'error');
       this.render();
     };
-    const minus = el('button', { className: 'step-btn', text: '−', attrs: { type: 'button', 'aria-label': `Turunkan harga ${recipe.name}` }, onClick: () => change(price - PRICE_RULES.step) });
-    const plus = el('button', { className: 'step-btn', text: '+', attrs: { type: 'button', 'aria-label': `Naikkan harga ${recipe.name}` }, onClick: () => change(price + PRICE_RULES.step) });
+    const minus = el('button', { className: 'step-btn', text: '−', attrs: { type: 'button', 'aria-label': tr('Turunkan harga {name}', { name: recipe.name }) }, onClick: () => change(price - PRICE_RULES.step) });
+    const plus = el('button', { className: 'step-btn', text: '+', attrs: { type: 'button', 'aria-label': tr('Naikkan harga {name}', { name: recipe.name }) }, onClick: () => change(price + PRICE_RULES.step) });
     minus.disabled = price <= min;
     plus.disabled = price >= max;
-    const reset = el('button', { className: 'link-btn', text: 'Wajar', attrs: { type: 'button', title: `Kembalikan ke ${formatRupiah(recipe.salePrice)}` }, onClick: () => change(recipe.salePrice) });
+    const reset = el('button', { className: 'link-btn', text: tr('Wajar'), attrs: { type: 'button', title: tr('Kembalikan ke {salePrice}', { salePrice: formatRupiah(recipe.salePrice) }) }, onClick: () => change(recipe.salePrice) });
     reset.hidden = price === recipe.salePrice;
     return el('div', {
       className: 'price-control',
       children: [
-        el('span', { className: 'item-meta', text: 'Harga' }),
+        el('span', { className: 'item-meta', text: tr('Harga') }),
         minus,
         el('strong', { className: 'price-value', text: formatRupiah(price) }),
         plus,
@@ -228,7 +229,7 @@ export class KitchenPanel {
     const shortIds = new Set(shortages.map((s) => s.ingredientId));
 
     if (this.plan.size === 0) {
-      this.planEl.replaceChildren(el('p', { className: 'panel-note muted', text: 'Belum ada. Pilih menu di bawah dengan tombol "+ Tambah".' }));
+      this.planEl.replaceChildren(el('p', { className: 'panel-note muted', text: tr('Belum ada. Pilih menu di bawah dengan tombol "+ Tambah".') }));
     } else {
       const rows = [...this.plan.entries()].map(([recipeId, portions]) => {
         const recipe = catalog.recipe(recipeId);
@@ -244,13 +245,13 @@ export class KitchenPanel {
           const short = have < need || shortIds.has(ingId);
           return el('span', {
             className: `req-chip${short ? ' is-short' : ''}`,
-            attrs: { title: `${ing.name}: butuh ${need} ${ing.unit}, ada ${have}` },
-            children: [itemIcon(ing.icon, 'chip-icon'), el('span', { text: `${ing.name} ${need}/${have}` })],
+            attrs: { title: tr('{name}: butuh {need} {unit}, ada {have}', { name: ing.name, need, unit: ing.unit, have }) },
+            children: [itemIcon(ing.icon, 'chip-icon'), el('span', { text: tr('{name} {need}/{have}', { name: ing.name, need, have }) })],
           });
         });
         const cookOne = el('button', {
           className: 'btn btn-primary btn-sm',
-          text: 'Masak',
+          text: tr('Masak'),
           attrs: { type: 'button' },
           onClick: () => this.cook([{ recipeId, portions: this.plan.get(recipeId) ?? 0 }], recipeId),
         });
@@ -266,7 +267,7 @@ export class KitchenPanel {
                 el('div', { className: 'item-name', text: recipe.name }),
                 el('button', {
                   className: 'link-btn',
-                  text: `Maks (${max})`,
+                  text: tr('Maks ({max})', { max }),
                   attrs: { type: 'button' },
                   onClick: () => {
                     this.plan.set(recipeId, Math.min(max, maxPortionsPerOrder(this.ctx.store.get())));
@@ -276,7 +277,7 @@ export class KitchenPanel {
                 el('button', {
                   className: 'icon-btn',
                   text: '×',
-                  attrs: { type: 'button', 'aria-label': `Hapus ${recipe.name} dari daftar`, title: 'Hapus dari daftar' },
+                  attrs: { type: 'button', 'aria-label': tr('Hapus {name} dari daftar', { name: recipe.name }), title: tr('Hapus dari daftar') },
                   onClick: () => {
                     this.plan.delete(recipeId);
                     this.render();
@@ -284,7 +285,7 @@ export class KitchenPanel {
                 }),
               ],
             }),
-            el('div', { className: 'plan-controls', children: [step.root, el('span', { className: 'item-meta', text: 'porsi' }), cookOne] }),
+            el('div', { className: 'plan-controls', children: [step.root, el('span', { className: 'item-meta', text: tr('porsi') }), cookOne] }),
             el('div', { className: 'req-chips', children: chips }),
           ],
         });
@@ -295,11 +296,11 @@ export class KitchenPanel {
     const portions = orders.reduce((s, o) => s + o.portions, 0);
     const cost = orders.reduce((s, o) => s + estimatedPortionCost(catalog, catalog.recipe(o.recipeId), state.calendar.day) * o.portions, 0);
     const revenue = orders.reduce((s, o) => s + salePriceOf(state, catalog.recipe(o.recipeId)) * o.portions, 0);
-    setText(this.summaryEl, portions > 0 ? `Total ${portions} porsi · modal ±${formatRupiah(cost)} · potensi penjualan ${formatRupiah(revenue)}` : 'Daftar persiapan kosong.');
+    setText(this.summaryEl, portions > 0 ? tr('Total {portions} porsi · modal ±{cost} · potensi penjualan {revenue}', { portions, cost: formatRupiah(cost), revenue: formatRupiah(revenue) }) : tr('Daftar persiapan kosong.'));
     setText(
       this.warning,
       shortages.length
-        ? `Bahan kurang: ${shortages.map((s) => `${catalog.ingredient(s.ingredientId).name} ${s.missing} ${catalog.ingredient(s.ingredientId).unit}`).join(', ')}. Belanja dulu atau kurangi porsi.`
+        ? tr('Bahan kurang: {0}. Belanja dulu atau kurangi porsi.', { 0: shortages.map((s) => tr('{name} {missing} {unit}', { name: catalog.ingredient(s.ingredientId).name, missing: s.missing, unit: catalog.ingredient(s.ingredientId).unit })).join(', ') })
         : '',
     );
     this.cookAllBtn.disabled = portions === 0 || shortages.length > 0;
@@ -309,7 +310,7 @@ export class KitchenPanel {
   private renderStock(state: Readonly<GameState>): void {
     const entries = Object.entries(state.inventory.products).filter(([, b]) => totalQty(b) > 0);
     if (entries.length === 0) {
-      this.stockEl.replaceChildren(el('p', { className: 'panel-note muted', text: 'Belum ada produk matang.' }));
+      this.stockEl.replaceChildren(el('p', { className: 'panel-note muted', text: tr('Belum ada produk matang.') }));
       return;
     }
     this.stockEl.replaceChildren(
@@ -317,10 +318,10 @@ export class KitchenPanel {
         const recipe = this.ctx.catalog.recipe(id);
         return el('div', {
           className: 'stock-chip',
-          attrs: { title: `${recipe.name}: ${expiryText(nearestExpiry(batches), state.calendar.day)}` },
+          attrs: { title: tr('{name}: {1}', { name: recipe.name, 1: expiryText(nearestExpiry(batches), state.calendar.day) }) },
           children: [
             itemIcon(recipe.icon, 'chip-icon'),
-            el('span', { className: 'item-name', text: `${recipe.name} × ${totalQty(batches)}` }),
+            el('span', { className: 'item-name', text: tr('{name} × {batches}', { name: recipe.name, batches: totalQty(batches) }) }),
             el('span', { className: 'item-meta', text: expiryText(nearestExpiry(batches), state.calendar.day) }),
           ],
         });
@@ -332,7 +333,7 @@ export class KitchenPanel {
     const result = this.ctx.actions.prepare(orders.filter((o) => o.portions > 0));
     if (result.ok) {
       // Menu tetap di Daftar persiapan supaya bisa langsung dimasak lagi (hapus manual lewat ×/Kosongkan).
-      this.ctx.notify(`${result.message} Modal ${formatRupiah(result.value.totalCost)}.`, 'success');
+      this.ctx.notify(tr('{message} Modal {totalCost}.', { message: result.message, totalCost: formatRupiah(result.value.totalCost) }), 'success');
     } else {
       this.ctx.notify(result.message, 'error', 5000);
     }

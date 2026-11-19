@@ -9,6 +9,7 @@ import { totalQty } from './InventorySystem';
 import { clampPopularity, nextLoyalty, popularityDelta } from './PopularitySystem';
 import { closeOnlineDay, finishOnlineDay } from './OnlineOrderSystem';
 import { closeBranches } from './BranchSystem';
+import { challengeReport, odgjLeaves, ormasPay, ormasPresent } from './ChallengeEventSystem';
 
 /** Stok yang akan basi malam ini (kedaluwarsa sebelum hari berikutnya). */
 function expiringTonight(group: Record<string, StockBatch[]>, day: number): { list: [string, number][]; cost: number } {
@@ -36,6 +37,10 @@ export const BANKRUPT_AFTER_DAYS = 3;
 export function closeDay(draft: GameState, catalog: Catalog): DayReport {
   // Pesanan online yang masih berjalan dituntaskan dulu (pendapatannya masuk omzet hari ini).
   finishOnlineDay(draft, catalog);
+  // ODGJ yang masih di dekat gerobak saat tutup dianggap pergi sendiri.
+  odgjLeaves(draft);
+  // Ormas yang belum dijawab saat tutup tetap menagih uang keamanan.
+  if (ormasPresent(draft)) ormasPay(draft);
   const l = draft.ledger;
   const day = draft.calendar.day;
   // Sewa/operasional tergantung lokasi (Jalan Kampung Rp10.000, Dekat Kampus Rp15.000).
@@ -84,7 +89,7 @@ export function closeDay(draft: GameState, catalog: Catalog): DayReport {
     promotionCost: l.promotionCost,
     operationalCost: l.operationalCost,
     netProfit:
-      l.revenue - l.purchaseTotal - l.promotionCost - l.operationalCost + l.bankIncome - l.loanCost - l.moveCost +
+      l.revenue - l.purchaseTotal - l.promotionCost - l.operationalCost + l.bankIncome - l.loanCost - l.moveCost - (l.securityCost ?? 0) +
       (online ? online.feesKept - online.commission - online.wage - (online.branchFees ?? 0) : 0) +
       branchNet,
     costOfSales: Math.round(l.costOfSales),
@@ -119,6 +124,7 @@ export function closeDay(draft: GameState, catalog: Catalog): DayReport {
     event: draft.event ? { ...draft.event, bulk: draft.event.bulk ? { ...draft.event.bulk } : null } : null,
     online,
     branches,
+    challenges: challengeReport(draft),
   };
   // Bangkrut: kas minus saat tutup 3 hari berturut-turut.
   draft.debtDays = draft.player.money < 0 ? draft.debtDays + 1 : 0;

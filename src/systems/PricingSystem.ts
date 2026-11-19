@@ -1,6 +1,7 @@
 import type { GameState } from '../core/GameState';
 import type { RecipeDef } from '../data/catalog';
 import { GameRuleError } from './rules';
+import { tr } from '../i18n/i18n';
 
 /**
  * Harga jual yang diatur pemain.
@@ -34,8 +35,8 @@ export function setOnlinePrice(draft: GameState, recipe: RecipeDef, price: numbe
     delete draft.online.prices[recipe.id];
     return salePriceOf(draft, recipe);
   }
-  if (!Number.isFinite(price)) throw new GameRuleError('price-invalid', 'Harga tidak valid.');
-  if (!draft.unlockedRecipes.includes(recipe.id)) throw new GameRuleError('recipe-locked', `${recipe.name} belum terbuka.`);
+  if (!Number.isFinite(price)) throw new GameRuleError('price-invalid', tr('Harga tidak valid.'));
+  if (!draft.unlockedRecipes.includes(recipe.id)) throw new GameRuleError('recipe-locked', tr('{name} belum terbuka.', { name: recipe.name }));
   const { min, max } = priceBounds(recipe);
   const next = Math.min(max, Math.max(min, Math.round(price / PRICE_RULES.step) * PRICE_RULES.step));
   draft.online.prices[recipe.id] = next;
@@ -64,8 +65,8 @@ export function priceBounds(recipe: RecipeDef): { min: number; max: number } {
 
 /** Atur harga jual (dibulatkan ke Rp500 & dibatasi 50–200% harga wajar). */
 export function setPrice(draft: GameState, recipe: RecipeDef, price: number): number {
-  if (!Number.isFinite(price)) throw new GameRuleError('price-invalid', 'Harga tidak valid.');
-  if (!draft.unlockedRecipes.includes(recipe.id)) throw new GameRuleError('recipe-locked', `${recipe.name} belum terbuka.`);
+  if (!Number.isFinite(price)) throw new GameRuleError('price-invalid', tr('Harga tidak valid.'));
+  if (!draft.unlockedRecipes.includes(recipe.id)) throw new GameRuleError('recipe-locked', tr('{name} belum terbuka.', { name: recipe.name }));
   const { min, max } = priceBounds(recipe);
   const rounded = Math.min(max, Math.max(min, Math.round(price / PRICE_RULES.step) * PRICE_RULES.step));
   if (rounded === recipe.salePrice) delete draft.prices[recipe.id];
@@ -75,8 +76,8 @@ export function setPrice(draft: GameState, recipe: RecipeDef, price: number): nu
 
 /** Label singkat penilaian harga untuk UI. */
 export function priceVerdict(ratio: number): { label: string; tone: 'good' | 'warn' | 'bad' | 'neutral' } {
-  if (ratio < 0.85) return { label: 'Murah — laris, margin tipis', tone: 'warn' };
-  if (ratio <= 1.05) return { label: 'Wajar', tone: 'good' };
-  if (ratio <= 1.3) return { label: 'Agak mahal — peminat turun', tone: 'warn' };
-  return { label: 'Kemahalan — pelanggan kecewa', tone: 'bad' };
+  if (ratio < 0.85) return { label: tr('Murah — laris, margin tipis'), tone: 'warn' };
+  if (ratio <= 1.05) return { label: tr('Wajar'), tone: 'good' };
+  if (ratio <= 1.3) return { label: tr('Agak mahal — peminat turun'), tone: 'warn' };
+  return { label: tr('Kemahalan — pelanggan kecewa'), tone: 'bad' };
 }

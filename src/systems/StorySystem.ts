@@ -13,8 +13,10 @@ import {
   type RelationStage,
 } from '../data/story';
 import { formatRupiah } from '../utils/formatting';
+import { isAlly } from '../data/challenges';
 import { SeededRandom } from '../utils/random';
 import { GameRuleError } from './rules';
+import { tr } from '../i18n/i18n';
 
 /**
  * Sistem cerita "Kabar Kampung & Buku Dapur Kardi" (tanpa Phaser, bisa diuji di Node).
@@ -88,10 +90,10 @@ export function currentAct(state: Readonly<GameState>): 1 | 2 | 3 | 4 {
 }
 
 export const ACT_TITLES: Record<1 | 2 | 3 | 4, string> = {
-  1: 'Babak 1 · Pembukaan',
-  2: 'Babak 2 · Tegangan',
-  3: 'Babak 3 · Klimaks',
-  4: 'Babak 4 · Penyelesaian',
+  1: tr('Babak 1 · Pembukaan'),
+  2: tr('Babak 2 · Tegangan'),
+  3: tr('Babak 3 · Klimaks'),
+  4: tr('Babak 4 · Penyelesaian'),
 };
 
 // ---------- kabar ----------
@@ -119,7 +121,7 @@ export function receiveNews(draft: GameState, id: string): void {
 export function readNews(draft: GameState, id: string): boolean {
   const def = newsById(id);
   const rec = draft.story.news[id];
-  if (!rec) throw new GameRuleError('story-not-received', 'Kabar ini belum sampai.');
+  if (!rec) throw new GameRuleError('story-not-received', tr('Kabar ini belum sampai.'));
   rec.status = 'dibaca';
   return def.opensDecision && !draft.story.choice;
 }
@@ -182,6 +184,8 @@ export function planVisits(state: Readonly<GameState>): NamedVisit[] {
 
 /** Pelanggan bernama tiba: kabar yang dibawa masuk log. */
 export function namedArrived(draft: GameState, visit: NamedVisit): void {
+  // Kenalan tantangan (nakes/polisi) punya hati sendiri, tidak ikut hubungan cerita.
+  if (isAlly(visit.who)) return;
   ensureRelation(draft, visit.who).lastVisitDay = draft.calendar.day;
   if (visit.newsId && !draft.story.news[visit.newsId]) receiveNews(draft, visit.newsId);
 }
@@ -232,6 +236,7 @@ export function applyTalk(draft: GameState, who: NamedId, newsId: string | null)
 
 /** Pelanggan bernama dilayani: puas (+1) dan menu favorit tersedia (+1). */
 export function applyNamedService(draft: GameState, who: NamedId, satisfaction: number, soldIds: readonly string[]): RelationStage | null {
+  if (isAlly(who)) return null;
   const def = namedById(who);
   let delta = 0;
   if (satisfaction >= 70) delta++;
@@ -242,6 +247,7 @@ export function applyNamedService(draft: GameState, who: NamedId, satisfaction: 
 
 /** Pelanggan bernama pergi tanpa dilayani. */
 export function applyNamedWalkAway(draft: GameState, who: NamedId): void {
+  if (isAlly(who)) return;
   namedById(who);
   addPoints(draft, who, -1);
 }
@@ -290,14 +296,14 @@ export function decisionAvailable(state: Readonly<GameState>): boolean {
 export function choiceBlocker(state: Readonly<GameState>, id: ChoiceId): string | null {
   switch (id) {
     case 'bertahan':
-      return state.player.money >= RENT_PRICE ? null : `Kas belum cukup (butuh ${formatRupiah(RENT_PRICE)}).`;
+      return state.player.money >= RENT_PRICE ? null : tr('Kas belum cukup (butuh {RENT_PRICE}).', { RENT_PRICE: formatRupiah(RENT_PRICE) });
     case 'gotong': {
       const sum = (['surti', 'gito', 'bayu'] as const).reduce((s, w) => s + relationOf(state, w).stage, 0);
-      if (state.player.popularity < 55) return `Popularitas belum cukup (${Math.floor(state.player.popularity)} dari 55).`;
-      return sum >= 5 ? null : `Kedekatan warga belum cukup (total tahap ${sum} dari 5).`;
+      if (state.player.popularity < 55) return tr('Popularitas belum cukup ({popularity} dari 55).', { popularity: Math.floor(state.player.popularity) });
+      return sum >= 5 ? null : tr('Kedekatan warga belum cukup (total tahap {sum} dari 5).', { sum });
     }
     case 'warisan':
-      return relationOf(state, 'bayu').stage >= 2 ? null : `Mas Bayu belum cukup dekat (tahap ${relationOf(state, 'bayu').stage} dari 2).`;
+      return relationOf(state, 'bayu').stage >= 2 ? null : tr('Mas Bayu belum cukup dekat (tahap {stage} dari 2).', { stage: relationOf(state, 'bayu').stage });
     case 'jual':
       return null;
   }
@@ -307,8 +313,8 @@ const clampPop = (v: number): number => Math.max(BALANCE_CONFIG.popularityMin, M
 
 /** Terapkan keputusan hari ke-43. */
 export function applyChoice(draft: GameState, id: ChoiceId, coffeeIds: readonly string[] = ['kopi_susu', 'es_kopi_susu', 'kopi_joss']): void {
-  if (draft.phase === 'berjualan') throw new GameRuleError('wrong-phase', 'Putuskan saat persiapan atau setelah tutup.');
-  if (!decisionAvailable(draft)) throw new GameRuleError('no-decision', 'Belum ada keputusan yang perlu diambil.');
+  if (draft.phase === 'berjualan') throw new GameRuleError('wrong-phase', tr('Putuskan saat persiapan atau setelah tutup.'));
+  if (!decisionAvailable(draft)) throw new GameRuleError('no-decision', tr('Belum ada keputusan yang perlu diambil.'));
   const blocker = choiceBlocker(draft, id);
   if (blocker) throw new GameRuleError('choice-blocked', blocker);
   const p = draft.player;

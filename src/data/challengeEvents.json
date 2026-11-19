@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "graceDays": 3,
+  "tiers": {
+    "rendah": { "maxPopularity": 35 },
+    "sedang": { "maxPopularity": 65 },
+    "tinggi": { "maxPopularity": 101 }
+  },
+  "cat": {
+    "chances": { "rendah": [0.3], "sedang": [0.5, 0.15], "tinggi": [0.6, 0.3] },
+    "portions": { "rendah": [1, 1], "sedang": [1, 1], "tinggi": [1, 2] }
+  },
+  "odgj": {
+    "chance": { "rendah": 0.12, "sedang": 0.2, "tinggi": 0.3 },
+    "minGapDays": 1,
+    "untilMinute": 1320,
+    "arrivalFactor": 0.5,
+    "fleeChance": 0.5,
+    "failFleeChance": 0.35
+  },
+  "ormas": {
+    "chance": { "rendah": 0.2, "sedang": 0.3, "tinggi": 0.4 },
+    "minGapDays": 3,
+    "rateMin": 0.1,
+    "rateMax": 0.15,
+    "failRate": 0.2,
+    "minAmount": 2000,
+    "patienceMinutes": 30
+  },
+  "allies": {
+    "maxHeart": 5,
+    "homeVisitChance": 0.8,
+    "awayVisitChance": 0.45
+  }
+}

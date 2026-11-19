@@ -1,6 +1,15 @@
-import branchesRaw from './branches.json';
-import upgradesRaw from './branchUpgrades.json';
-import staffRaw from './branchStaff.json';
+import branchesRawBase from './branches.json';
+import branchesRawEn from '../i18n/en/data/branches.json';
+import upgradesRawBase from './branchUpgrades.json';
+import upgradesRawEn from '../i18n/en/data/branchUpgrades.json';
+import staffRawBase from './branchStaff.json';
+import staffRawEn from '../i18n/en/data/branchStaff.json';
+import { localizeData } from '../i18n/i18n';
+
+// Teks data dalam bahasa aktif (tumpangan terjemahan Inggris di src/i18n/en/data/).
+const branchesRaw = localizeData(branchesRawBase, branchesRawEn);
+const upgradesRaw = localizeData(upgradesRawBase, upgradesRawEn);
+const staffRaw = localizeData(staffRawBase, staffRawEn);
 
 export interface BranchSlotDef {
   readonly slot: number;

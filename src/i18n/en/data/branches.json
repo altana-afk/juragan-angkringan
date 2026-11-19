@@ -1,0 +1,7 @@
+{
+  "branches": [
+    { "slot": 0, "name": "Branch 1" },
+    { "slot": 1, "name": "Branch 2" },
+    { "slot": 2, "name": "Branch 3" }
+  ]
+}

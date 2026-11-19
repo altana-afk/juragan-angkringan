@@ -1,6 +1,7 @@
 import type { CloudSync } from '../cloud/CloudSync';
 import { el } from './dom';
 import type { UIManager } from './UIManager';
+import { locale, tr } from '../i18n/i18n';
 
 /**
  * Panel Akun: login Google / email agar progres tersimpan di akun dan bisa dilanjutkan di perangkat lain.
@@ -32,17 +33,17 @@ export function openAccountPanel(ui: UIManager, cloud: CloudSync): void {
   const note = (): HTMLElement | null => (message ? el('p', { className: `account-msg${message.bad ? ' is-bad' : ''}`, text: message.text, attrs: { role: 'status' } }) : null);
 
   const loggedOut = (): HTMLElement[] => {
-    const email = el('input', { className: 'account-input', attrs: { type: 'email', autocomplete: 'email', placeholder: 'email@contoh.com', 'aria-label': 'Email', required: '' } }) as HTMLInputElement;
+    const email = el('input', { className: 'account-input', attrs: { type: 'email', autocomplete: 'email', placeholder: tr('email@contoh.com'), 'aria-label': tr('Email'), required: '' } }) as HTMLInputElement;
     const pass = el('input', {
       className: 'account-input',
-      attrs: { type: 'password', autocomplete: mode === 'daftar' ? 'new-password' : 'current-password', placeholder: mode === 'daftar' ? 'Kata sandi (min. 6 karakter)' : 'Kata sandi', 'aria-label': 'Kata sandi', required: '', minlength: '6' },
+      attrs: { type: 'password', autocomplete: mode === 'daftar' ? 'new-password' : 'current-password', placeholder: mode === 'daftar' ? tr('Kata sandi (min. 6 karakter)') : tr('Kata sandi'), 'aria-label': tr('Kata sandi'), required: '', minlength: '6' },
     }) as HTMLInputElement;
     const form = el('form', {
       className: 'account-form',
       children: [
         email,
         pass,
-        el('button', { className: 'btn btn-primary', text: busy ? 'Memproses…' : mode === 'daftar' ? 'Daftar' : 'Masuk', attrs: { type: 'submit', ...(busy ? { disabled: '' } : {}) } }),
+        el('button', { className: 'btn btn-primary', text: busy ? tr('Memproses…') : mode === 'daftar' ? tr('Daftar') : tr('Masuk'), attrs: { type: 'submit', ...(busy ? { disabled: '' } : {}) } }),
       ],
     }) as HTMLFormElement;
     form.addEventListener('submit', (e) => {
@@ -50,21 +51,21 @@ export function openAccountPanel(ui: UIManager, cloud: CloudSync): void {
       void run(() => cloud.signInEmail(email.value.trim(), pass.value, mode === 'daftar'));
     });
     const nodes: (HTMLElement | null)[] = [
-      el('p', { className: 'guide-text', text: 'Masuk supaya progres tersimpan di akun dan bisa dilanjutkan di HP atau komputer lain. Tidak wajib — tanpa akun, progres tetap tersimpan di perangkat ini.' }),
+      el('p', { className: 'guide-text', text: tr('Masuk supaya progres tersimpan di akun dan bisa dilanjutkan di HP atau komputer lain. Tidak wajib — tanpa akun, progres tetap tersimpan di perangkat ini.') }),
       el('button', {
         className: 'btn account-google',
         attrs: { type: 'button', ...(busy ? { disabled: '' } : {}) },
-        children: [el('span', { className: 'account-g', text: 'G', attrs: { 'aria-hidden': 'true' } }), el('span', { text: 'Masuk dengan Google' })],
+        children: [el('span', { className: 'account-g', text: 'G', attrs: { 'aria-hidden': 'true' } }), el('span', { text: tr('Masuk dengan Google') })],
         onClick: () => void run(() => cloud.signInGoogle()),
       }),
-      el('div', { className: 'account-or', text: 'atau dengan email' }),
+      el('div', { className: 'account-or', text: tr('atau dengan email') }),
       el('div', {
         className: 'account-switch',
         attrs: { role: 'tablist' },
         children: (['masuk', 'daftar'] as const).map((m) =>
           el('button', {
             className: `stats-tab${mode === m ? ' is-active' : ''}`,
-            text: m === 'masuk' ? 'Masuk' : 'Daftar baru',
+            text: m === 'masuk' ? tr('Masuk') : tr('Daftar baru'),
             attrs: { type: 'button', role: 'tab', 'aria-selected': String(mode === m) },
             onClick: () => {
               mode = m;
@@ -78,15 +79,15 @@ export function openAccountPanel(ui: UIManager, cloud: CloudSync): void {
       mode === 'masuk'
         ? el('button', {
             className: 'link-btn account-forgot',
-            text: 'Lupa kata sandi?',
+            text: tr('Lupa kata sandi?'),
             attrs: { type: 'button' },
             onClick: () => {
               if (!email.value.trim()) {
-                message = { text: 'Isi email dulu, lalu tekan "Lupa kata sandi?" lagi.', bad: true };
+                message = { text: tr('Isi email dulu, lalu tekan "Lupa kata sandi?" lagi.'), bad: true };
                 render();
                 return;
               }
-              void run(() => cloud.resetPassword(email.value.trim()), `Tautan reset kata sandi dikirim ke ${email.value.trim()}. Cek juga folder spam.`);
+              void run(() => cloud.resetPassword(email.value.trim()), tr('Tautan reset kata sandi dikirim ke {0}. Cek juga folder spam.', { 0: email.value.trim() }));
             },
           })
         : null,
@@ -97,17 +98,17 @@ export function openAccountPanel(ui: UIManager, cloud: CloudSync): void {
   /** Pilih / ganti username (tampil di leaderboard). */
   const usernameBlock = (): HTMLElement => {
     const p = cloud.profile;
-    if (!p) return el('p', { className: 'muted account-small', text: 'Memuat profil…' });
+    if (!p) return el('p', { className: 'muted account-small', text: tr('Memuat profil…') });
     const need = !p.username;
     const cooldown = cloud.usernameCooldownDays;
     if (!need && !editingName) {
       return el('div', {
         className: 'account-name',
         children: [
-          el('div', { className: 'account-who', children: [el('span', { className: 'muted', text: 'Username (tampil di leaderboard)' }), el('strong', { text: `@${p.username}` })] }),
+          el('div', { className: 'account-who', children: [el('span', { className: 'muted', text: tr('Username (tampil di leaderboard)') }), el('strong', { text: tr('@{username}', { username: p.username }) })] }),
           el('button', {
             className: 'btn btn-secondary btn-sm',
-            text: cooldown ? `Ganti (${cooldown} hari lagi)` : 'Ganti',
+            text: cooldown ? tr('Ganti ({cooldown} hari lagi)', { cooldown }) : tr('Ganti'),
             attrs: { type: 'button', ...(cooldown || busy ? { disabled: '' } : {}) },
             onClick: () => {
               editingName = true;
@@ -119,19 +120,19 @@ export function openAccountPanel(ui: UIManager, cloud: CloudSync): void {
     }
     const input = el('input', {
       className: 'account-input',
-      attrs: { type: 'text', autocomplete: 'nickname', maxlength: '16', placeholder: 'mis. juragan_sate', 'aria-label': 'Username', value: p.username, autocapitalize: 'off', spellcheck: 'false' },
+      attrs: { type: 'text', autocomplete: 'nickname', maxlength: '16', placeholder: tr('mis. juragan_sate'), 'aria-label': tr('Username'), value: p.username, autocapitalize: 'off', spellcheck: 'false' },
     }) as HTMLInputElement;
     const form = el('form', {
       className: 'account-form',
       children: [
-        el('label', { className: 'account-label', text: need ? 'Pilih username untuk leaderboard' : 'Username baru' }),
+        el('label', { className: 'account-label', text: need ? tr('Pilih username untuk leaderboard') : tr('Username baru') }),
         input,
-        el('span', { className: 'muted account-small', text: '3–16 karakter: huruf, angka, garis bawah. Tidak bisa dipakai pemain lain. Bisa diganti 30 hari sekali.' }),
+        el('span', { className: 'muted account-small', text: tr('3–16 karakter: huruf, angka, garis bawah. Tidak bisa dipakai pemain lain. Bisa diganti 30 hari sekali.') }),
         el('div', {
           className: 'account-actions',
           children: ([
-            need ? null : el('button', { className: 'btn btn-secondary', text: 'Batal', attrs: { type: 'button' }, onClick: () => { editingName = false; message = null; render(); } }),
-            el('button', { className: 'btn btn-primary', text: busy ? 'Menyimpan…' : 'Simpan username', attrs: { type: 'submit', ...(busy ? { disabled: '' } : {}) } }),
+            need ? null : el('button', { className: 'btn btn-secondary', text: tr('Batal'), attrs: { type: 'button' }, onClick: () => { editingName = false; message = null; render(); } }),
+            el('button', { className: 'btn btn-primary', text: busy ? tr('Menyimpan…') : tr('Simpan username'), attrs: { type: 'submit', ...(busy ? { disabled: '' } : {}) } }),
           ] as (HTMLElement | null)[]).filter((n): n is HTMLElement => n !== null),
         }),
       ],
@@ -142,7 +143,7 @@ export function openAccountPanel(ui: UIManager, cloud: CloudSync): void {
       void run(async () => {
         await cloud.setUsername(name);
         editingName = false;
-      }, `Username @${name} tersimpan.`);
+      }, tr('Username @{name} tersimpan.', { name }));
     });
     if (need) queueMicrotask(() => input.focus());
     return el('div', { className: `account-name-edit${need ? ' is-required' : ''}`, children: [form] });
@@ -152,12 +153,12 @@ export function openAccountPanel(ui: UIManager, cloud: CloudSync): void {
     const u = cloud.user!;
     const status =
       cloud.status === 'syncing'
-        ? 'Menyinkronkan…'
+        ? tr('Menyinkronkan…')
         : cloud.status === 'error'
-          ? `Gagal sinkron: ${cloud.lastError ?? ''}`
+          ? tr('Gagal sinkron: {0}', { 0: cloud.lastError ?? '' })
           : cloud.lastSync
-            ? `Tersimpan di akun ${new Date(cloud.lastSync).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}`
-            : 'Siap menyimpan ke akun';
+            ? tr('Tersimpan di akun {0}', { 0: new Date(cloud.lastSync).toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit' }) })
+            : tr('Siap menyimpan ke akun');
     return [
       el('div', {
         className: 'account-card',
@@ -165,18 +166,18 @@ export function openAccountPanel(ui: UIManager, cloud: CloudSync): void {
           el('span', { className: 'account-avatar', text: (u.name ?? u.email ?? '?').charAt(0).toUpperCase(), attrs: { 'aria-hidden': 'true' } }),
           el('div', {
             className: 'account-who',
-            children: [el('strong', { text: u.name ?? u.email ?? 'Pemain' }), el('span', { className: 'muted', text: `${u.email ?? ''} · ${u.provider === 'google' ? 'Google' : 'Email'}` })],
+            children: [el('strong', { text: u.name ?? u.email ?? tr('Pemain') }), el('span', { className: 'muted', text: `${u.email ?? ''} · ${u.provider === 'google' ? 'Google' : tr('Email')}` })],
           }),
         ],
       }),
       usernameBlock(),
       el('p', { className: `account-msg${cloud.status === 'error' ? ' is-bad' : ''}`, text: status, attrs: { role: 'status' } }),
-      el('p', { className: 'guide-text', text: 'Progres otomatis disimpan ke akun selama bermain dan saat kembali ke menu. Di perangkat lain, cukup masuk dengan akun yang sama.' }),
+      el('p', { className: 'guide-text', text: tr('Progres otomatis disimpan ke akun selama bermain dan saat kembali ke menu. Di perangkat lain, cukup masuk dengan akun yang sama.') }),
       el('div', {
         className: 'account-actions',
         children: [
-          el('button', { className: 'btn btn-secondary', text: 'Simpan ke akun sekarang', attrs: { type: 'button', ...(busy ? { disabled: '' } : {}) }, onClick: () => void run(async () => void (await cloud.upload(true)), 'Progres disimpan ke akun.') }),
-          el('button', { className: 'btn btn-secondary', text: 'Keluar akun', attrs: { type: 'button', ...(busy ? { disabled: '' } : {}) }, onClick: () => void run(() => cloud.signOut(), 'Sudah keluar. Progres tetap ada di perangkat ini.') }),
+          el('button', { className: 'btn btn-secondary', text: tr('Simpan ke akun sekarang'), attrs: { type: 'button', ...(busy ? { disabled: '' } : {}) }, onClick: () => void run(async () => void (await cloud.upload(true)), tr('Progres disimpan ke akun.')) }),
+          el('button', { className: 'btn btn-secondary', text: tr('Keluar akun'), attrs: { type: 'button', ...(busy ? { disabled: '' } : {}) }, onClick: () => void run(() => cloud.signOut(), tr('Sudah keluar. Progres tetap ada di perangkat ini.')) }),
         ],
       }),
     ];
@@ -193,9 +194,9 @@ export function openAccountPanel(ui: UIManager, cloud: CloudSync): void {
     render();
   });
   void cloud.load().catch(() => {
-    message = { text: 'Tidak bisa memuat layanan akun. Cek koneksi internet.', bad: true };
+    message = { text: tr('Tidak bisa memuat layanan akun. Cek koneksi internet.'), bad: true };
     render();
   });
   render();
-  ui.openModal({ title: 'Akun', className: 'sheet sheet-account', closeButton: true, body, actions: [{ label: 'Tutup' }], onClose: off });
+  ui.openModal({ title: tr('Akun'), className: 'sheet sheet-account', closeButton: true, body, actions: [{ label: tr('Tutup') }], onClose: off });
 }

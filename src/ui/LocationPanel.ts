@@ -5,6 +5,7 @@ import { crowdLabel, isWeekend, MOVE_LOYALTY_KEEP, previewDemand } from '../syst
 import { formatRupiah } from '../utils/formatting';
 import { el } from './dom';
 import type { ModalHandle, UIManager } from './UIManager';
+import { tr } from '../i18n/i18n';
 
 /**
  * Pindah lokasi saat persiapan: bandingkan semua lokasi (sifat, sewa, perkiraan ramai hari ini, event di sana)
@@ -25,8 +26,8 @@ export class LocationPanel {
       const ev = preview.event ? eventById(preview.event.id) : null;
       const btn = el('button', {
         className: `btn ${here ? 'btn-secondary' : 'btn-primary'} btn-sm`,
-        text: here ? 'Lokasi sekarang' : `Pindah · ${formatRupiah(loc.moveCost)}`,
-        attrs: { type: 'button', 'aria-label': here ? `${loc.name} (lokasi sekarang)` : `Pindah ke ${loc.name}` },
+        text: here ? tr('Lokasi sekarang') : tr('Pindah · {moveCost}', { moveCost: formatRupiah(loc.moveCost) }),
+        attrs: { type: 'button', 'aria-label': here ? tr('{name} (lokasi sekarang)', { name: loc.name }) : tr('Pindah ke {name}', { name: loc.name }) },
         onClick: () => this.confirm(loc.id),
       });
       btn.disabled = here || !canMove || s.player.money < loc.moveCost;
@@ -40,8 +41,8 @@ export class LocationPanel {
           el('div', {
             className: 'location-today',
             children: [
-              el('span', { text: `Hari ini: pengunjung ${crowdLabel(preview.dayFactor)} (×${preview.dayFactor.toFixed(2)})` }),
-              el('span', { text: ev ? `${ev.icon} ${ev.name}` : 'Tanpa event' }),
+              el('span', { text: tr('Hari ini: pengunjung {dayFactor} (×{1})', { dayFactor: crowdLabel(preview.dayFactor), 1: preview.dayFactor.toFixed(2) }) }),
+              el('span', { text: ev ? tr('{icon} {name}', { icon: ev.icon, name: ev.name }) : tr('Tanpa event') }),
             ],
           }),
           btn,
@@ -49,7 +50,7 @@ export class LocationPanel {
       });
     });
     this.modal = this.ui.openModal({
-      title: 'Pindah Lokasi',
+      title: tr('Pindah Lokasi'),
       className: 'sheet location-modal',
       closeButton: true,
       body: el('div', {
@@ -58,10 +59,10 @@ export class LocationPanel {
             className: s.phase !== 'persiapan' || !canMove ? 'panel-warning' : 'panel-note',
             text:
               s.phase !== 'persiapan'
-                ? 'Pindah lokasi hanya bisa saat persiapan (sebelum buka).'
+                ? tr('Pindah lokasi hanya bisa saat persiapan (sebelum buka).')
                 : !canMove
-                  ? 'Gerobak sudah dipindah hari ini. Kamu bisa pindah lagi besok.'
-                  : `Hari ini ${isWeekend(s.calendar.day) ? 'akhir pekan' : 'hari kerja'}. Pindah maksimal sekali sehari; stok, upgrade & tabungan ikut, tapi sebagian pelanggan tetap tertinggal (loyalitas ×${MOVE_LOYALTY_KEEP}).`,
+                  ? tr('Gerobak sudah dipindah hari ini. Kamu bisa pindah lagi besok.')
+                  : tr('Hari ini {0}. Pindah maksimal sekali sehari; stok, upgrade & tabungan ikut, tapi sebagian pelanggan tetap tertinggal (loyalitas ×{MOVE_LOYALTY_KEEP}).', { 0: isWeekend(s.calendar.day) ? tr('akhir pekan') : tr('hari kerja'), MOVE_LOYALTY_KEEP }),
           }),
           el('div', { className: 'location-grid', children: cards }),
         ],
@@ -77,12 +78,12 @@ export class LocationPanel {
     const loc = LOCATIONS.find((l) => l.id === id);
     if (!loc) return;
     this.ui.openModal({
-      title: `Pindah ke ${loc.name}?`,
-      body: `Biaya pindah ${formatRupiah(loc.moveCost)}, sewa di sana ${formatRupiah(loc.rent)}/hari. Sebagian pelanggan tetap tidak ikut pindah. Kamu baru bisa pindah lagi besok.`,
+      title: tr('Pindah ke {name}?', { name: loc.name }),
+      body: tr('Biaya pindah {moveCost}, sewa di sana {rent}/hari. Sebagian pelanggan tetap tidak ikut pindah. Kamu baru bisa pindah lagi besok.', { moveCost: formatRupiah(loc.moveCost), rent: formatRupiah(loc.rent) }),
       actions: [
-        { label: 'Batal' },
+        { label: tr('Batal') },
         {
-          label: 'Ya, pindah',
+          label: tr('Ya, pindah'),
           variant: 'primary',
           onClick: () => {
             const res = this.ctx.actions.moveLocation(id);

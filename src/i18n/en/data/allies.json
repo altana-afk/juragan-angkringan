@@ -1,0 +1,80 @@
+{
+  "allies": [
+    {
+      "id": "ratna",
+      "name": "Ratna",
+      "role": "Nurse at Tirta Husada Mental Hospital",
+      "want": "Patients going home safely and being accepted by their neighbors",
+      "fear": "People with mental illness being treated roughly on the street",
+      "talk": [
+        [
+          "One hot tea, please. I just finished the evening shift.",
+          "I work at the mental hospital across the road. Don't worry, our patients are fine."
+        ],
+        [
+          "If you meet someone confused on the street, just greet them softly. Don't shout.",
+          "The nasi kucing is just right before a night shift."
+        ],
+        [
+          "A patient wandered off yesterday. Luckily the neighbors helped look for him instead of hitting him.",
+          "I'm glad there's an angkringan near here. A place to talk after a shift."
+        ],
+        [
+          "You're a patient person. You'd fit right in on the ward, haha.",
+          "If anyone needs help, call me. Our ambulance is on standby."
+        ],
+        [
+          "I saved your cart's number. The other nurses like to stop by too.",
+          "People with mental illness are sick, not bad. You already understand that."
+        ],
+        [
+          "Wherever your cart is, if I pass by, I'll stop.",
+          "If someone needs help while I'm here, let our team handle it."
+        ]
+      ],
+      "favoriteHints": {
+        "teh_hangat": "Something warm, just a little sweet. To get my energy back after the shift.",
+        "nasi_kucing": "The small one wrapped in a leaf, to fill me up before the night shift.",
+        "wedang_jahe": "Something spicy-warm for my throat. The ward was freezing today."
+      }
+    },
+    {
+      "id": "bram",
+      "name": "Officer Bram",
+      "role": "Police officer at headquarters, loves strong coffee",
+      "want": "Small vendors being able to sell in peace",
+      "fear": "People being too scared to report extortion",
+      "talk": [
+        [
+          "Hot coffee, no sugar.",
+          "I'm stationed at headquarters. Just stopping by before the night roll call."
+        ],
+        [
+          "Has anyone asked you for protection money here? Don't keep paying, or they'll keep coming back.",
+          "The satay is good. Don't tell my commander I come here so often."
+        ],
+        [
+          "Keep your trading permit safe. That's what you show when someone tries something.",
+          "My father was a vendor too. I know how hard it is."
+        ],
+        [
+          "You're brave. Most vendors choose to stay quiet.",
+          "If someone extorts you, note what they look like. We'll follow up."
+        ],
+        [
+          "I told the officers on duty to keep an eye on this angkringan.",
+          "Your coffee keeps me awake until dawn."
+        ],
+        [
+          "Wherever you're selling, if I see your cart, I'll stop.",
+          "If someone tries to extort you while I'm having coffee, leave it to me."
+        ]
+      ],
+      "favoriteHints": {
+        "kopi_panas": "Black, hot, no sugar. Keeps me awake until roll call.",
+        "sate_usus": "The one on a skewer, grilled. Not the sweet kind.",
+        "tempe_goreng": "The simplest fried snack. What students in boarding houses eat."
+      }
+    }
+  ]
+}

@@ -241,6 +241,82 @@
       "hours": [],
       "patience": 0,
       "ingredientPriceFactor": 1
+    },
+    {
+      "id": "dekat-rsj",
+      "mapId": "dekat-rsj",
+      "name": "Seberang RSJ",
+      "tagline": "Jalan tenang di depan rumah sakit jiwa",
+      "description": "Perawat, keluarga pasien, dan pekerja lewat sini setiap sore. Pelanggan sabar dan sopan, tapi malam cepat sepi. Kamu bisa berkenalan dengan Mbak Ratna, perawat RSJ.",
+      "rent": 12000,
+      "weekday": [
+        1.0,
+        1.05,
+        1.05,
+        1.05,
+        1.05,
+        1.0,
+        0.95
+      ],
+      "typeWeights": {
+        "pekerja": 1.5,
+        "keluarga": 1.3,
+        "mahasiswa": 0.6
+      },
+      "budgetFactor": 1,
+      "lateNight": 0.8,
+      "perks": [
+        "Pelanggan +2 menit sabar",
+        "Ramai pekerja & keluarga pasien",
+        "Malam lebih cepat sepi",
+        "Kenalan dengan Mbak Ratna (perawat)",
+        "Sewa Rp12.000/hari"
+      ],
+      "moveCost": 25000,
+      "hours": [
+        {
+          "from": 1020,
+          "to": 1200,
+          "factor": 1.15
+        }
+      ],
+      "patience": 2,
+      "ingredientPriceFactor": 1
+    },
+    {
+      "id": "dekat-mabes",
+      "mapId": "dekat-mabes",
+      "name": "Depan Mabes",
+      "tagline": "Paling aman, tapi sewanya tidak murah",
+      "description": "Polisi piket dan pegawai kantor mampir sebelum apel malam. Ramai sampai larut, pelanggan berkantong tebal. Kamu bisa berkenalan dengan Pak Bram, polisi yang suka kopi.",
+      "rent": 18000,
+      "weekday": [
+        0.9,
+        1.1,
+        1.1,
+        1.1,
+        1.1,
+        1.05,
+        0.9
+      ],
+      "typeWeights": {
+        "pekerja": 1.8,
+        "royal": 1.2,
+        "mahasiswa": 0.5
+      },
+      "budgetFactor": 1.1,
+      "lateNight": 1.2,
+      "perks": [
+        "Anggaran pelanggan +10%",
+        "Ramai sampai larut (+20% lewat 22.00)",
+        "Akhir pekan agak sepi",
+        "Kenalan dengan Pak Bram (polisi)",
+        "Sewa Rp18.000/hari"
+      ],
+      "moveCost": 35000,
+      "hours": [],
+      "patience": 0,
+      "ingredientPriceFactor": 1.03
     }
   ]
 }

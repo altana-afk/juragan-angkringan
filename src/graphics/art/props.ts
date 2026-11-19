@@ -480,3 +480,40 @@ export function paintRiders(): ArtEntry[] {
     }),
   }));
 }
+
+/** Kunci tekstur kendaraan penolong (0.18.0). */
+export const VEHICLE_KEYS = { ambulans: 'vehicle-ambulans', polisi: 'vehicle-polisi' } as const;
+
+/** Ambulans putih bergaris merah & mobil patroli biru-putih, membujur ke sumbu x seperti motor. */
+export function paintRescueVehicles(): ArtEntry[] {
+  const looks: [string, Color, Color, Color][] = [
+    // kunci, badan, garis, lampu sirene
+    [VEHICLE_KEYS.ambulans, 0xf4f4f0, 0xd23a32, 0xff4a3a],
+    [VEHICLE_KEYS.polisi, 0x2a4a8a, 0xf4f4f0, 0x4aa0ff],
+  ];
+  return looks.map(([key, body, stripe, siren]) => ({
+    key,
+    art: paintIsoSprite({ footW: 34, footD: 14, height: 26 }, (p) => {
+      const wheel = (x: number, y: number): void => {
+        p.discY(x, y, 5, 5, PAL.black);
+        p.discY(x, y + 0.1, 5, 2.6, PAL.steelDark);
+      };
+      wheel(7, -0.2);
+      wheel(27, -0.2);
+      // Badan bawah, kabin atas, kaca.
+      p.box(1, 1, 3, 32, 12, 8, boxColors(body), { noise: 0.03, seed: 41 });
+      p.box(1, 1, 11, 22, 12, 9, boxColors(body), { noise: 0.03, seed: 43 });
+      p.box(23, 1.5, 11, 6, 11, 6, boxColors(0x7fb6d8));
+      p.box(1, 0.9, 7, 32, 0.4, 2.4, stripe);
+      p.box(1, 12.7, 7, 32, 0.4, 2.4, stripe);
+      p.box(32.6, 1, 7, 0.6, 12, 2.4, stripe);
+      // Sirene di atap.
+      p.box(10, 4, 20, 5, 6, 2, siren);
+      p.box(15, 4, 20, 3, 6, 2, shade(siren, 0.6));
+      p.box(32.8, 2, 5, 0.5, 2, 2, PAL.cream);
+      p.box(32.8, 10, 5, 0.5, 2, 2, PAL.cream);
+      wheel(7, 13.2);
+      wheel(27, 13.2);
+    }),
+  }));
+}

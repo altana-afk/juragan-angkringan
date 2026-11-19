@@ -43,6 +43,8 @@ import { getMap } from '../world/maps';
 import { terrainAt } from '../world/MapData';
 import { buildWorld, type WorldView } from '../world/WorldBuilder';
 import { getAudio, getContext, getUI, SCENES } from './sceneKeys';
+import { tr } from '../i18n/i18n';
+import { openDebugPanel } from '../ui/DebugPanel';
 
 /**
  * Scene utama permainan: dunia angkringan isometrik + HUD.
@@ -56,6 +58,7 @@ export class AngkringanScene extends Phaser.Scene {
   private components: UIComponent[] = [];
   private unsubscribers: (() => void)[] = [];
   private debugPanel: HTMLElement | null = null;
+  private debugTools: HTMLElement | null = null;
   private hoveredTile: { x: number; y: number } | null = null;
   private sales: SalesController | null = null;
   private weather: WeatherFx | null = null;
@@ -202,14 +205,14 @@ export class AngkringanScene extends Phaser.Scene {
     if (!state.bankrupt && state.phase === 'persiapan' && state.story.ending && !state.story.endingSeen) this.time.delayedCall(2600, () => this.showEnding());
     // Dimuat setelah tutup tapi belum ganti hari: tampilkan ringkasan lagi.
     if (state.phase === 'evaluasi') this.time.delayedCall(700, () => showDaySummary(this.ctx, ui));
-    this.ctx.notify(`Hari ${state.calendar.day} · ${formatDateLong(state.calendar.day)}. Selamat datang di angkringanmu!`, 'info', 4200);
+    this.ctx.notify(tr('Hari {day} · {day2}. Selamat datang di angkringanmu!', { day: state.calendar.day, day2: formatDateLong(state.calendar.day) }), 'info', 4200);
     const firstTime = state.stats.totalPurchases === 0;
     this.time.delayedCall(900, () => {
       if (firstTime) {
-        this.ctx.notify('Mulai dengan Belanja bahan, lalu masak di Persiapan.', 'info', 5000);
+        this.ctx.notify(tr('Mulai dengan Belanja bahan, lalu masak di Persiapan.'), 'info', 5000);
       } else {
         const touch = this.sys.game.device.input.touch;
-        this.ctx.notify(touch ? 'Geser untuk melihat sekeliling, cubit untuk zoom.' : 'Seret untuk menggeser kamera, scroll untuk zoom.', 'info', 4200);
+        this.ctx.notify(touch ? tr('Geser untuk melihat sekeliling, cubit untuk zoom.') : tr('Seret untuk menggeser kamera, scroll untuk zoom.'), 'info', 4200);
       }
     });
 
@@ -271,11 +274,11 @@ export class AngkringanScene extends Phaser.Scene {
     for (const id of notice.update?.chapters ?? []) {
       if (id === 1 || id === 7) continue;
       const c = CHAPTERS.find((x) => x.id === id);
-      if (c) this.ctx.notify(`📖 Bab baru Buku Dapur Kardi: ${c.title}`, 'success', 5000);
+      if (c) this.ctx.notify(tr('📖 Bab baru Buku Dapur Kardi: {title}', { title: c.title }), 'success', 5000);
     }
     const sum = notice.update?.summarized.length ?? 0;
-    if (sum) this.ctx.notify(`📰 ${sum} kabar lama kamu dengar dari warga (ringkasan di Kabar Kampung).`, 'info', 4500);
-    if (notice.stageUp) this.ctx.notify(`❤ ${namedById(notice.stageUp.who).name} makin dekat denganmu (tahap ${notice.stageUp.stage}).`, 'success', 4500);
+    if (sum) this.ctx.notify(tr('📰 {sum} kabar lama kamu dengar dari warga (ringkasan di Kabar Kampung).', { sum }), 'info', 4500);
+    if (notice.stageUp) this.ctx.notify(tr('❤ {name} makin dekat denganmu (tahap {stage}).', { name: namedById(notice.stageUp.who).name, stage: notice.stageUp.stage }), 'success', 4500);
   }
 
   /** Akhir cerita: dialog penutup, lalu kartu akhir. */
@@ -294,13 +297,13 @@ export class AngkringanScene extends Phaser.Scene {
           title: ending.title,
           body: el('div', {
             children: [
-              el('p', { className: 'modal-body', text: 'Cerita Gang Melati sudah sampai di akhirnya. Bab 7 Buku Dapur Kardi kini terbuka.' }),
-              el('p', { className: 'modal-body muted', text: 'Permainan tetap berlanjut dalam mode bebas: warga masih mampir dan mengobrol, tanpa babak baru.' }),
+              el('p', { className: 'modal-body', text: tr('Cerita Gang Melati sudah sampai di akhirnya. Bab 7 Buku Dapur Kardi kini terbuka.') }),
+              el('p', { className: 'modal-body muted', text: tr('Permainan tetap berlanjut dalam mode bebas: warga masih mampir dan mengobrol, tanpa babak baru.') }),
             ],
           }),
           actions: [
-            { label: 'Baca Bab 7', onClick: () => this.ctx.bus.emit('ui:open-panel', { panel: 'story', tab: 'buku' }) },
-            { label: 'Lanjut berjualan', variant: 'primary' },
+            { label: tr('Baca Bab 7'), onClick: () => this.ctx.bus.emit('ui:open-panel', { panel: 'story', tab: 'buku' }) },
+            { label: tr('Lanjut berjualan'), variant: 'primary' },
           ],
         });
       },
@@ -320,7 +323,25 @@ export class AngkringanScene extends Phaser.Scene {
     const ui = getUI(this);
     this.debugPanel = el('pre', { className: 'debug-panel' });
     ui.layers.hud.append(this.debugPanel);
+    this.debugTools = this.buildDebugTools();
+    ui.layers.hud.append(this.debugTools);
     window.addEventListener('keydown', this.onDebugKey);
+  }
+
+  /** Tombol mode debug: membuka panel untuk menguji semua fitur (stok, waktu, upgrade, cerita, tantangan…). */
+  private buildDebugTools(): HTMLElement {
+    const toggle = el('button', { className: 'debug-tools-toggle', attrs: { type: 'button' }, text: tr('🧪 Debug') });
+    toggle.addEventListener('click', () => {
+      const ui = getUI(this);
+      if (ui.hasOpenModal()) return;
+      const notSelling = tr('Mulai berjualan dulu, lalu coba lagi.');
+      openDebugPanel(ui, this.ctx, {
+        challenge: (kind) => (this.sales ? this.sales.debugChallenge(kind) : notSelling),
+        callNamed: (who) => (this.sales ? this.sales.debugCallNamed(who) : notSelling),
+        reloadScene: () => this.scene.restart(),
+      });
+    });
+    return el('div', { className: 'debug-tools', children: [toggle] });
   }
 
   private readonly onDebugKey = (event: KeyboardEvent): void => {
@@ -356,6 +377,8 @@ export class AngkringanScene extends Phaser.Scene {
     this.components = [];
     this.debugPanel?.remove();
     this.debugPanel = null;
+    this.debugTools?.remove();
+    this.debugTools = null;
     window.removeEventListener('keydown', this.onDebugKey);
     this.input.off(Phaser.Input.Events.POINTER_MOVE, this.onPointerMove, this);
     this.input.off(Phaser.Input.Events.GAME_OUT);

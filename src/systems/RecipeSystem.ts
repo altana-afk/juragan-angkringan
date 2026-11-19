@@ -4,6 +4,7 @@ import type { Catalog, RecipeCategory, RecipeDef, UnlockCondition } from '../dat
 import { formatRupiah } from '../utils/formatting';
 import { unitCostOn } from './EconomySystem';
 import { totalQty } from './InventorySystem';
+import { tr } from '../i18n/i18n';
 
 /** Pesanan memasak: resep & jumlah porsi. */
 export interface CookOrder {
@@ -80,15 +81,15 @@ export function isUnlockMet(condition: UnlockCondition, state: Readonly<GameStat
 export function describeUnlock(condition: UnlockCondition): string {
   switch (condition.type) {
     case 'start':
-      return 'Tersedia sejak awal';
+      return tr('Tersedia sejak awal');
     case 'popularity':
-      return `Terbuka saat popularitas ≥ ${condition.min}`;
+      return tr('Terbuka saat popularitas ≥ {min}', { min: condition.min });
     case 'money':
-      return `Terbuka saat kas mencapai ${formatRupiah(condition.min)}`;
+      return tr('Terbuka saat kas mencapai {min}', { min: formatRupiah(condition.min) });
     case 'level':
-      return `Butuh level usaha ${condition.min} (upgrade gerobak)`;
+      return tr('Butuh level usaha {min} (upgrade gerobak)', { min: condition.min });
     case 'story':
-      return `Terbuka dari Buku Dapur Kardi bab ${condition.chapter}`;
+      return tr('Terbuka dari Buku Dapur Kardi bab {chapter}', { chapter: condition.chapter });
   }
 }
 

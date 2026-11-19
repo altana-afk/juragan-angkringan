@@ -1,0 +1,25 @@
+{
+  "areas": [
+    { "name": "Griya Asri Housing" },
+    { "name": "Melati Women's Boarding House" },
+    { "name": "Village Office" },
+    { "name": "Student Dorm" },
+    { "name": "Main Road Shophouses" },
+    { "name": "Sehat Hospital" },
+    { "name": "Gang Kenanga" }
+  ],
+  "profiles": [
+    { "id": "keluarga", "label": "Family dinner" },
+    { "id": "anak_kos", "label": "Hungry boarder" },
+    { "id": "lembur", "label": "Working late" },
+    { "id": "ngemil", "label": "Hangout snacks" }
+  ],
+  "notes": [
+    { "id": "tanpa_sambal", "text": "No chili sauce, please" },
+    { "id": "pedas", "text": "Make it really spicy" },
+    { "id": "kurang_manis", "text": "Less sugar in the tea" },
+    { "id": "dipisah", "text": "Wrap each person's order separately" },
+    { "id": "alat_makan", "text": "Spoons & napkins, please" },
+    { "id": "tambah_tempe", "text": "Add one fried tempeh" }
+  ]
+}

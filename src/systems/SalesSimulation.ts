@@ -13,6 +13,7 @@ import { arrivalChancePerMinute, planCustomer, planNamedCustomer, type CustomerP
 import { namedById } from '../data/story';
 import type { NamedVisit } from './StorySystem';
 import type { OrderOutcome } from './SalesSystem';
+import { arrivalFactor } from './ChallengeEventSystem';
 
 /**
  * Simulasi berjualan tanpa ketergantungan Phaser (bisa diuji di Node):
@@ -62,7 +63,7 @@ export type SimEvent =
   | { type: 'arrive'; group: Group }
   | { type: 'named-arrive'; group: Group; visit: NamedVisit }
   | { type: 'order'; group: Group; outcome: OrderOutcome }
-  | { type: 'walk-away'; group: Group; reason: 'full' | 'impatient' | 'closing' }
+  | { type: 'walk-away'; group: Group; reason: 'full' | 'impatient' | 'closing' | 'scared' }
   | { type: 'pay'; group: Group; amount: number }
   | { type: 'gone'; group: Group }
   | { type: 'closed' }
@@ -163,7 +164,7 @@ export class SalesSimulation {
           const visit = this.namedQueue.shift() as NamedVisit;
           events.push({ type: 'named-arrive', group: this.spawn(visit), visit });
         }
-        if (this.lastWholeMinute < close && this.rng.chance(arrivalChancePerMinute(this.lastWholeMinute, state.player.popularity, modifiersOf(state)))) {
+        if (this.lastWholeMinute < close && this.rng.chance(arrivalChancePerMinute(this.lastWholeMinute, state.player.popularity, modifiersOf(state)) * arrivalFactor(state))) {
           events.push({ type: 'arrive', group: this.spawn() });
         }
       }
@@ -190,6 +191,47 @@ export class SalesSimulation {
       this.ended = true;
       events.push({ type: 'ended' });
     }
+  }
+
+  /**
+   * Sebagian pelanggan kabur (tantangan ODGJ, 0.18.0). Yang mengantre/baru datang bisa pergi;
+   * jika `includeSeated`, yang sedang duduk juga bisa pergi (yang sudah makan tetap membayar).
+   * Pelanggan bernama tidak ikut kabur.
+   */
+  scare(chance: number, includeSeated = false): SimEvent[] {
+    const events: SimEvent[] = [];
+    for (const g of this.groups) {
+      if (g.named || !this.rng.chance(chance)) continue;
+      if (g.state === 'arriving' || g.state === 'queueing' || (includeSeated && (g.state === 'seating' || g.state === 'ordering'))) {
+        this.hooks.walkAway(g.plan);
+        events.push({ type: 'walk-away', group: g, reason: 'scared' });
+        this.leave(g, 'angry');
+      } else if (includeSeated && g.state === 'eating') {
+        events.push({ type: 'pay', group: g, amount: g.outcome?.total ?? 0 });
+        this.leave(g, 'angry');
+      }
+    }
+    return events;
+  }
+
+  /** Pelanggan bernama yang sedang ada di angkringan: mengantre, duduk, atau makan (untuk kenalan yang menolong). */
+  seatedNamed(who: string): Group | null {
+    return this.groups.find((g) => g.named?.who === who && (g.state === 'queueing' || g.state === 'seating' || g.state === 'ordering' || g.state === 'eating')) ?? null;
+  }
+
+  /** Mode debug: jadwalkan kunjungan pelanggan bernama tambahan. */
+  addNamedVisit(visit: NamedVisit): void {
+    this.namedQueue.push(visit);
+    this.namedQueue.sort((a, b) => a.minute - b.minute);
+  }
+
+  hasNamedGroup(who: string): boolean {
+    return this.groups.some((g) => g.named?.who === who && g.state !== 'leaving');
+  }
+
+  /** Tempat kosong di dekat pintu masuk (untuk tamu tantangan yang berdiri). */
+  get anchorsForGuests(): CustomerAnchors {
+    return this.anchors;
   }
 
   private spawn(visit: NamedVisit | null = null): Group {

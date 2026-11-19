@@ -61,7 +61,7 @@ describe('pindah lokasi saat persiapan', () => {
       expect(map.customers?.seats.length).toBe(seats);
       expect(map.objects.find((o) => o.id === 'cart')).toBeDefined();
     }
-    expect(LOCATIONS.map((l) => l.id)).toEqual(['main-street', 'kampus', 'pasar', 'stasiun', 'pasar-malam']);
+    expect(LOCATIONS.map((l) => l.id)).toEqual(['main-street', 'kampus', 'pasar', 'stasiun', 'pasar-malam', 'dekat-rsj', 'dekat-mabes']);
   });
 });
 

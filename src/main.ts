@@ -13,6 +13,7 @@ import { attachSoundDirector } from './audio/SoundDirector';
 import { initPwa } from './pwa/pwa';
 import { initAnalytics } from './analytics/analytics';
 import { CloudSync } from './cloud/CloudSync';
+import { lang, missingTranslations, tr } from './i18n/i18n';
 
 function requireElement(id: string): HTMLElement {
   const node = document.getElementById(id);
@@ -29,6 +30,8 @@ function applyFpsLimit(game: Phaser.Game, lowPower: boolean): void {
 }
 
 function bootstrap(): Phaser.Game {
+  // Bahasa halaman mengikuti pilihan bahasa game (pembaca layar & terjemahan otomatis browser).
+  document.documentElement.lang = lang();
   GRAPHICS.init();
   const ctx = new GameContext();
   // PWA: offline + tombol "Pasang game". Dipanggil sedini mungkin agar prompt install tidak terlewat.
@@ -71,7 +74,7 @@ function bootstrap(): Phaser.Game {
   // Layar penuh: dipicu dari UI lewat event bus (harus berasal dari klik pengguna).
   ctx.bus.on('system:toggle-fullscreen', () => {
     if (!game.scale.fullscreen.available) {
-      ctx.notify('Layar penuh tidak didukung di perangkat atau browser ini.', 'warning');
+      ctx.notify(tr('Layar penuh tidak didukung di perangkat atau browser ini.'), 'warning');
       return;
     }
     game.scale.toggleFullscreen();
@@ -79,8 +82,8 @@ function bootstrap(): Phaser.Game {
   const emitFullscreen = (): void => ctx.bus.emit('system:fullscreen-changed', { active: game.scale.isFullscreen });
   game.scale.on(Phaser.Scale.Events.ENTER_FULLSCREEN, emitFullscreen);
   game.scale.on(Phaser.Scale.Events.LEAVE_FULLSCREEN, emitFullscreen);
-  game.scale.on(Phaser.Scale.Events.FULLSCREEN_FAILED, () => ctx.notify('Gagal masuk mode layar penuh.', 'error'));
-  game.scale.on(Phaser.Scale.Events.FULLSCREEN_UNSUPPORTED, () => ctx.notify('Layar penuh tidak didukung di perangkat ini.', 'warning'));
+  game.scale.on(Phaser.Scale.Events.FULLSCREEN_FAILED, () => ctx.notify(tr('Gagal masuk mode layar penuh.'), 'error'));
+  game.scale.on(Phaser.Scale.Events.FULLSCREEN_UNSUPPORTED, () => ctx.notify(tr('Layar penuh tidak didukung di perangkat ini.'), 'warning'));
 
   // Jaga ukuran kanvas tetap sama dengan wadahnya. Pada rotasi ponsel, Phaser kadang memproses
   // event orientationchange sebelum layout berubah sehingga ukurannya tertinggal; ResizeObserver
@@ -107,11 +110,11 @@ function bootstrap(): Phaser.Game {
   // Tangkap error tak terduga agar terlihat oleh pemain & mudah dilaporkan.
   window.addEventListener('error', (event) => {
     console.error(event.error ?? event.message);
-    ctx.notify('Terjadi kesalahan. Detail ada di console browser.', 'error', 6000);
+    ctx.notify(tr('Terjadi kesalahan. Detail ada di console browser.'), 'error', 6000);
   });
   window.addEventListener('unhandledrejection', (event) => {
     console.error(event.reason);
-    ctx.notify('Terjadi kesalahan. Detail ada di console browser.', 'error', 6000);
+    ctx.notify(tr('Terjadi kesalahan. Detail ada di console browser.'), 'error', 6000);
   });
 
   return game;
@@ -119,8 +122,9 @@ function bootstrap(): Phaser.Game {
 
 const game = bootstrap();
 
-// Mode debug: buka akses ke instance game dari console browser (window.__game).
-if (isDebugMode()) (window as unknown as { __game?: Phaser.Game }).__game = game;
+// Mode debug: buka akses ke instance game (window.__game) dan daftar teks yang belum diterjemahkan
+// (window.__i18nMissing()) dari console browser.
+if (isDebugMode()) Object.assign(window, { __game: game, __i18nMissing: missingTranslations });
 
 // Bersihkan saat hot-reload Vite agar tidak ada dua instance game.
 if (import.meta.hot) {

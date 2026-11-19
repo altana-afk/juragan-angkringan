@@ -4,6 +4,7 @@ import type { Catalog } from '../data/catalog';
 import { addStock, consumeStock } from './InventorySystem';
 import { aggregateRequirements, findShortages, type CookOrder, type Shortage } from './RecipeSystem';
 import { GameRuleError } from './rules';
+import { tr } from '../i18n/i18n';
 
 export interface PreparedLine {
   readonly recipeId: string;
@@ -32,19 +33,19 @@ export function maxPortionsPerOrder(state: Readonly<GameState>): number {
  */
 export function prepareProducts(draft: GameState, catalog: Catalog, orders: readonly CookOrder[]): CookResult {
   const valid = orders.filter((o) => o.portions !== 0);
-  if (valid.length === 0) throw new GameRuleError('orders-empty', 'Belum ada produk yang dipilih untuk dimasak.');
+  if (valid.length === 0) throw new GameRuleError('orders-empty', tr('Belum ada produk yang dipilih untuk dimasak.'));
   for (const o of valid) {
-    if (!Number.isInteger(o.portions) || o.portions < 0) throw new GameRuleError('qty-invalid', 'Jumlah porsi harus bilangan bulat positif.');
+    if (!Number.isInteger(o.portions) || o.portions < 0) throw new GameRuleError('qty-invalid', tr('Jumlah porsi harus bilangan bulat positif.'));
     const max = maxPortionsPerOrder(draft);
-    if (o.portions > max) throw new GameRuleError('qty-too-large', `Maksimal ${max} porsi per produk sekali masak (upgrade wajan/kompor untuk menambah).`);
+    if (o.portions > max) throw new GameRuleError('qty-too-large', tr('Maksimal {max} porsi per produk sekali masak (upgrade wajan/kompor untuk menambah).', { max }));
     if (!draft.unlockedRecipes.includes(o.recipeId)) {
-      throw new GameRuleError('recipe-locked', `${catalog.recipe(o.recipeId).name} belum terbuka.`);
+      throw new GameRuleError('recipe-locked', tr('{name} belum terbuka.', { name: catalog.recipe(o.recipeId).name }));
     }
   }
   const shortages: Shortage[] = findShortages(draft, aggregateRequirements(catalog, valid));
   if (shortages.length > 0) {
-    const names = shortages.map((s) => `${catalog.ingredient(s.ingredientId).name} (kurang ${s.missing})`).join(', ');
-    throw new GameRuleError('ingredients-short', `Bahan tidak cukup: ${names}.`, shortages);
+    const names = shortages.map((s) => tr('{name} (kurang {missing})', { name: catalog.ingredient(s.ingredientId).name, missing: s.missing })).join(', ');
+    throw new GameRuleError('ingredients-short', tr('Bahan tidak cukup: {names}.', { names }), shortages);
   }
 
   const day = draft.calendar.day;

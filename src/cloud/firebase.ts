@@ -20,6 +20,7 @@ import {
 } from 'firebase/auth';
 import { collection, doc, getCountFromServer, getDoc, getDocsFromServer, getFirestore, limit, orderBy, query, serverTimestamp, setDoc, where, writeBatch } from 'firebase/firestore';
 import { FIREBASE_CONFIG } from './config';
+import { tr } from '../i18n/i18n';
 
 const app = initializeApp(FIREBASE_CONFIG);
 const auth = getAuth(app);
@@ -163,22 +164,22 @@ export async function claimUsername(uid: string, username: string, previous: str
 export function authErrorMessage(error: unknown): string {
   const code = (error as { code?: string })?.code ?? '';
   const map: Record<string, string> = {
-    'username/taken': 'Username sudah dipakai pemain lain. Coba yang lain.',
-    'auth/invalid-email': 'Format email tidak valid.',
-    'auth/missing-password': 'Isi kata sandi.',
-    'auth/weak-password': 'Kata sandi minimal 6 karakter.',
-    'auth/email-already-in-use': 'Email ini sudah terdaftar. Pilih "Masuk".',
-    'auth/invalid-credential': 'Email atau kata sandi salah.',
-    'auth/wrong-password': 'Email atau kata sandi salah.',
-    'auth/user-not-found': 'Akun dengan email ini belum ada. Pilih "Daftar".',
-    'auth/too-many-requests': 'Terlalu banyak percobaan. Coba lagi beberapa menit lagi.',
-    'auth/popup-closed-by-user': 'Jendela login ditutup sebelum selesai.',
-    'auth/cancelled-popup-request': 'Jendela login ditutup sebelum selesai.',
-    'auth/popup-blocked': 'Popup login diblokir browser. Izinkan popup lalu coba lagi.',
-    'auth/network-request-failed': 'Tidak ada koneksi internet.',
-    'auth/unauthorized-domain': 'Alamat situs ini belum diizinkan di Firebase (Authorized domains).',
-    'permission-denied': 'Akses ke penyimpanan akun ditolak (cek aturan Firestore).',
-    unavailable: 'Server penyimpanan tidak bisa dihubungi. Coba lagi nanti.',
+    'username/taken': tr('Username sudah dipakai pemain lain. Coba yang lain.'),
+    'auth/invalid-email': tr('Format email tidak valid.'),
+    'auth/missing-password': tr('Isi kata sandi.'),
+    'auth/weak-password': tr('Kata sandi minimal 6 karakter.'),
+    'auth/email-already-in-use': tr('Email ini sudah terdaftar. Pilih "Masuk".'),
+    'auth/invalid-credential': tr('Email atau kata sandi salah.'),
+    'auth/wrong-password': tr('Email atau kata sandi salah.'),
+    'auth/user-not-found': tr('Akun dengan email ini belum ada. Pilih "Daftar".'),
+    'auth/too-many-requests': tr('Terlalu banyak percobaan. Coba lagi beberapa menit lagi.'),
+    'auth/popup-closed-by-user': tr('Jendela login ditutup sebelum selesai.'),
+    'auth/cancelled-popup-request': tr('Jendela login ditutup sebelum selesai.'),
+    'auth/popup-blocked': tr('Popup login diblokir browser. Izinkan popup lalu coba lagi.'),
+    'auth/network-request-failed': tr('Tidak ada koneksi internet.'),
+    'auth/unauthorized-domain': tr('Alamat situs ini belum diizinkan di Firebase (Authorized domains).'),
+    'permission-denied': tr('Akses ke penyimpanan akun ditolak (cek aturan Firestore).'),
+    unavailable: tr('Server penyimpanan tidak bisa dihubungi. Coba lagi nanti.'),
   };
-  return map[code] ?? `Gagal: ${code || (error as Error)?.message || 'kesalahan tidak dikenal'}`;
+  return map[code] ?? tr('Gagal: {0}', { 0: code || (error as Error)?.message || tr('kesalahan tidak dikenal') });
 }

@@ -1,0 +1,60 @@
+{
+  "chapters": [
+    {
+      "id": 1,
+      "title": "Hot Ginger Drink",
+      "recipeNote": "Roast the ginger over the charcoal until it smells fragrant, then smash it. Palm sugar to taste, and don't be stingy.",
+      "memory": "The first night this cart opened, it poured with rain. Not a single customer came. Kardi made two glasses of ginger drink, one for him and one for me. We drank under the tarp, laughing because nothing had sold. Kardi said, \"Someone will come tomorrow for sure.\" And the next day someone did. Just one person. That was enough.",
+      "condition": "Open from the first day"
+    },
+    {
+      "id": 2,
+      "title": "Tofu Bacem",
+      "recipeNote": "Simmer the tofu in coconut water with palm sugar, shallots, coriander, galangal, and bay leaves until the liquid is gone. Then fry it briefly. Be patient, and don't turn up the heat.",
+      "memory": "Kardi never had the patience to wait for bacem. Every five minutes he lifted the lid. I smacked his hand with a wooden spoon. Bacem is like people, I told him: you have to give it time so the spices can sink in. He laughed, but he never lifted the lid again after that.",
+      "condition": "Day 8 and the news \"Mbah Kardi's cart stands empty\" has been read"
+    },
+    {
+      "id": 3,
+      "title": "Fried Banana",
+      "recipeNote": "Kepok bananas that are ripe but still firm. Don't make the batter too thick, and add a pinch of slaked lime so it turns crispy.",
+      "memory": "Our first customer in this alley was a little child with only five hundred rupiah. Kardi gave him two fried bananas. The child came back the next day with his mother, and then with the neighbors. Kardi said fortune isn't counted by the bananas we sell, but by the people who come back.",
+      "condition": "Day 15 and you've chatted with Pak Gito at least once"
+    },
+    {
+      "id": 4,
+      "title": "Nasi Kucing",
+      "recipeNote": "A fistful of rice, anchovy sambal, a slice of tempeh. Wrap it in banana leaf. The price must stay low enough for anyone to buy.",
+      "memory": "One night when I was sick and couldn't get up, Kardi sold alone. On his way home he brought the leftover nasi kucing and shared it with the houses whose lights were still on. He never told anyone. I only knew because the neighbors came to thank me, and I pretended I already knew.",
+      "condition": "Day 32, the eviction news has been read, and you've bought ingredients while selling at Market Edge"
+    },
+    {
+      "id": 5,
+      "title": "Sri's Sambal (torn page)",
+      "recipeNote": "Red bird's eye chilies and curly chilies, shallots, garlic, roasted shrimp paste, palm sugar, salt. Grind it coarse, not fine. The amounts are...",
+      "memory": "The bottom of this page is torn. All that's left is slanted writing in the margin: \"Kardi always says it's too spicy. But he always asks for more.\"",
+      "condition": "Day 38, Chapter 4 is open, and the torn-page news has been read"
+    },
+    {
+      "id": 6,
+      "title": "Sri's Sambal",
+      "recipeNote": "The final amounts: ten bird's eye chilies, five curly chilies, six shallots, three garlic cloves, a fingertip of shrimp paste, a thumb of palm sugar. Sing while you grind so your hands don't get tired.",
+      "memory": "For Kardi: don't stop. If one day I'm gone, make this sambal for the people in the alley. They aren't customers, they're family who haven't come home yet.",
+      "condition": "Day 42, Chapter 5 is open, and your bond with Bu Surti is at least stage 2. Unlocks the Sri's Sambal Rice menu item"
+    },
+    {
+      "id": 7,
+      "title": "The Last Page",
+      "recipeNote": "",
+      "memory": "",
+      "condition": "Opens once the story reaches its end"
+    }
+  ],
+  "lastPage": {
+    "lengkap": "On the last page is Kardi's own handwriting, shaky and slanted: \"Sri, I stopped making your sambal because every time I ground the chilies I cried. Now there's a young one making it again. Surti tells me it tastes almost the same. Almost. That's all right. What matters is that this alley remembers you.\"",
+    "gotong_royong": "On the last page, Kardi wrote a list of the neighbors who came to help the cart years ago. Below it is an empty space. You add the names of the neighbors who came that morning.",
+    "warisan": "On the last page is an old photo: young Kardi, Sri, and a little boy holding a coffee glass. On the back it says: \"Bayu, six years old. Says he wants to sell coffee someday.\"",
+    "bertahan": "On the last page, Kardi wrote: \"The cart is small, but it can hold a lot of stories.\" You tuck the rent receipt in there as a new chapter.",
+    "kota": "On the last page there's just one sentence from Sri: \"Wherever this cart stands, may everyone who eats here go home full.\" You close the book gently."
+  }
+}

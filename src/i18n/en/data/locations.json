@@ -1,0 +1,48 @@
+{
+  "locations": [
+    {
+      "id": "main-street",
+      "name": "Village Street",
+      "tagline": "A lively neighborhood of families & workers",
+      "description": "A mix of customers: families, workers, ride-hail drivers. Busy on weekends, especially Saturday night. Cheap rent.",
+      "perks": ["Busy weekends (+30–40%)", "Rent Rp10,000/day", "Good for beginners"]
+    },
+    {
+      "id": "kampus",
+      "name": "Near Campus",
+      "tagline": "Across from campus, open until late",
+      "description": "Plenty of students who stay until late at night, but their pockets are thin. Busy on class days, quiet on weekends when campus is closed. Higher rent.",
+      "perks": ["Busy on class days (+20–25%)", "Quiet weekends (−35–40%)", "Students ×3, busy after 22:00", "Customer budget −10%", "Rent Rp15,000/day"]
+    },
+    {
+      "id": "pasar",
+      "name": "Market Edge",
+      "tagline": "Next to the market: cheap ingredients, busy afternoons",
+      "description": "Right beside a traditional market. Ingredients are cheaper because you can grab them at the market, and from late afternoon until 21:00 it's packed with families & traders. The catch: lots of competing vendors, and once the market closes (21:30) the street empties fast, so stock has to sell quickly and you need enough seats for the afternoon rush.",
+      "perks": ["Ingredients −10%", "Very busy 17:00–21:00 (+30%)", "Quiet after 21:30 (−60%)", "Lots of competition: ordinary days are a bit quieter", "Families & traders on tight budgets", "Rent Rp14,000/day"]
+    },
+    {
+      "id": "stasiun",
+      "name": "Station Front",
+      "tagline": "Commuter crowds, customers in a hurry",
+      "description": "In front of the train station. Two big waves: workers heading home (17:00–19:30) and passengers off the last trains (23:00–01:00), plus lots of ride-hail drivers waiting around. Customers have more money but they're in a hurry and leave quickly if they have to wait. Busy on weekdays, ordinary on weekends. The most expensive rent.",
+      "perks": ["Evening commute & last-train waves", "Customer budget +15%", "Less patient customers (−3 min)", "Mostly ride-hail drivers & workers", "Rent Rp20,000/day"]
+    },
+    {
+      "id": "pasar-malam",
+      "name": "Night Market",
+      "tagline": "Ferris wheel & colorful lights until 2 a.m.",
+      "description": "On the edge of the night market field with a Ferris wheel and a carousel. It gets busy after evening prayers and stays packed until 02:00, peaking on Saturday night. The catch: afternoons are still quiet, weekdays are much emptier, most visitors come only once (few regulars), the noise makes customers less patient, ingredients have to be hauled from far away, and stall rent is the highest.",
+      "perks": ["Busy 20:30–02:00, peaks Saturday night", "Very busy weekends (+45–60%)", "Quieter weekdays (−10–15%), quiet afternoons", "Lots of new visitors, few regulars", "Noisy: customers −1 min patience", "Ingredients +8%, rent Rp22,000/day"]
+    },
+    {
+      "id": "dekat-stadion-bola",
+      "name": "Near the Stadium",
+      "tagline": "near the stadium",
+      "description": "",
+      "perks": []
+    },
+    {"id": "dekat-rsj", "name": "Across the Hospital", "tagline": "A quiet road in front of the mental hospital", "description": "Nurses, patients' families, and workers pass by every afternoon. Customers are patient and polite, but the nights get quiet early. You can get to know Ratna, a nurse at the hospital.", "perks": ["Customers +2 min patience", "Busy with workers & patients' families", "Quiet earlier at night", "Meet Ratna (nurse)", "Rent Rp12,000/day"]},
+    {"id": "dekat-mabes", "name": "Police HQ", "tagline": "The safest spot, but the rent isn't cheap", "description": "Officers on duty and office workers stop by before the night roll call. Busy until late, and customers have deeper pockets. You can get to know Officer Bram, who loves his coffee.", "perks": ["Customer budget +10%", "Busy until late (+20% after 22:00)", "Slightly quieter weekends", "Meet Officer Bram (police)", "Rent Rp18,000/day"]}
+  ]
+}

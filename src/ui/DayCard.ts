@@ -5,6 +5,7 @@ import { WEATHER_EFFECTS } from '../systems/WeatherSystem';
 import { formatDateLong } from '../utils/calendar';
 import { el } from './dom';
 import type { UIManager } from './UIManager';
+import { tr } from '../i18n/i18n';
 
 /** Kartu judul singkat di awal hari: "Hari 6 · Sabtu, 11 Juli · Hujan". */
 export function showDayCard(ui: UIManager, state: Readonly<GameState>): void {
@@ -16,13 +17,13 @@ export function showDayCard(ui: UIManager, state: Readonly<GameState>): void {
       el('div', {
         className: 'day-card-inner',
         children: [
-          el('div', { className: 'day-card-title', text: `Hari ${state.calendar.day}` }),
-          el('div', { className: 'day-card-sub', text: `${formatDateLong(state.calendar.day)} · ${WEATHER_EFFECTS[state.weather].label}` }),
+          el('div', { className: 'day-card-title', text: tr('Hari {day}', { day: state.calendar.day }) }),
+          el('div', { className: 'day-card-sub', text: tr('{day} · {label}', { day: formatDateLong(state.calendar.day), label: WEATHER_EFFECTS[state.weather].label }) }),
           el('div', {
             className: 'day-card-sub',
-            text: `${isWeekend(state.calendar.day) ? 'Akhir pekan' : 'Hari kerja'} · pengunjung ${crowdLabel(dayDemand(state).dayFactor)}`,
+            text: tr('{0} · pengunjung {dayFactor}', { 0: isWeekend(state.calendar.day) ? tr('Akhir pekan') : tr('Hari kerja'), dayFactor: crowdLabel(dayDemand(state).dayFactor) }),
           }),
-          state.event ? el('div', { className: 'day-card-event', text: `${eventById(state.event.id).icon} ${eventById(state.event.id).name}` }) : null,
+          state.event ? el('div', { className: 'day-card-event', text: tr('{icon} {name}', { icon: eventById(state.event.id).icon, name: eventById(state.event.id).name }) }) : null,
         ],
       }),
     ],

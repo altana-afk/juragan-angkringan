@@ -15,6 +15,7 @@ import { el, keepScroll } from './dom';
 import { CATEGORY_LABEL } from './KitchenPanel';
 import { itemIcon, stepper } from './itemIcon';
 import type { ModalHandle, UIManager } from './UIManager';
+import { tr } from '../i18n/i18n';
 
 /** Saringan daftar kirim stok (diingat selama permainan berjalan). */
 let shipFilter: 'semua' | 'makanan' | 'minuman' = 'semua';
@@ -53,12 +54,12 @@ export function openBranchPanel(ctx: GameContext, ui: UIManager, startSlot: numb
     return [
       el('p', {
         className: 'guide-text',
-        text: 'Cabang berjualan sendiri di latar belakang selama jam jualan toko utama. Cabang butuh karyawan dan produk siap jual yang kamu kirim dari sini.',
+        text: tr('Cabang berjualan sendiri di latar belakang selama jam jualan toko utama. Cabang butuh karyawan dan produk siap jual yang kamu kirim dari sini.'),
       }),
       s.branches.list.length
         ? el('p', {
             className: 'panel-note',
-            text: `Biaya harian semua cabang ±${formatRupiah(total)} (sewa, operasional & gaji).`,
+            text: tr('Biaya harian semua cabang ±{total} (sewa, operasional & gaji).', { total: formatRupiah(total) }),
           })
         : null,
       el('div', {
@@ -76,22 +77,22 @@ export function openBranchPanel(ctx: GameContext, ui: UIManager, startSlot: numb
                   el('strong', { text: def.name }),
                   el('span', {
                     className: 'guide-badge',
-                    text: isNext ? 'Belum dibuka' : '🔒 Terkunci',
+                    text: isNext ? tr('Belum dibuka') : tr('🔒 Terkunci'),
                   }),
                 ],
               }),
               el('ul', {
                 className: 'branch-reqs',
                 children: [
-                  req(`Level usaha ${def.minLevel}`, isNext ? !check.reasons.some((r) => r.includes('level usaha')) : false),
-                  req(`Popularitas ${def.minPopularity}`, s.player.popularity >= def.minPopularity),
-                  req(`Kas ${formatRupiah(def.openCost)}`, s.player.money >= def.openCost),
+                  req(tr('Level usaha {minLevel}', { minLevel: def.minLevel }), isNext ? !check.reasons.some((r) => r.includes('level usaha')) : false),
+                  req(tr('Popularitas {minPopularity}', { minPopularity: def.minPopularity }), s.player.popularity >= def.minPopularity),
+                  req(tr('Kas {openCost}', { openCost: formatRupiah(def.openCost) }), s.player.money >= def.openCost),
                 ],
               }),
               isNext
                 ? el('button', {
                     className: 'btn btn-primary',
-                    text: `Buka ${def.name} · ${formatRupiah(def.openCost)}`,
+                    text: tr('Buka {name} · {openCost}', { name: def.name, openCost: formatRupiah(def.openCost) }),
                     attrs: {
                       type: 'button',
                       ...(check.ok && s.phase === 'persiapan' ? {} : { disabled: '' }),
@@ -100,7 +101,7 @@ export function openBranchPanel(ctx: GameContext, ui: UIManager, startSlot: numb
                   })
                 : el('p', {
                     className: 'muted branch-small',
-                    text: `Buka ${BRANCH_SLOTS[def.slot - 1]?.name ?? 'cabang sebelumnya'} dulu.`,
+                    text: tr('Buka {0} dulu.', { 0: BRANCH_SLOTS[def.slot - 1]?.name ?? tr('cabang sebelumnya') }),
                   }),
               isNext && !check.ok
                 ? el('p', {
@@ -118,7 +119,7 @@ export function openBranchPanel(ctx: GameContext, ui: UIManager, startSlot: numb
   const req = (text: string, ok: boolean): HTMLElement =>
     el('li', {
       className: ok ? 'is-ok' : 'is-missing',
-      text: `${ok ? '✓' : '✗'} ${text}`,
+      text: tr('{0} {text}', { 0: ok ? '✓' : '✗', text }),
     });
 
   const statusChip = (b: Readonly<Branch>): HTMLElement => {
@@ -140,25 +141,25 @@ export function openBranchPanel(ctx: GameContext, ui: UIManager, startSlot: numb
         }),
         el('div', {
           className: 'branch-line',
-          text: `📍 ${loc.name} · ⭐ popularitas ${Math.round(b.popularity)}`,
+          text: tr('📍 {name} · ⭐ popularitas {popularity}', { name: loc.name, popularity: Math.round(b.popularity) }),
         }),
         el('div', {
           className: 'branch-line',
-          text: b.staff ? `👤 ${b.staff.name} · gaji ${wagePlanById(b.staff.plan).name.toLowerCase()}` : '👤 Belum ada karyawan',
+          text: b.staff ? tr('👤 {name} · gaji {1}', { name: b.staff.name, 1: wagePlanById(b.staff.plan).name.toLowerCase() }) : tr('👤 Belum ada karyawan'),
         }),
         el('div', {
           className: 'branch-line',
-          text: `📦 ${branchStockTotal(b)} porsi siap jual · biaya ±${formatRupiah(branchOperational(b) + wageDue(s, b))}/hari`,
+          text: tr('📦 {b} porsi siap jual · biaya ±{1}/hari', { b: branchStockTotal(b), 1: formatRupiah(branchOperational(b) + wageDue(s, b)) }),
         }),
         branchNeedsAttention(b)
           ? el('p', {
               className: 'panel-warning branch-small',
-              text: !b.staff ? 'Rekrut karyawan supaya cabang bisa berjualan.' : 'Kirim produk supaya cabang bisa berjualan.',
+              text: !b.staff ? tr('Rekrut karyawan supaya cabang bisa berjualan.') : tr('Kirim produk supaya cabang bisa berjualan.'),
             })
           : null,
         el('button', {
           className: 'btn btn-secondary',
-          text: 'Kelola cabang',
+          text: tr('Kelola cabang'),
           attrs: { type: 'button' },
           onClick: () => go({ kind: 'detail', slot: b.slot }),
         }),
@@ -175,7 +176,7 @@ export function openBranchPanel(ctx: GameContext, ui: UIManager, startSlot: numb
     const evId = b.open ? branchEvent(s, ctx.catalog, b) : null;
     const back = el('button', {
       className: 'link-btn branch-back',
-      text: '← Semua cabang',
+      text: tr('← Semua cabang'),
       attrs: { type: 'button' },
       onClick: () => go({ kind: 'list' }),
     });
@@ -186,20 +187,20 @@ export function openBranchPanel(ctx: GameContext, ui: UIManager, startSlot: numb
       children: [
         el('div', {
           className: 'branch-detail-title',
-          children: [el('strong', { text: `${b.name} · ${loc.name}` }), statusChip(b)],
+          children: [el('strong', { text: tr('{name} · {name2}', { name: b.name, name2: loc.name }) }), statusChip(b)],
         }),
         el('div', {
           className: 'branch-actions',
           children: [
             el('button', {
               className: `btn ${b.open ? 'btn-secondary' : 'btn-primary'}`,
-              text: b.open ? 'Tutup sementara' : 'Buka lagi',
+              text: b.open ? tr('Tutup sementara') : tr('Buka lagi'),
               attrs: { type: 'button', ...(prep ? {} : { disabled: '' }) },
               onClick: () => notify(ctx.actions.setBranchOpen(slot, !b.open)),
             }),
             el('button', {
               className: 'btn btn-secondary',
-              text: 'Pindah lokasi',
+              text: tr('Pindah lokasi'),
               attrs: {
                 type: 'button',
                 ...(prep && b.lastMoveDay !== s.calendar.day ? {} : { disabled: '' }),
@@ -214,10 +215,10 @@ export function openBranchPanel(ctx: GameContext, ui: UIManager, startSlot: numb
     const facts = el('ul', {
       className: 'about-list',
       children: [
-        `Event hari ini di ${loc.name}: ${evId ? `${eventById(evId).icon} ${eventById(evId).name}` : 'tidak ada'}`,
-        `Biaya operasional: ${formatRupiah(branchOperational(b))}/hari (sewa ${formatRupiah(b.open ? loc.rent : 0)} + dasar)${b.open ? '' : ' — tutup, tidak dibayar'}`,
-        st === 'penuh' ? `Perkiraan laku hari ini: ±${Math.round(branchDemand(s, ctx.catalog, b))} porsi (dibatasi stok)` : null,
-        `Popularitas cabang: ${Math.round(b.popularity)}/100`,
+        tr('Event hari ini di {name}: {1}', { name: loc.name, 1: evId ? tr('{icon} {name}', { icon: eventById(evId).icon, name: eventById(evId).name }) : tr('tidak ada') }),
+        tr('Biaya operasional: {b}/hari (sewa {1} + dasar){2}', { b: formatRupiah(branchOperational(b)), 1: formatRupiah(b.open ? loc.rent : 0), 2: b.open ? '' : tr(' — tutup, tidak dibayar') }),
+        st === 'penuh' ? tr('Perkiraan laku hari ini: ±{0} porsi (dibatasi stok)', { 0: Math.round(branchDemand(s, ctx.catalog, b)) }) : null,
+        tr('Popularitas cabang: {popularity}/100', { popularity: Math.round(b.popularity) }),
       ]
         .filter((t): t is string => t !== null)
         .map((t) => el('li', { text: t })),
@@ -230,7 +231,7 @@ export function openBranchPanel(ctx: GameContext, ui: UIManager, startSlot: numb
         ? null
         : el('p', {
             className: 'panel-note',
-            text: 'Saat berjualan, cabang hanya bisa dilihat. Ubah pengaturan saat persiapan.',
+            text: tr('Saat berjualan, cabang hanya bisa dilihat. Ubah pengaturan saat persiapan.'),
           }),
       facts,
       staffSection(s, b, prep),
@@ -240,13 +241,13 @@ export function openBranchPanel(ctx: GameContext, ui: UIManager, startSlot: numb
   };
 
   const staffSection = (s: Readonly<GameState>, b: Readonly<Branch>, prep: boolean): HTMLElement => {
-    const parts: (HTMLElement | null)[] = [el('h3', { className: 'section-title', text: 'Karyawan & gaji' })];
+    const parts: (HTMLElement | null)[] = [el('h3', { className: 'section-title', text: tr('Karyawan & gaji') })];
     if (!b.staff) {
       const cost = hireCost(b);
       parts.push(
         el('p', {
           className: 'panel-note',
-          text: cost ? `Merekrut lagi kena biaya ${formatRupiah(cost)}.` : 'Karyawan pertama tanpa biaya rekrut.',
+          text: cost ? tr('Merekrut lagi kena biaya {cost}.', { cost: formatRupiah(cost) }) : tr('Karyawan pertama tanpa biaya rekrut.'),
         }),
       );
       parts.push(
@@ -259,15 +260,15 @@ export function openBranchPanel(ctx: GameContext, ui: UIManager, startSlot: numb
                 el('strong', { text: p.name }),
                 el('span', {
                   className: 'branch-plan-price',
-                  text: `${formatRupiah(p.amount)} / ${p.periodDays === 1 ? 'hari' : p.periodDays === 7 ? 'minggu' : 'bulan'}`,
+                  text: tr('{amount} / {1}', { amount: formatRupiah(p.amount), 1: p.periodDays === 1 ? tr('hari') : p.periodDays === 7 ? tr('minggu') : tr('bulan') }),
                 }),
                 el('span', {
                   className: 'muted branch-small',
-                  text: `±${formatRupiah(dailyWage(p.id))} per hari · ${p.description}`,
+                  text: tr('±{id} per hari · {description}', { id: formatRupiah(dailyWage(p.id)), description: p.description }),
                 }),
                 el('button', {
                   className: 'btn btn-primary btn-sm',
-                  text: 'Rekrut',
+                  text: tr('Rekrut'),
                   attrs: { type: 'button', ...(prep ? {} : { disabled: '' }) },
                   onClick: () => notify(ctx.actions.hireBranchStaff(b.slot, p.id)),
                 }),
@@ -286,26 +287,26 @@ export function openBranchPanel(ctx: GameContext, ui: UIManager, startSlot: numb
             el('div', {
               className: 'branch-line',
               children: [
-                el('strong', { text: `👤 ${staff.name}` }),
+                el('strong', { text: tr('👤 {name}', { name: staff.name }) }),
                 el('span', {
-                  text: ` · gaji ${wagePlanById(staff.plan).name.toLowerCase()} ${formatRupiah(dailyWage(staff.plan))}/hari`,
+                  text: tr(' · gaji {0} {plan}/hari', { 0: wagePlanById(staff.plan).name.toLowerCase(), plan: formatRupiah(dailyWage(staff.plan)) }),
                 }),
               ],
             }),
             el('div', {
               className: 'branch-line',
-              text: `Kinerja ${Math.round(staffPerformance(b) * 100)}%${staff.lateStreak ? ` · gaji telat ${staff.lateStreak}× berturut-turut (keluar jika ${STAFF_RULES.quitAfterLate}×)` : ''}`,
+              text: tr('Kinerja {0}%{1}', { 0: Math.round(staffPerformance(b) * 100), 1: staff.lateStreak ? tr(' · gaji telat {lateStreak}× berturut-turut (keluar jika {quitAfterLate}×)', { lateStreak: staff.lateStreak, quitAfterLate: STAFF_RULES.quitAfterLate }) : '' }),
             }),
             staff.plan !== 'harian'
               ? el('div', {
                   className: 'branch-line muted',
-                  text: free ? 'Masa ikatan sudah selesai.' : `Terikat sampai hari ${staff.boundUntil}.`,
+                  text: free ? tr('Masa ikatan sudah selesai.') : tr('Terikat sampai hari {boundUntil}.', { boundUntil: staff.boundUntil }),
                 })
               : null,
             staff.lateStreak
               ? el('p', {
                   className: 'panel-warning branch-small',
-                  text: 'Gaji telat: penyajian memburuk, stok kurang diawasi, selisih kas naik. Jaga kas cukup saat tutup.',
+                  text: tr('Gaji telat: penyajian memburuk, stok kurang diawasi, selisih kas naik. Jaga kas cukup saat tutup.'),
                 })
               : null,
           ],
@@ -318,7 +319,7 @@ export function openBranchPanel(ctx: GameContext, ui: UIManager, startSlot: numb
             ...WAGE_PLANS.filter((p) => p.id !== staff.plan).map((p) =>
               el('button', {
                 className: 'btn btn-secondary btn-sm',
-                text: `Ganti ke ${p.name.toLowerCase()}`,
+                text: tr('Ganti ke {0}', { 0: p.name.toLowerCase() }),
                 attrs: {
                   type: 'button',
                   ...(prep && free ? {} : { disabled: '' }),
@@ -328,7 +329,7 @@ export function openBranchPanel(ctx: GameContext, ui: UIManager, startSlot: numb
             ),
             el('button', {
               className: 'btn btn-secondary btn-sm',
-              text: 'Berhentikan',
+              text: tr('Berhentikan'),
               attrs: {
                 type: 'button',
                 ...(prep && free ? {} : { disabled: '' }),
@@ -349,7 +350,7 @@ export function openBranchPanel(ctx: GameContext, ui: UIManager, startSlot: numb
     const parts: (HTMLElement | null)[] = [
       el('h3', {
         className: 'section-title',
-        text: `Stok cabang · ${branchStockTotal(b)} porsi`,
+        text: tr('Stok cabang · {b} porsi', { b: branchStockTotal(b) }),
       }),
       stockRows.length
         ? el('div', {
@@ -357,22 +358,22 @@ export function openBranchPanel(ctx: GameContext, ui: UIManager, startSlot: numb
             children: stockRows.map(([id, q]) =>
               el('span', {
                 className: 'stock-chip',
-                children: [itemIcon(ctx.catalog.recipe(id).icon), el('span', { text: `${ctx.catalog.recipe(id).name} ×${q}` })],
+                children: [itemIcon(ctx.catalog.recipe(id).icon), el('span', { text: tr('{name} ×{q}', { name: ctx.catalog.recipe(id).name, q }) })],
               }),
             ),
           })
-        : el('p', { className: 'muted', text: 'Belum ada produk di cabang.' }),
+        : el('p', { className: 'muted', text: tr('Belum ada produk di cabang.') }),
     ];
     // Kirim stok dari toko utama.
     const fee = shipFee(s, b);
     const filter = el('div', {
       className: 'menu-filter',
-      attrs: { role: 'group', 'aria-label': 'Saring produk' },
+      attrs: { role: 'group', 'aria-label': tr('Saring produk') },
       children: (
         [
-          ['semua', 'Semua'],
-          ['makanan', 'Makanan'],
-          ['minuman', 'Minuman'],
+          ['semua', tr('Semua')],
+          ['makanan', tr('Makanan')],
+          ['minuman', tr('Minuman')],
         ] as const
       ).map(([id, label]) =>
         el('button', {
@@ -394,7 +395,7 @@ export function openBranchPanel(ctx: GameContext, ui: UIManager, startSlot: numb
         children: [
           el('h3', {
             className: 'section-title',
-            text: 'Kirim stok dari toko utama',
+            text: tr('Kirim stok dari toko utama'),
           }),
           b.open ? filter : null,
         ],
@@ -404,7 +405,7 @@ export function openBranchPanel(ctx: GameContext, ui: UIManager, startSlot: numb
       parts.push(
         el('p', {
           className: 'panel-warning',
-          text: 'Cabang sedang tutup — buka lagi dulu sebelum mengirim stok.',
+          text: tr('Cabang sedang tutup — buka lagi dulu sebelum mengirim stok.'),
         }),
       );
       return el('section', { className: 'branch-section', children: parts });
@@ -415,7 +416,7 @@ export function openBranchPanel(ctx: GameContext, ui: UIManager, startSlot: numb
       parts.push(
         el('p', {
           className: 'muted',
-          text: 'Toko utama belum punya produk siap jual. Masak dulu di Persiapan.',
+          text: tr('Toko utama belum punya produk siap jual. Masak dulu di Persiapan.'),
         }),
       );
       return el('section', { className: 'branch-section', children: parts });
@@ -423,7 +424,7 @@ export function openBranchPanel(ctx: GameContext, ui: UIManager, startSlot: numb
     parts.push(
       el('p', {
         className: 'panel-note',
-        text: `${fee ? `Ongkos kirim ${formatRupiah(fee)} sekali kirim` : 'Gratis ongkir (kurir sendiri / motor cabang)'}. Produk yang kedaluwarsa malam ini akan terbuang di cabang.`,
+        text: tr('{0}. Produk yang kedaluwarsa malam ini akan terbuang di cabang.', { 0: fee ? tr('Ongkos kirim {fee} sekali kirim', { fee: formatRupiah(fee) }) : tr('Gratis ongkir (kurir sendiri / motor cabang)') }),
       }),
     );
     const total = el('strong');
@@ -433,8 +434,8 @@ export function openBranchPanel(ctx: GameContext, ui: UIManager, startSlot: numb
     });
     const refreshTotal = (): void => {
       const n = [...shipPlan.values()].reduce((a, q) => a + q, 0);
-      total.textContent = `${n} porsi dipilih`;
-      sendBtn.textContent = n ? `Kirim ${n} porsi` : 'Kirim';
+      total.textContent = tr('{n} porsi dipilih', { n });
+      sendBtn.textContent = n ? tr('Kirim {n} porsi', { n }) : tr('Kirim');
       sendBtn.disabled = !prep || n === 0;
     };
     sendBtn.addEventListener('click', () => {
@@ -472,11 +473,11 @@ export function openBranchPanel(ctx: GameContext, ui: UIManager, startSlot: numb
               }),
               el('div', {
                 className: 'item-meta',
-                text: `Harga ${formatRupiah(salePriceOf(s, r))}`,
+                text: tr('Harga {0}', { 0: formatRupiah(salePriceOf(s, r)) }),
               }),
               el('div', {
                 className: 'item-meta',
-                text: `Di toko utama: ${have}`,
+                text: tr('Di toko utama: {have}', { have }),
               }),
             ],
           }),
@@ -486,7 +487,7 @@ export function openBranchPanel(ctx: GameContext, ui: UIManager, startSlot: numb
               st.root,
               el('button', {
                 className: 'link-btn',
-                text: 'Semua',
+                text: tr('Semua'),
                 attrs: { type: 'button' },
                 onClick: () => {
                   shipPlan.set(r.id, have);
@@ -504,7 +505,7 @@ export function openBranchPanel(ctx: GameContext, ui: UIManager, startSlot: numb
         ? [
             el('div', {
               className: 'recipe-group-title',
-              text: `${title} · ${list.length}`,
+              text: tr('{title} · {length}', { title, length: list.length }),
             }),
             ...list.map(card),
           ]
@@ -515,15 +516,15 @@ export function openBranchPanel(ctx: GameContext, ui: UIManager, startSlot: numb
         children: avail.length
           ? [
               ...group(
-                'Makanan',
+                tr('Makanan'),
                 avail.filter((r) => !isDrink(r)),
               ),
-              ...group('Minuman', avail.filter(isDrink)),
+              ...group(tr('Minuman'), avail.filter(isDrink)),
             ]
           : [
               el('p', {
                 className: 'muted',
-                text: shipFilter === 'minuman' ? 'Tidak ada minuman siap jual di toko utama.' : 'Tidak ada makanan siap jual di toko utama.',
+                text: shipFilter === 'minuman' ? tr('Tidak ada minuman siap jual di toko utama.') : tr('Tidak ada makanan siap jual di toko utama.'),
               }),
             ],
       }),
@@ -537,7 +538,7 @@ export function openBranchPanel(ctx: GameContext, ui: UIManager, startSlot: numb
     el('section', {
       className: 'branch-section',
       children: [
-        el('h3', { className: 'section-title', text: 'Upgrade cabang' }),
+        el('h3', { className: 'section-title', text: tr('Upgrade cabang') }),
         ...BRANCH_UPGRADES.map((u) => {
           const owned = b.upgrades.includes(u.id);
           return el('div', {
@@ -561,14 +562,14 @@ export function openBranchPanel(ctx: GameContext, ui: UIManager, startSlot: numb
               owned
                 ? el('span', {
                     className: 'guide-badge tone-good',
-                    text: 'Terpasang',
+                    text: tr('Terpasang'),
                   })
                 : el('button', {
                     className: 'btn btn-secondary btn-sm',
                     text: formatRupiah(u.cost),
                     attrs: {
                       type: 'button',
-                      'aria-label': `Beli ${u.name} ${formatRupiah(u.cost)}`,
+                      'aria-label': tr('Beli {name} {cost}', { name: u.name, cost: formatRupiah(u.cost) }),
                       ...(prep && s.player.money >= u.cost ? {} : { disabled: '' }),
                     },
                     onClick: () => notify(ctx.actions.buyBranchUpgrade(b.slot, u.id)),
@@ -587,15 +588,15 @@ export function openBranchPanel(ctx: GameContext, ui: UIManager, startSlot: numb
     return [
       el('button', {
         className: 'link-btn branch-back',
-        text: '← Kembali',
+        text: tr('← Kembali'),
         attrs: { type: 'button' },
         onClick: () => go(slot === null ? { kind: 'list' } : { kind: 'detail', slot }),
       }),
       el('p', {
         className: 'guide-text',
         text: b
-          ? `Pilih lokasi baru untuk ${b.name}. Popularitas cabang turun sebagian karena pelanggan tetap tertinggal.`
-          : `Pilih lokasi ${def?.name ?? 'cabang'}. Satu lokasi hanya untuk satu angkringan yang buka.`,
+          ? tr('Pilih lokasi baru untuk {name}. Popularitas cabang turun sebagian karena pelanggan tetap tertinggal.', { name: b.name })
+          : tr('Pilih lokasi {0}. Satu lokasi hanya untuk satu angkringan yang buka.', { 0: def?.name ?? tr('cabang') }),
       }),
       el('div', {
         className: 'branch-locations',
@@ -621,12 +622,12 @@ export function openBranchPanel(ctx: GameContext, ui: UIManager, startSlot: numb
                       owner
                         ? el('span', {
                             className: 'guide-badge',
-                            text: `Dipakai ${owner}`,
+                            text: tr('Dipakai {owner}', { owner }),
                           })
                         : current
                           ? el('span', {
                               className: 'guide-badge',
-                              text: 'Lokasi sekarang',
+                              text: tr('Lokasi sekarang'),
                             })
                           : null,
                     ],
@@ -634,11 +635,11 @@ export function openBranchPanel(ctx: GameContext, ui: UIManager, startSlot: numb
                   el('p', { className: 'guide-line', text: loc.tagline }),
                   el('p', {
                     className: 'guide-line muted',
-                    text: `Sewa ${formatRupiah(loc.rent)}/hari${ev ? ` · event hari ini: ${eventById(ev).icon} ${eventById(ev).name}` : ''}`,
+                    text: tr('Sewa {rent}/hari{1}', { rent: formatRupiah(loc.rent), 1: ev ? tr(' · event hari ini: {icon} {name}', { icon: eventById(ev).icon, name: eventById(ev).name }) : '' }),
                   }),
                   el('button', {
                     className: 'btn btn-primary btn-sm',
-                    text: b ? `Pindah ke sini · ${formatRupiah(price)}` : `Buka di sini · ${formatRupiah(price)}`,
+                    text: b ? tr('Pindah ke sini · {price}', { price: formatRupiah(price) }) : tr('Buka di sini · {price}', { price: formatRupiah(price) }),
                     attrs: {
                       type: 'button',
                       ...(blocked || s.phase !== 'persiapan' ? { disabled: '' } : {}),
@@ -676,11 +677,11 @@ export function openBranchPanel(ctx: GameContext, ui: UIManager, startSlot: numb
   });
   render();
   handle = ui.openModal({
-    title: 'Cabang',
+    title: tr('Cabang'),
     className: 'sheet sheet-branch',
     closeButton: true,
     body,
-    actions: [{ label: 'Tutup', variant: 'primary' }],
+    actions: [{ label: tr('Tutup'), variant: 'primary' }],
     onClose: () => {
       off();
       handle = null;
@@ -700,21 +701,21 @@ export function openBranchReportDetail(ctx: GameContext, ui: UIManager, reports:
         children: [
           el('h3', {
             className: 'section-title',
-            text: `${r.name} · ${locationById(r.mapId).name}`,
+            text: tr('{name} · {name2}', { name: r.name, name2: locationById(r.mapId).name }),
           }),
           el('p', {
             className: 'panel-note',
-            text: `${BRANCH_STATUS_LABEL[r.status]} · ${r.portions} porsi · pendapatan ${formatRupiah(r.revenue)} · selisih kas ${formatRupiah(r.shrink)} · operasional ${formatRupiah(r.operational)} · gaji ${formatRupiah(r.wage)}${r.wageLate ? ' (telat!)' : ''} · bersih ${r.net < 0 ? '−' : '+'}${formatRupiah(Math.abs(r.net))}`,
+            text: tr('{0} · {portions} porsi · pendapatan {revenue} · selisih kas {shrink} · operasional {operational} · gaji {wage}{6} · bersih {7}{net}', { 0: BRANCH_STATUS_LABEL[r.status], portions: r.portions, revenue: formatRupiah(r.revenue), shrink: formatRupiah(r.shrink), operational: formatRupiah(r.operational), wage: formatRupiah(r.wage), 6: r.wageLate ? tr(' (telat!)') : '', 7: r.net < 0 ? '−' : '+', net: formatRupiah(Math.abs(r.net)) }),
           }),
           ids.length
             ? el('div', {
                 className: 'branch-table',
-                attrs: { role: 'table', 'aria-label': `Rincian ${r.name}` },
+                attrs: { role: 'table', 'aria-label': tr('Rincian {name}', { name: r.name }) },
                 children: [
                   el('div', {
                     className: 'branch-tr branch-th',
                     attrs: { role: 'row' },
-                    children: ['Produk', 'Diterima', 'Terjual', 'Tersisa', 'Terbuang'].map((h) => el('span', { text: h, attrs: { role: 'columnheader' } })),
+                    children: [tr('Produk'), tr('Diterima'), tr('Terjual'), tr('Tersisa'), tr('Terbuang')].map((h) => el('span', { text: h, attrs: { role: 'columnheader' } })),
                   }),
                   ...ids.map((id) =>
                     el('div', {
@@ -728,14 +729,14 @@ export function openBranchReportDetail(ctx: GameContext, ui: UIManager, reports:
                         }),
                         ...(
                           [
-                            ['Diterima', r.received[id] ?? 0],
-                            ['Terjual', r.sold[id] ?? 0],
-                            ['Tersisa', r.left[id] ?? 0],
-                            ['Terbuang', r.wasted[id] ?? 0],
+                            [tr('Diterima'), r.received[id] ?? 0],
+                            [tr('Terjual'), r.sold[id] ?? 0],
+                            [tr('Tersisa'), r.left[id] ?? 0],
+                            [tr('Terbuang'), r.wasted[id] ?? 0],
                           ] as const
                         ).map(([label, v]) =>
                           el('span', {
-                            className: label === 'Terbuang' && v ? 'is-bad' : '',
+                            className: label === tr('Terbuang') && v ? 'is-bad' : '',
                             attrs: { role: 'cell', 'data-label': label },
                             text: String(v),
                           }),
@@ -747,17 +748,17 @@ export function openBranchReportDetail(ctx: GameContext, ui: UIManager, reports:
               })
             : el('p', {
                 className: 'muted',
-                text: 'Tidak ada produk hari ini.',
+                text: tr('Tidak ada produk hari ini.'),
               }),
         ],
       });
     }),
   });
   return ui.openModal({
-    title: 'Rincian cabang',
+    title: tr('Rincian cabang'),
     className: 'sheet sheet-branch',
     closeButton: true,
     body,
-    actions: [{ label: 'Tutup', variant: 'primary' }],
+    actions: [{ label: tr('Tutup'), variant: 'primary' }],
   });
 }

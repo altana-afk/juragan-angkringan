@@ -7,12 +7,13 @@ import { el } from './dom';
 import { renderReport } from './DaySummary';
 import { renderHistory } from './HistoryPanel';
 import type { UIManager } from './UIManager';
+import { tr } from '../i18n/i18n';
 
 /** Tab Ringkasan / Riwayat di panel Statistik. Riwayat dibuat saat tab pertama kali dibuka. */
 function tabbed(ctx: GameContext, ui: UIManager, summary: HTMLElement): HTMLElement {
   let history: HTMLElement | null = null;
   const pane = el('div', { className: 'stats-pane', children: [summary] });
-  const tabs = (['Ringkasan', 'Riwayat'] as const).map((label, i) =>
+  const tabs = ([tr('Ringkasan'), tr('Riwayat')] as const).map((label, i) =>
     el('button', {
       className: `stats-tab${i === 0 ? ' is-active' : ''}`,
       text: label,
@@ -39,11 +40,11 @@ export function showStats(ctx: GameContext, ui: UIManager): void {
   const bars = recent.length
     ? el('div', {
         className: 'stat-chart',
-        attrs: { role: 'img', 'aria-label': 'Grafik penjualan & keuntungan per hari' },
+        attrs: { role: 'img', 'aria-label': tr('Grafik penjualan & keuntungan per hari') },
         children: recent.map((h) =>
           el('div', {
             className: 'stat-col',
-            attrs: { title: `Hari ${h.day}: penjualan ${formatRupiah(h.revenue)}, untung ${formatRupiah(h.netProfit)}, ${h.customers} pelanggan, popularitas ${Math.round(h.popularity)}` },
+            attrs: { title: tr('Hari {day}: penjualan {revenue}, untung {netProfit}, {customers} pelanggan, popularitas {popularity}', { day: h.day, revenue: formatRupiah(h.revenue), netProfit: formatRupiah(h.netProfit), customers: h.customers, popularity: Math.round(h.popularity) }) },
             children: [
               el('div', {
                 className: 'stat-bars',
@@ -60,46 +61,46 @@ export function showStats(ctx: GameContext, ui: UIManager): void {
                   })(),
                 ],
               }),
-              el('span', { className: 'stat-label', text: `H${h.day}` }),
+              el('span', { className: 'stat-label', text: tr('H{day}', { day: h.day }) }),
               el('span', { className: 'stat-label', text: formatRupiahShort(h.netProfit).replace('Rp', '') }),
             ],
           }),
         ),
       })
-    : el('p', { className: 'panel-note muted', text: 'Belum ada hari yang ditutup. Statistik muncul setelah hari pertama selesai.' });
+    : el('p', { className: 'panel-note muted', text: tr('Belum ada hari yang ditutup. Statistik muncul setelah hari pertama selesai.') });
 
   const st = s.stats;
   const totalProfit = s.history.reduce((n, h) => n + h.netProfit, 0);
   const row = (label: string, value: string): HTMLElement => el('div', { className: 'report-row', children: [el('span', { text: label }), el('strong', { text: value })] });
   ui.openModal({
-    title: 'Statistik Usaha',
+    title: tr('Statistik Usaha'),
     className: 'sheet sheet-stats',
     closeButton: true,
     body: tabbed(ctx, ui, el('div', {
       className: 'report',
       children: [
-        el('h3', { className: 'section-title', text: 'Penjualan & keuntungan bersih (14 hari terakhir)' }),
-        el('div', { className: 'stat-legend', children: [el('span', { className: 'lg-rev', text: 'Penjualan' }), el('span', { className: 'lg-profit', text: 'Untung bersih' })] }),
+        el('h3', { className: 'section-title', text: tr('Penjualan & keuntungan bersih (14 hari terakhir)') }),
+        el('div', { className: 'stat-legend', children: [el('span', { className: 'lg-rev', text: tr('Penjualan') }), el('span', { className: 'lg-profit', text: tr('Untung bersih') })] }),
         bars,
-        el('h3', { className: 'section-title', text: 'Sepanjang usaha' }),
+        el('h3', { className: 'section-title', text: tr('Sepanjang usaha') }),
         el('div', {
           className: 'report-grid',
           children: [
-            row('Hari berjalan', String(s.calendar.day)),
-            row('Total penjualan', formatRupiah(st.totalRevenue)),
-            row('Total keuntungan bersih', formatRupiah(totalProfit)),
-            row('Total belanja bahan', formatRupiah(st.totalPurchases)),
-            row('Porsi dimasak / terjual', `${st.totalPortionsPrepared} / ${st.totalPortionsSold}`),
-            row('Total pelanggan', `${st.totalCustomers} rombongan`),
-            row('Popularitas', `${Math.round(s.player.popularity)} — ${getPopularityTier(s.player.popularity).label}`),
-            row('Loyalitas', `${Math.round(s.player.loyalty)}/100`),
-            row('Menu terbuka', `${s.unlockedRecipes.length}/${ctx.catalog.recipes.length}`),
+            row(tr('Hari berjalan'), String(s.calendar.day)),
+            row(tr('Total penjualan'), formatRupiah(st.totalRevenue)),
+            row(tr('Total keuntungan bersih'), formatRupiah(totalProfit)),
+            row(tr('Total belanja bahan'), formatRupiah(st.totalPurchases)),
+            row(tr('Porsi dimasak / terjual'), tr('{totalPortionsPrepared} / {totalPortionsSold}', { totalPortionsPrepared: st.totalPortionsPrepared, totalPortionsSold: st.totalPortionsSold })),
+            row(tr('Total pelanggan'), tr('{totalCustomers} rombongan', { totalCustomers: st.totalCustomers })),
+            row(tr('Popularitas'), tr('{popularity} — {label}', { popularity: Math.round(s.player.popularity), label: getPopularityTier(s.player.popularity).label })),
+            row(tr('Loyalitas'), tr('{loyalty}/100', { loyalty: Math.round(s.player.loyalty) })),
+            row(tr('Menu terbuka'), tr('{length}/{length2}', { length: s.unlockedRecipes.length, length2: ctx.catalog.recipes.length })),
           ],
         }),
-        s.lastReport ? el('h3', { className: 'section-title', text: `Laporan terakhir (Hari ${s.lastReport.day})` }) : null,
+        s.lastReport ? el('h3', { className: 'section-title', text: tr('Laporan terakhir (Hari {day})', { day: s.lastReport.day }) }) : null,
         s.lastReport ? renderReport(ctx, s.lastReport, ui) : null,
       ],
     })),
-    actions: [{ label: `Pencapaian ${Object.keys(ctx.store.get().achievements).length}/${ACHIEVEMENTS.length}`, onClick: () => { showAchievements(ctx, ui); return false; } }],
+    actions: [{ label: tr('Pencapaian {length}/{length2}', { length: Object.keys(ctx.store.get().achievements).length, length2: ACHIEVEMENTS.length }), onClick: () => { showAchievements(ctx, ui); return false; } }],
   });
 }

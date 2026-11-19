@@ -1,5 +1,6 @@
 import type { WeatherKind } from '../core/GameState';
 import { SeededRandom } from '../utils/random';
+import { tr } from '../i18n/i18n';
 
 /** Cuaca harian & pengaruhnya terhadap permintaan. */
 export interface WeatherEffect {
@@ -13,10 +14,10 @@ export interface WeatherEffect {
 }
 
 export const WEATHER_EFFECTS: Readonly<Record<WeatherKind, WeatherEffect>> = {
-  cerah: { arrival: 1, warm: 1, cold: 1, label: 'Cerah', hint: 'Cuaca normal.' },
-  berawan: { arrival: 0.95, warm: 1.15, cold: 0.9, label: 'Berawan', hint: 'Sedikit lebih sepi; minuman hangat agak dicari.' },
-  hujan: { arrival: 0.75, warm: 1.7, cold: 0.45, label: 'Hujan', hint: 'Lebih sepi; makanan & minuman hangat sangat dicari, es kurang laku.' },
-  panas: { arrival: 1.05, warm: 0.7, cold: 1.75, label: 'Panas terik', hint: 'Minuman dingin laris, minuman hangat kurang laku.' },
+  cerah: { arrival: 1, warm: 1, cold: 1, label: tr('Cerah'), hint: tr('Cuaca normal.') },
+  berawan: { arrival: 0.95, warm: 1.15, cold: 0.9, label: tr('Berawan'), hint: tr('Sedikit lebih sepi; minuman hangat agak dicari.') },
+  hujan: { arrival: 0.75, warm: 1.7, cold: 0.45, label: tr('Hujan'), hint: tr('Lebih sepi; makanan & minuman hangat sangat dicari, es kurang laku.') },
+  panas: { arrival: 1.05, warm: 0.7, cold: 1.75, label: tr('Panas terik'), hint: tr('Minuman dingin laris, minuman hangat kurang laku.') },
 };
 
 /** Peluang dasar tiap cuaca (bobot, total 100). */

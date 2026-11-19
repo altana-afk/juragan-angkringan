@@ -1,6 +1,7 @@
-import { CHANGELOG } from '../data/changelog';
+import { CHANGELOG, localizedChangelog } from '../data/changelog';
 import { el } from './dom';
 import type { ModalHandle, UIManager } from './UIManager';
+import { tr } from '../i18n/i18n';
 
 /** Versi changelog terakhir yang sudah dilihat pemain (disimpan terpisah dari save permainan). */
 const SEEN_KEY = 'juragan-angkringan.changelog-seen';
@@ -43,7 +44,7 @@ export function compareVersions(a: string, b: string): number {
 export function openChangelog(ui: UIManager, onClose?: () => void): ModalHandle {
   const seen = lastSeenVersion();
   markChangelogSeen();
-  const entries = CHANGELOG.map((entry, i) => {
+  const entries = localizedChangelog().map((entry, i) => {
     const isNew = seen !== null && compareVersions(entry.version, seen) > 0;
     return el('article', {
       className: `changelog-entry${i === 0 ? ' is-latest' : ''}`,
@@ -53,7 +54,7 @@ export function openChangelog(ui: UIManager, onClose?: () => void): ModalHandle 
           children: [
             el('span', { className: 'changelog-version', text: `v${entry.version}` }),
             el('strong', { text: entry.title }),
-            i === 0 ? el('span', { className: 'guide-badge tone-good', text: 'Terbaru' }) : isNew ? el('span', { className: 'guide-badge tone-info', text: 'Baru' }) : null,
+            i === 0 ? el('span', { className: 'guide-badge tone-good', text: tr('Terbaru') }) : isNew ? el('span', { className: 'guide-badge tone-info', text: tr('Baru') }) : null,
           ],
         }),
         el('ul', { className: 'about-list', children: entry.items.map((t) => el('li', { text: t })) }),
@@ -61,11 +62,11 @@ export function openChangelog(ui: UIManager, onClose?: () => void): ModalHandle 
     });
   });
   return ui.openModal({
-    title: 'Apa yang baru',
+    title: tr('Apa yang baru'),
     className: 'sheet sheet-changelog sheet-centered',
     closeButton: true,
     body: el('div', { className: 'changelog-list', children: entries }),
-    actions: [{ label: 'Mengerti', variant: 'primary' }],
+    actions: [{ label: tr('Mengerti'), variant: 'primary' }],
     onClose,
   });
 }

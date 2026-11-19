@@ -1,0 +1,19 @@
+{
+  "events": [
+    {
+      "id": "diskon_toko",
+      "name": "Online Store Discount",
+      "description": "The delivery app runs a discount for your stall. Online order prices drop 15%, but incoming orders rise 50%."
+    },
+    {
+      "id": "ulasan_viral",
+      "name": "Viral Review",
+      "description": "A customer's review of your stall is being shared everywhere. Online orders +30% and your rating rises twice as fast."
+    },
+    {
+      "id": "aplikasi_gangguan",
+      "name": "App Outage",
+      "description": "The delivery app's servers are having problems. Incoming online orders are cut in half."
+    }
+  ]
+}

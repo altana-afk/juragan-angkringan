@@ -12,6 +12,7 @@ import { el, type UIComponent } from './dom';
 import { icon } from './icons';
 import { renderPixelTitle, toHtmlCanvas } from './pixelImage';
 import type { UIManager } from './UIManager';
+import { tr } from '../i18n/i18n';
 
 export interface MainMenuActions {
   /** Mulai permainan baru (menimpa simpanan lama). */
@@ -37,15 +38,15 @@ export class MainMenuUI implements UIComponent {
   private readonly minorActions = el('div', { className: 'menu-actions menu-actions-minor' });
   private readonly installButton = el('button', {
     className: 'btn btn-secondary',
-    text: 'Pasang game',
-    attrs: { type: 'button', title: 'Pasang ke layar utama — bisa dibuka seperti aplikasi & dimainkan offline' },
+    text: tr('Pasang game'),
+    attrs: { type: 'button', title: tr('Pasang ke layar utama — bisa dibuka seperti aplikasi & dimainkan offline') },
     onClick: () => void this.install(),
   });
   private readonly stopInstallWatch: () => void;
   /** Ikon 📜 di pojok kanan atas untuk membuka lagi catatan pembaruan. */
   private readonly changelogButton = el('button', {
     className: 'changelog-btn',
-    attrs: { type: 'button', title: 'Apa yang baru (catatan pembaruan)', 'aria-label': 'Apa yang baru' },
+    attrs: { type: 'button', title: tr('Apa yang baru (catatan pembaruan)'), 'aria-label': tr('Apa yang baru') },
     children: [el('span', { text: '📜', attrs: { 'aria-hidden': 'true' } }), el('span', { className: 'changelog-dot', attrs: { 'aria-hidden': 'true' } })],
     onClick: () => this.showChangelog(),
   });
@@ -53,7 +54,7 @@ export class MainMenuUI implements UIComponent {
   /** Tombol Akun di pojok kanan atas (sebelah 📜). */
   private readonly accountButton = el('button', {
     className: 'changelog-btn account-btn',
-    attrs: { type: 'button', title: 'Akun — simpan progres di akun', 'aria-label': 'Akun' },
+    attrs: { type: 'button', title: tr('Akun — simpan progres di akun'), 'aria-label': tr('Akun') },
     children: [el('span', { text: '👤', attrs: { 'aria-hidden': 'true' } }), el('span', { className: 'account-dot', attrs: { 'aria-hidden': 'true' } })],
     onClick: () => {
       if (this.actions.cloud) openAccountPanel(this.ui, this.actions.cloud);
@@ -81,45 +82,45 @@ export class MainMenuUI implements UIComponent {
     const fullscreen = el('button', {
       className: 'btn btn-secondary',
       attrs: { type: 'button' },
-      children: [icon('fullscreen'), el('span', { text: 'Layar penuh' })],
+      children: [icon('fullscreen'), el('span', { text: tr('Layar penuh') })],
       onClick: () => actions.onToggleFullscreen(),
     });
     const sound = el('button', {
       className: 'btn btn-secondary',
-      text: 'Pengaturan',
+      text: tr('Pengaturan'),
       attrs: { type: 'button' },
       onClick: () => actions.onAudioSettings(),
     });
     const guide = el('button', {
       className: 'btn btn-secondary btn-guide',
-      attrs: { type: 'button', title: 'Info lengkap: cara main, event, cuaca, lokasi, pelanggan, menu, upgrade, bank, pencapaian' },
-      children: [el('span', { text: '📖', attrs: { 'aria-hidden': 'true' } }), el('span', { text: 'Panduan & Info' })],
+      attrs: { type: 'button', title: tr('Info lengkap: cara main, event, cuaca, lokasi, pelanggan, menu, upgrade, bank, pencapaian') },
+      children: [el('span', { text: '📖', attrs: { 'aria-hidden': 'true' } }), el('span', { text: tr('Panduan & Info') })],
       onClick: () => openGuide(this.ui, { catalog: CATALOG, centered: true }),
     });
     const about = el('button', {
       className: 'btn btn-secondary',
-      text: 'Tentang game',
+      text: tr('Tentang game'),
       attrs: { type: 'button' },
       onClick: () => this.showAbout(),
     });
 
     this.root = el('section', {
       className: 'main-menu',
-      attrs: { 'aria-label': 'Menu utama' },
+      attrs: { 'aria-label': tr('Menu utama') },
       children: [
         el('div', {
           className: 'panel main-menu-panel',
           children: [
-            el('h1', { className: 'visually-hidden', text: `${GAME_CONFIG.title} ${GAME_CONFIG.subtitle}` }),
+            el('h1', { className: 'visually-hidden', text: tr('{title} {subtitle}', { title: GAME_CONFIG.title, subtitle: GAME_CONFIG.subtitle }) }),
             title,
             el('p', { className: 'menu-subtitle', text: GAME_CONFIG.subtitle.toUpperCase() }),
-            el('p', { className: 'menu-tagline', text: 'Rintis angkringanmu dari nol — dari satu gerobak sampai jadi tujuan favorit warga.' }),
+            el('p', { className: 'menu-tagline', text: tr('Rintis angkringanmu dari nol — dari satu gerobak sampai jadi tujuan favorit warga.') }),
             this.actionsEl,
             this.saveInfo,
             this.minorActions,
           ],
         }),
-        el('p', { className: 'menu-footer', text: `v${GAME_CONFIG.version} · ${GAME_CONFIG.stage}` }),
+        el('p', { className: 'menu-footer', text: tr('v{version} · {stage}', { version: GAME_CONFIG.version, stage: GAME_CONFIG.stage }) }),
         this.changelogButton,
         ...(this.actions.cloud?.available ? [this.accountButton] : []),
       ],
@@ -128,8 +129,8 @@ export class MainMenuUI implements UIComponent {
     const leaderboard = cloud?.available
       ? el('button', {
           className: 'btn btn-secondary btn-guide',
-          attrs: { type: 'button', title: 'Peringkat pemain: hari terlama, pendapatan 1 hari, kas terbanyak' },
-          children: [el('span', { text: '🏆', attrs: { 'aria-hidden': 'true' } }), el('span', { text: 'Leaderboard' })],
+          attrs: { type: 'button', title: tr('Peringkat pemain: hari terlama, pendapatan 1 hari, kas terbanyak') },
+          children: [el('span', { text: '🏆', attrs: { 'aria-hidden': 'true' } }), el('span', { text: tr('Leaderboard') })],
           onClick: () => openLeaderboard(this.ui, cloud),
         })
       : null;
@@ -150,7 +151,7 @@ export class MainMenuUI implements UIComponent {
   /** Tanda hijau di ikon akun saat sudah masuk. */
   setSignedIn(on: boolean): void {
     this.accountButton.classList.toggle('is-signed-in', on);
-    this.accountButton.title = on ? 'Akun — progres tersimpan di akun' : 'Akun — masuk untuk menyimpan progres di akun';
+    this.accountButton.title = on ? tr('Akun — progres tersimpan di akun') : tr('Akun — masuk untuk menyimpan progres di akun');
   }
 
   /** Tombol utama tergantung ada/tidaknya simpanan. */
@@ -162,18 +163,18 @@ export class MainMenuUI implements UIComponent {
         el('button', {
           className: 'btn btn-primary btn-lg',
           attrs: { type: 'button' },
-          children: [el('span', { text: 'Lanjutkan' }), el('small', { className: 'btn-sub', text: `Hari ${save.day} · ${formatRupiah(save.money)}` })],
+          children: [el('span', { text: tr('Lanjutkan') }), el('small', { className: 'btn-sub', text: tr('Hari {day} · {money}', { day: save.day, money: formatRupiah(save.money) }) })],
           onClick: () => this.actions.onContinue(),
         }),
         el('button', {
           className: 'btn btn-secondary',
-          text: 'Mulai Baru',
+          text: tr('Mulai Baru'),
           attrs: { type: 'button' },
           onClick: () =>
             this.ui.openModal({
-              title: 'Mulai permainan baru?',
-              body: `Progres tersimpan (Hari ${save.day}) akan ditimpa dan tidak bisa dikembalikan.`,
-              actions: [{ label: 'Batal' }, { label: 'Ya, mulai baru', variant: 'danger', onClick: () => this.actions.onNewGame() }],
+              title: tr('Mulai permainan baru?'),
+              body: tr('Progres tersimpan (Hari {day}) akan ditimpa dan tidak bisa dikembalikan.', { day: save.day }),
+              actions: [{ label: tr('Batal') }, { label: tr('Ya, mulai baru'), variant: 'danger', onClick: () => this.actions.onNewGame() }],
             }),
         }),
       );
@@ -181,7 +182,7 @@ export class MainMenuUI implements UIComponent {
       buttons.push(
         el('button', {
           className: 'btn btn-primary btn-lg',
-          text: 'Mulai Bermain',
+          text: tr('Mulai Bermain'),
           attrs: { type: 'button' },
           onClick: () => this.actions.onNewGame(),
         }),
@@ -190,20 +191,20 @@ export class MainMenuUI implements UIComponent {
     this.actionsEl.replaceChildren(...buttons);
 
     const info: (HTMLElement | string)[] = [];
-    if (!this.actions.persistent) info.push('Browser ini tidak mengizinkan penyimpanan — progres hilang saat halaman ditutup.');
+    if (!this.actions.persistent) info.push(tr('Browser ini tidak mengizinkan penyimpanan — progres hilang saat halaman ditutup.'));
     if (save) {
       const del = el('button', {
         className: 'link-btn',
-        text: 'Hapus data simpanan',
+        text: tr('Hapus data simpanan'),
         attrs: { type: 'button' },
         onClick: () =>
           this.ui.openModal({
-            title: 'Hapus data simpanan?',
-            body: 'Semua progres (uang, stok, menu terbuka) akan dihapus permanen.',
+            title: tr('Hapus data simpanan?'),
+            body: tr('Semua progres (uang, stok, menu terbuka) akan dihapus permanen.'),
             actions: [
-              { label: 'Batal' },
+              { label: tr('Batal') },
               {
-                label: 'Hapus permanen',
+                label: tr('Hapus permanen'),
                 variant: 'danger',
                 onClick: () => {
                   this.actions.onDeleteSave();
@@ -230,24 +231,24 @@ export class MainMenuUI implements UIComponent {
       return;
     }
     this.ui.openModal({
-      title: 'Pasang ke layar utama',
+      title: tr('Pasang ke layar utama'),
       body: el('div', {
         children: [
           el('ol', {
             className: 'about-list',
             children: [
-              el('li', { text: 'Buka game ini di Safari.' }),
-              el('li', { text: 'Ketuk tombol Bagikan (kotak dengan panah ke atas).' }),
-              el('li', { text: 'Pilih "Tambah ke Layar Utama", lalu ketuk "Tambah".' }),
+              el('li', { text: tr('Buka game ini di Safari.') }),
+              el('li', { text: tr('Ketuk tombol Bagikan (kotak dengan panah ke atas).') }),
+              el('li', { text: tr('Pilih "Tambah ke Layar Utama", lalu ketuk "Tambah".') }),
             ],
           }),
           el('p', {
             className: 'modal-body muted',
-            text: 'Setelah itu buka game dari ikon di layar utama: tampil layar penuh dan tetap bisa dimainkan tanpa internet.',
+            text: tr('Setelah itu buka game dari ikon di layar utama: tampil layar penuh dan tetap bisa dimainkan tanpa internet.'),
           }),
         ],
       }),
-      actions: [{ label: 'Mengerti', variant: 'primary' }],
+      actions: [{ label: tr('Mengerti'), variant: 'primary' }],
     });
   }
 
@@ -260,26 +261,26 @@ export class MainMenuUI implements UIComponent {
     const controls = el('ul', {
       className: 'about-list',
       children: [
-        el('li', { text: 'Geser layar (mouse / satu jari) untuk menggeser kamera.' }),
-        el('li', { text: 'Scroll mouse atau cubit dua jari untuk zoom.' }),
-        el('li', { text: 'Keyboard: WASD / panah untuk geser, Q / E untuk zoom, F untuk fokus ke gerobak, B belanja, P persiapan, Esc untuk menu.' }),
-        el('li', { text: 'Progres tersimpan otomatis di browser ini.' }),
+        el('li', { text: tr('Geser layar (mouse / satu jari) untuk menggeser kamera.') }),
+        el('li', { text: tr('Scroll mouse atau cubit dua jari untuk zoom.') }),
+        el('li', { text: tr('Keyboard: WASD / panah untuk geser, Q / E untuk zoom, F untuk fokus ke gerobak, B belanja, P persiapan, Esc untuk menu.') }),
+        el('li', { text: tr('Progres tersimpan otomatis di browser ini.') }),
       ],
     });
     this.ui.openModal({
-      title: 'Tentang game',
+      title: tr('Tentang game'),
       body: el('div', {
         children: [
           el('p', {
             className: 'modal-body',
-            text: 'Kelola angkringan: belanja bahan, siapkan nasi kucing, sate, dan wedang, layani pelanggan, lalu kembangkan usahamu hari demi hari.',
+            text: tr('Kelola angkringan: belanja bahan, siapkan nasi kucing, sate, dan wedang, layani pelanggan, lalu kembangkan usahamu hari demi hari.'),
           }),
-          el('h3', { className: 'modal-subtitle', text: 'Kontrol' }),
+          el('h3', { className: 'modal-subtitle', text: tr('Kontrol') }),
           controls,
-          el('p', { className: 'modal-body muted', text: `Versi ${GAME_CONFIG.version} — ${GAME_CONFIG.stage}. Semua aset adalah placeholder orisinal buatan prosedural.` }),
+          el('p', { className: 'modal-body muted', text: tr('Versi {version} — {stage}. Semua aset adalah placeholder orisinal buatan prosedural.', { version: GAME_CONFIG.version, stage: GAME_CONFIG.stage }) }),
         ],
       }),
-      actions: [{ label: 'Tutup', variant: 'primary' }],
+      actions: [{ label: tr('Tutup'), variant: 'primary' }],
     });
   }
 

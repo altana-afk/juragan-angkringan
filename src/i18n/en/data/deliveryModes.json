@@ -1,0 +1,16 @@
+{
+  "modes": [
+    {
+      "id": "kurir",
+      "name": "Own courier",
+      "description": "Mas Joko delivers on your motorbike. Fixed daily wage, no commission, and delivery fees go to your cash.",
+      "courierName": "Mas Joko"
+    },
+    {
+      "id": "ojol",
+      "name": "Ride-hail partnership",
+      "description": "A ride-hail driver picks up each order. No daily wage, but the platform takes a 20% commission and the delivery fee goes to the driver.",
+      "courierName": "Ride-hail driver"
+    }
+  ]
+}

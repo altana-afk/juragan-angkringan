@@ -1,0 +1,9 @@
+{
+  "ads": [
+    { "id": "selebaran", "name": "Flyers", "description": "Hand out flyers around the neighborhood.", "effectLabel": "A few extra customers" },
+    { "id": "whatsapp", "name": "WhatsApp promo", "description": "Share the news in the neighborhood & campus WhatsApp groups.", "effectLabel": "Some extra customers" },
+    { "id": "media_sosial", "name": "Social media", "description": "Post photos of the menu & the angkringan vibe.", "effectLabel": "Quite a few extra customers" },
+    { "id": "spanduk", "name": "Big banner", "description": "An eye-catching banner by the roadside.", "effectLabel": "A good number of extra customers" },
+    { "id": "influencer", "name": "Local influencer", "description": "A food influencer drops by & reviews you.", "effectLabel": "Lots of extra customers" }
+  ]
+}

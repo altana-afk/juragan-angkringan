@@ -1,6 +1,7 @@
 import type { EventBus } from '../core/EventBus';
 import type { GameEvents, NotificationKind } from '../core/GameEvents';
 import { el } from './dom';
+import { tr } from '../i18n/i18n';
 
 export interface ModalAction {
   label: string;
@@ -101,7 +102,7 @@ export class UIManager {
     const titleId = `modal-title-${Math.random().toString(36).slice(2, 8)}`;
     const actions = el('div', { className: 'modal-actions' });
     const closeBtn = options.closeButton
-      ? el('button', { className: 'modal-close', text: '×', attrs: { type: 'button', 'aria-label': 'Tutup' } })
+      ? el('button', { className: 'modal-close', text: '×', attrs: { type: 'button', 'aria-label': tr('Tutup') } })
       : null;
     const header = el('div', {
       className: 'modal-header',

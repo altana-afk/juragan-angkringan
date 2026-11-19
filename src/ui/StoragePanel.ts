@@ -7,6 +7,7 @@ import { formatRupiah } from '../utils/formatting';
 import { el, setText } from './dom';
 import { itemIcon, stepper } from './itemIcon';
 import type { ModalHandle, UIManager } from './UIManager';
+import { tr } from '../i18n/i18n';
 
 /** Rincian umur stok: "4 basi hari ini · 8 sampai Hari 5 · 10 awet". */
 export function batchSummary(batches: readonly StockBatch[], today: number): { text: string; urgent: boolean } {
@@ -15,10 +16,10 @@ export function batchSummary(batches: readonly StockBatch[], today: number): { t
   const parts = [...groups.entries()]
     .sort((a, b) => (a[0] ?? Infinity) - (b[0] ?? Infinity))
     .map(([day, qty]) => {
-      if (day === null) return `${qty} awet`;
-      if (day <= today) return `${qty} basi akhir hari ini`;
-      if (day === today + 1) return `${qty} basi besok`;
-      return `${qty} sampai Hari ${day}`;
+      if (day === null) return tr('{qty} awet', { qty });
+      if (day <= today) return tr('{qty} basi akhir hari ini', { qty });
+      if (day === today + 1) return tr('{qty} basi besok', { qty });
+      return tr('{qty} sampai Hari {day}', { qty, day });
     });
   const urgent = batches.some((b) => b.expiresDay !== null && b.expiresDay <= today + 1);
   return { text: parts.join(' · '), urgent };
@@ -47,7 +48,7 @@ export class StoragePanel {
     if (this.modal) return;
     this.discard.clear();
     this.modal = this.ui.openModal({
-      title: 'Gudang Bahan',
+      title: tr('Gudang Bahan'),
       className: 'sheet sheet-storage',
       closeButton: true,
       body: el('div', {
@@ -59,7 +60,7 @@ export class StoragePanel {
               el('div', { className: 'cap-bar', children: [this.capFill] }),
             ],
           }),
-          el('p', { className: 'panel-note', text: 'Bahan yang paling cepat basi dibuang lebih dulu. Bahan yang dibuang tidak dapat dikembalikan dan uangnya tidak kembali.' }),
+          el('p', { className: 'panel-note', text: tr('Bahan yang paling cepat basi dibuang lebih dulu. Bahan yang dibuang tidak dapat dikembalikan dan uangnya tidak kembali.') }),
           this.list,
         ],
       }),
@@ -80,14 +81,14 @@ export class StoragePanel {
     const used = storedUnits(s);
     const cap = storageCapacity(s);
     const pct = Math.min(100, Math.round((used / cap) * 100));
-    setText(this.capText, `Terisi ${used}/${cap} satuan (${pct}%)`);
+    setText(this.capText, tr('Terisi {used}/{cap} satuan ({pct}%)', { used, cap, pct }));
     this.capFill.style.width = `${pct}%`;
     this.capFill.classList.toggle('is-full', pct >= 90);
     const entries = Object.entries(s.inventory.ingredients).filter(([, b]) => totalQty(b) > 0);
     const value = entries.reduce((sum, [, b]) => sum + b.reduce((v, x) => v + x.qty * x.unitCost, 0), 0);
-    setText(this.valueText, `nilai modal ±${formatRupiah(Math.round(value))}`);
+    setText(this.valueText, tr('nilai modal ±{value}', { value: formatRupiah(Math.round(value)) }));
     if (entries.length === 0) {
-      this.list.replaceChildren(el('p', { className: 'panel-note muted', text: 'Gudang kosong. Beli bahan lewat menu Belanja.' }));
+      this.list.replaceChildren(el('p', { className: 'panel-note muted', text: tr('Gudang kosong. Beli bahan lewat menu Belanja.') }));
       return;
     }
     // Yang paling mendesak (cepat basi) di atas.
@@ -101,21 +102,21 @@ export class StoragePanel {
     const { text, urgent } = batchSummary(batches, s.calendar.day);
     const uses = recipesUsing(s, this.ctx.catalog, id);
     const amount = Math.min(this.discard.get(id) ?? 0, have);
-    const step = stepper(`buang ${def.name}`, amount, (n) => {
+    const step = stepper(tr('buang {name}', { name: def.name }), amount, (n) => {
       this.discard.set(id, n);
       this.render();
     }, have);
     const discardBtn = el('button', {
       className: 'btn btn-danger btn-sm',
-      text: amount > 0 ? `Buang ${amount}` : 'Buang',
-      attrs: { type: 'button', 'aria-label': `Buang ${amount} ${def.unit} ${def.name}` },
+      text: amount > 0 ? tr('Buang {amount}', { amount }) : tr('Buang'),
+      attrs: { type: 'button', 'aria-label': tr('Buang {amount} {unit} {name}', { amount, unit: def.unit, name: def.name }) },
       onClick: () => this.doDiscard(id, amount),
     });
     discardBtn.disabled = amount <= 0 || s.phase === 'evaluasi';
     const allBtn = el('button', {
       className: 'link-btn',
-      text: 'Buang semua',
-      attrs: { type: 'button', 'aria-label': `Buang semua ${def.name}` },
+      text: tr('Buang semua'),
+      attrs: { type: 'button', 'aria-label': tr('Buang semua {name}', { name: def.name }) },
       onClick: () => this.confirmAll(id, have),
     });
     return el('div', {
@@ -125,11 +126,11 @@ export class StoragePanel {
         el('div', {
           className: 'item-info',
           children: [
-            el('div', { className: 'item-name', text: `${def.name} — ${have} ${def.unit}` }),
+            el('div', { className: 'item-name', text: tr('{name} — {have} {unit}', { name: def.name, have, unit: def.unit }) }),
             el('div', { className: `item-meta${urgent ? ' is-bad' : ''}`, text: text }),
             el('div', {
               className: `item-meta${uses.length ? '' : ' is-bad'}`,
-              text: uses.length ? `Untuk: ${uses.join(', ')}` : 'Tidak dipakai menu yang terbuka — aman dibuang',
+              text: uses.length ? tr('Untuk: {0}', { 0: uses.join(', ') }) : tr('Tidak dipakai menu yang terbuka — aman dibuang'),
             }),
           ],
         }),
@@ -148,9 +149,9 @@ export class StoragePanel {
   private confirmAll(id: string, have: number): void {
     const def = this.ctx.catalog.ingredient(id);
     this.ui.openModal({
-      title: `Buang semua ${def.name}?`,
-      body: `${have} ${def.unit} ${def.name} akan dibuang dari gudang. Uang tidak kembali.`,
-      actions: [{ label: 'Batal' }, { label: 'Ya, buang', variant: 'danger', onClick: () => this.doDiscard(id, have) }],
+      title: tr('Buang semua {name}?', { name: def.name }),
+      body: tr('{have} {unit} {name} akan dibuang dari gudang. Uang tidak kembali.', { have, unit: def.unit, name: def.name }),
+      actions: [{ label: tr('Batal') }, { label: tr('Ya, buang'), variant: 'danger', onClick: () => this.doDiscard(id, have) }],
     });
   }
 }

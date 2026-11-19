@@ -7,6 +7,7 @@ import { GameRuleError } from './rules';
 import { locationById, type LocationDef } from '../data/locations';
 import { eventById } from '../data/events';
 import { getCalendarDate } from '../utils/calendar';
+import { tr } from '../i18n/i18n';
 
 export const locationOf = (state: Readonly<GameState>): LocationDef => locationById(state.mapId);
 
@@ -58,11 +59,11 @@ export const LATE_NIGHT_FROM = DEMAND_CONFIG.lateNightFrom;
 
 /** Label ramai/sepi hari ini untuk UI. */
 export function crowdLabel(factor: number): string {
-  if (factor >= 1.25) return 'sangat ramai';
-  if (factor >= 1.08) return 'ramai';
-  if (factor > 0.92) return 'normal';
-  if (factor > 0.75) return 'agak sepi';
-  return 'sepi';
+  if (factor >= 1.25) return tr('sangat ramai');
+  if (factor >= 1.08) return tr('ramai');
+  if (factor > 0.92) return tr('normal');
+  if (factor > 0.75) return tr('agak sepi');
+  return tr('sepi');
 }
 
 /** Pengali kedatangan dari jam ramai/sepi lokasi pada menit tertentu (menit ≥ 1440 = lewat tengah malam). */
@@ -81,12 +82,12 @@ export const MOVE_LOYALTY_KEEP = 0.6;
  */
 export function moveLocation(draft: GameState, catalog: Catalog, locationId: string): LocationDef {
   const dest = locationById(locationId);
-  if (draft.phase !== 'persiapan') throw new GameRuleError('wrong-phase', 'Pindah lokasi hanya saat persiapan (sebelum buka).');
-  if (draft.mapId === dest.id) throw new GameRuleError('same-location', `Kamu sudah berada di ${dest.name}.`);
-  if (draft.lastMoveDay === draft.calendar.day) throw new GameRuleError('moved-today', 'Gerobak sudah dipindah hari ini. Coba lagi besok.');
+  if (draft.phase !== 'persiapan') throw new GameRuleError('wrong-phase', tr('Pindah lokasi hanya saat persiapan (sebelum buka).'));
+  if (draft.mapId === dest.id) throw new GameRuleError('same-location', tr('Kamu sudah berada di {name}.', { name: dest.name }));
+  if (draft.lastMoveDay === draft.calendar.day) throw new GameRuleError('moved-today', tr('Gerobak sudah dipindah hari ini. Coba lagi besok.'));
   const branchHere = draft.branches.list.find((b) => b.open && b.mapId === dest.id);
-  if (branchHere) throw new GameRuleError('location-used', `${dest.name} sedang dipakai ${branchHere.name}. Satu lokasi hanya untuk satu angkringan yang buka.`);
-  if (draft.player.money < dest.moveCost) throw new GameRuleError('money-short', `Biaya pindah ${formatRupiah(dest.moveCost)}, uang kas tidak cukup.`);
+  if (branchHere) throw new GameRuleError('location-used', tr('{name} sedang dipakai {name2}. Satu lokasi hanya untuk satu angkringan yang buka.', { name: dest.name, name2: branchHere.name }));
+  if (draft.player.money < dest.moveCost) throw new GameRuleError('money-short', tr('Biaya pindah {moveCost}, uang kas tidak cukup.', { moveCost: formatRupiah(dest.moveCost) }));
   draft.player.money -= dest.moveCost;
   draft.ledger.moveCost += dest.moveCost;
   draft.player.loyalty = Math.round(draft.player.loyalty * MOVE_LOYALTY_KEEP * 10) / 10;

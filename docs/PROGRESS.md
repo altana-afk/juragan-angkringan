@@ -404,3 +404,61 @@ Bagian dari editor peta (alat Objek → **+ Objek baru**). Panduan & cara mengak
 - Animasi beberapa frame (ms per frame), alas & titik pijak, urutan gambar, menghalangi jalan, bisa jadi tempat duduk (tinggi dudukan), lampu malam (warna, jangkauan, terang, kedip, pendar).
 - Game: `objectTypes.ts` kini punya registri objek kustom (`objectType(id)`, id `c_...`), PNG dimuat di LoadingScene (`src/graphics/customArt.ts`), animasi & lampu ikut WorldBuilder, pelanggan duduk di objek kustom bertanda tempat duduk (CustomerLayer).
 - Verifikasi: 287 test lulus (27 baru di `tests/customObjects.test.ts`), uji klik studio di browser (termasuk mesin AI tiruan), objek kustom tampil di game tanpa error.
+
+## Pembaruan 0.17.0: Bahasa Inggris ✅
+
+Pilihan bahasa **Bahasa Indonesia / English** di Pengaturan (menu utama & menu jeda). Cara kerja dan cara
+menambah teks baru: `docs/I18N.md`.
+
+| Item | Status | Catatan |
+| --- | --- | --- |
+| Sistem bahasa | ✅ | `src/i18n/i18n.ts`: `tr('teks Indonesia', { param })`, `trc('konteks', 'teks')` untuk kata bermakna ganda, bentuk tunggal/jamak Inggris, `?lang=en/id` di alamat |
+| Teks UI & sistem | ✅ | 1.381 teks di `src/i18n/en/strings.ts` (semua panel, notifikasi, tutorial, panduan 10 tab, cerita, laporan, cabang, pesanan online, akun & leaderboard) |
+| Data JSON | ✅ | Tumpangan teks di `src/i18n/en/data/*.json` (16 file: menu, bahan, upgrade, event, lokasi, pelanggan, cerita, kabar, dll.). Angka & aturan tetap satu sumber di `src/data/` |
+| Catatan pembaruan | ✅ | `src/i18n/en/changelog.ts`, semua versi 0.1.0–0.17.0 |
+| Format | ✅ | Inggris: Rp1,500 · Rp1.25M · Rp75K · 17:00 · "Mon, Jul 6" · "Monday, July 6, 2026" |
+| Pilihan bahasa | ✅ | Judul dua bahasa "Bahasa · Language" paling atas di Pengaturan; konfirmasi ditulis dalam bahasa tujuan; progres disimpan lalu game dimuat ulang |
+| Bahasa awal | ✅ | Pilihan tersimpan → dipakai. Belum memilih: pemain lama (sudah ada save) tetap Indonesia, pemain baru mengikuti bahasa browser |
+| Nama cabang di save | ✅ | Disamakan dengan bahasa aktif saat save dimuat (`syncBranchNames`) |
+
+### Verifikasi
+
+- `npm run typecheck` bersih, `npm test` 322 test lulus (29 baru di `tests/i18n.test.ts`: setiap `tr()` punya
+  terjemahan, tidak ada terjemahan yatim, placeholder cocok, data JSON lengkap, changelog lengkap, format & data
+  dalam mode Inggris).
+- `tests/e2e/smoke.py` (bahasa Indonesia, kini memakai `?lang=id`) lulus di desktop & ponsel.
+- `tests/e2e/english.py` baru: ganti ke English lewat Pengaturan → 66 layar diperiksa di desktop 1280×800 &
+  ponsel 360×780 (panduan semua tab, belanja, dapur, gudang, usaha, cabang, bank, lokasi, cerita, obrolan warga,
+  berjualan, pesanan online, laporan, statistik, pencapaian) → tidak ada teks Indonesia tersisa, tidak ada kunci
+  tanpa terjemahan, tidak ada error console → ganti balik ke Bahasa Indonesia, progres & hari tetap sama.
+
+### Catatan
+
+- Papan nama di dalam peta (WARUNG, ANGKRINGAN, STASIUN, dst.) sengaja tetap bahasa Indonesia: bagian dari
+  suasana kampung. Panel debug (`?debug`) dan editor peta juga tetap bahasa Indonesia.
+- Nama diri dipertahankan: Pak Gito, Bu Surti, Mbah Kardi, Gang Melati, nasi kucing, angkringan, Juragan, Rp.
+
+## Pembaruan 0.18.0: Tantangan Kampung ✅
+
+Implementasi `claude/rencana-0.18.0.md`: kucing bandit, ODGJ, dan ormas, plus dua kenalan (nakes & polisi) yang menolong saat hatinya penuh.
+
+| Item | Status | Catatan |
+| --- | --- | --- |
+| Data | ✅ | `src/data/challengeEvents.json` (peluang per ketenaran, batas frekuensi, persen ormas), `src/data/allies.json` (Mbak Ratna & Pak Bram, obrolan hati 0–5), upgrade `kucing_peliharaan` (Rp90.000, efek `petCat`) |
+| Lokasi baru | ✅ | `dekat-rsj` (Seberang RSJ) & `dekat-mabes` (Depan Mabes); peta dari tata letak Dekat Kampus dengan gedung varian `rsj`/`mabes` |
+| Sistem | ✅ | `systems/ChallengeEventSystem.ts` (rencana harian ber-seed, kucing FEFO, ODGJ/ormas, hati kenalan, laporan), `systems/MinigameSystem.ts` (aturan 3 minigame) |
+| Ketenaran | ✅ | Rendah < 35, sedang < 65, tinggi sisanya. Tanpa tantangan sampai hari 3 dan selama tutorial |
+| Frekuensi | ✅ | Ormas maks. 1× per 3 hari (butuh hasil dagang kemarin), ODGJ maks. 1× per hari |
+| ODGJ | ✅ | Kedatangan pelanggan ×0,5 selama ada, 50% yang mengantre kabur saat datang. Pergi sendiri jam 22.00. Tidak ada opsi kekerasan |
+| Ormas | ✅ | 10–15% hasil kemarin (min. Rp2.000). Kalah gertak: 20%. Dibiarkan 30 menit atau sampai tutup: menagih sendiri. Masuk `ledger.securityCost` & laba bersih |
+| Minigame | ✅ | `ui/ChallengePanel.ts`: Tawarkan yang hangat, Panggil warga, Adu gertak; tombol Lewati & Nanti saja; jam ditahan; pintasan 1–5 / Spasi |
+| Kenalan | ✅ | Hati +1 per obrolan (sekali sehari). Hati < 5: hanya mampir di lokasi asal. Hati 5: mampir di mana saja (45%) dan menangani ODGJ/ormas jika sedang di angkringan |
+| Visual | ✅ | `world/ChallengeLayer.ts`: kucing liar & Si Belang, tamu dengan balon "!!!", warga mengantar, ambulans & mobil patroli (alur seperti ojol). Kamera bergeser agar tamu terlihat di atas panel |
+| Laporan, Panduan | ✅ | Bagian "Tantangan kampung" & baris uang keamanan di laporan hari; tab Panduan ⚠️ Tantangan |
+| Save | ✅ | v13, migrasi 12 → 13 menambah `challenges` kosong |
+
+### Verifikasi
+
+- `npm test` 355 test lulus (31 baru di `tests/challenges.test.ts`, termasuk uji bot 40 hari tanpa pernah menjawab tantangan: tidak bangkrut, uang keamanan < 8% pendapatan).
+- Uji browser 360×740 (Indonesia) dan 1280×800 (Inggris): kucing, ketiga minigame, laporan; panel tidak menutupi tamu, tombol ≥ 44 px, tanpa scroll horizontal, tanpa error konsol. Ambulans & mobil patroli diuji di Seberang RSJ & Depan Mabes.
+- Catatan uji bot: tanpa menjawab sama sekali, kas hari 40 sekitar 22% lebih rendah dari bot tanpa tantangan. Angka keseimbangan masih bisa disetel di `challengeEvents.json`.

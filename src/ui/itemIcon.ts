@@ -1,6 +1,7 @@
 import type { ItemIcon } from '../data/catalog';
 import { drawItemIcon } from '../graphics/art/itemIcons';
 import { pixelDataUrl } from './pixelImage';
+import { tr } from '../i18n/i18n';
 
 /** <img> ikon bahan/produk pixel art (di-cache per bentuk+warna). */
 export function itemIcon(icon: ItemIcon, className = 'item-icon'): HTMLImageElement {
@@ -24,19 +25,19 @@ export function stepper(label: string, value: number, onChange: (next: number) =
   minus.type = 'button';
   minus.className = 'step-btn';
   minus.textContent = '−';
-  minus.setAttribute('aria-label', `Kurangi ${label}`);
+  minus.setAttribute('aria-label', tr('Kurangi {label}', { label }));
   const plus = document.createElement('button');
   plus.type = 'button';
   plus.className = 'step-btn';
   plus.textContent = '+';
-  plus.setAttribute('aria-label', `Tambah ${label}`);
+  plus.setAttribute('aria-label', tr('Tambah {label}', { label }));
   const input = document.createElement('input');
   input.type = 'number';
   input.inputMode = 'numeric';
   input.min = '0';
   input.max = String(max);
   input.className = 'step-input';
-  input.setAttribute('aria-label', `Jumlah ${label}`);
+  input.setAttribute('aria-label', tr('Jumlah {label}', { label }));
   const root = document.createElement('div');
   root.className = 'stepper';
   root.append(minus, input, plus);

@@ -47,6 +47,24 @@ import {
 import { acceptOrder, dispatchCourier, rejectOrder, resetOnlineDay, setDeliveryMode, tickOnline, type OnlineTickEvent } from './OnlineOrderSystem';
 import { rollOnlineEvent } from './OnlineEventSystem';
 import type { Branch, DeliveryMode, OnlineOrder } from '../core/GameState';
+import { tr } from '../i18n/i18n';
+import type { ChallengeDay, ChallengeLogEntry } from '../core/GameState';
+import {
+  allyArrived,
+  allyHandles,
+  allyTalk,
+  catArrives,
+  markArrived,
+  odgjCalmFailed,
+  odgjCalmed,
+  odgjLeaves,
+  odgjNeighbors,
+  ormasDuel,
+  ormasAmount,
+  ormasPay,
+  startChallengeDay,
+  type CatResult,
+} from './ChallengeEventSystem';
 
 /** Kabar dari sistem cerita untuk UI (bab baru, tahap hubungan naik, akhir cerita). */
 export interface StoryNotice {
@@ -74,7 +92,7 @@ export class GameActions {
     let story: StoryUpdate | null = null;
     try {
       this.store.update(reason, (draft) => {
-        if (draft.bankrupt) throw new GameRuleError('bankrupt', 'Usaha sudah bangkrut. Mulai permainan baru.');
+        if (draft.bankrupt) throw new GameRuleError('bankrupt', tr('Usaha sudah bangkrut. Mulai permainan baru.'));
         value = apply(draft);
         story = refreshStory(draft);
         opened = refreshUnlocks(draft, this.catalog);
@@ -94,11 +112,11 @@ export class GameActions {
       const quote = applyPurchase(draft, this.catalog, cart);
       if (draft.mapId === 'pasar') draft.story.flags.pasar = true;
       return quote;
-    }, (q) => `Belanja ${q.lines.length} bahan seharga ${formatRupiah(q.total)} berhasil.`);
+    }, (q) => tr('Belanja {length} bahan seharga {total} berhasil.', { length: q.lines.length, total: formatRupiah(q.total) }));
   }
 
   prepare(orders: readonly CookOrder[]): ActionResult<CookResult> {
-    return this.run('masak', (draft) => prepareProducts(draft, this.catalog, orders), (r) => `${r.totalPortions} porsi siap dijual.`);
+    return this.run('masak', (draft) => prepareProducts(draft, this.catalog, orders), (r) => tr('{totalPortions} porsi siap dijual.', { totalPortions: r.totalPortions }));
   }
 
   /** Mulai fase berjualan: jam diset ke jam buka. */
@@ -106,20 +124,21 @@ export class GameActions {
     return this.run(
       'mulai-jualan',
       (draft) => {
-        if (draft.phase !== 'persiapan') throw new GameRuleError('wrong-phase', 'Angkringan sudah buka.');
+        if (draft.phase !== 'persiapan') throw new GameRuleError('wrong-phase', tr('Angkringan sudah buka.'));
         draft.phase = 'berjualan';
         draft.calendar.clockMinutes = GAME_CONFIG.dayCycle.openMinutes;
         // Pesanan borongan event diambil saat buka.
         const bulk = deliverBulkOrder(draft);
+        startChallengeDay(draft);
         return { products: Object.values(draft.inventory.products).reduce((s, b) => s + totalQty(b), 0), bulk };
       },
       (r) => {
-        const base = 'Angkringan buka! Pelanggan mulai berdatangan.';
+        const base = tr('Angkringan buka! Pelanggan mulai berdatangan.');
         if (!r.bulk) return base;
         const name = this.catalog.recipe(this.store.get().event?.bulk?.recipeId ?? '').name;
         return r.bulk.delivered
-          ? `${base} Pesanan borongan ${r.bulk.qty} ${name} terkirim (+${formatRupiah(r.bulk.revenue)}).`
-          : `${base} Pesanan borongan ${r.bulk.qty} ${name} batal — stok hanya ${r.bulk.have}.`;
+          ? tr('{base} Pesanan borongan {qty} {name} terkirim (+{revenue}).', { base, qty: r.bulk.qty, name, revenue: formatRupiah(r.bulk.revenue) })
+          : tr('{base} Pesanan borongan {qty} {name} batal — stok hanya {have}.', { base, qty: r.bulk.qty, name, have: r.bulk.have });
       },
     );
   }
@@ -128,24 +147,24 @@ export class GameActions {
     return this.run(
       'pindah-lokasi',
       (d) => moveLocation(d, this.catalog, locationId),
-      (loc) => `Gerobak pindah ke ${loc.name} (biaya ${formatRupiah(loc.moveCost)}).${this.store.get().event ? ` Event di sini: ${eventById(this.store.get().event!.id).name}.` : ''}`,
+      (loc) => tr('Gerobak pindah ke {name} (biaya {moveCost}).{2}', { name: loc.name, moveCost: formatRupiah(loc.moveCost), 2: this.store.get().event ? tr(' Event di sini: {name}.', { name: eventById(this.store.get().event!.id).name }) : '' }),
     );
   }
 
   depositMoney(amount: number, term: number): ActionResult<number> {
-    return this.run('bank-deposito', (d) => openDeposit(d, amount, term), () => `Deposito ${formatRupiah(amount)} tempo ${term / 7} minggu dibuka.`);
+    return this.run('bank-deposito', (d) => openDeposit(d, amount, term), () => tr('Deposito {amount} tempo {1} minggu dibuka.', { amount: formatRupiah(amount), 1: term / 7 }));
   }
 
   withdrawDeposit(id: number): ActionResult<number> {
-    return this.run('bank-tarik', (d) => withdrawDeposit(d, id), (t) => `Deposito dicairkan: ${formatRupiah(t)} masuk ke kas.`);
+    return this.run('bank-tarik', (d) => withdrawDeposit(d, id), (t) => tr('Deposito dicairkan: {t} masuk ke kas.', { t: formatRupiah(t) }));
   }
 
   borrow(amount: number, term: number): ActionResult<void> {
-    return this.run('bank-pinjam', (d) => takeLoan(d, amount, term), () => `Pinjaman ${formatRupiah(amount)} cair ke kas.`);
+    return this.run('bank-pinjam', (d) => takeLoan(d, amount, term), () => tr('Pinjaman {amount} cair ke kas.', { amount: formatRupiah(amount) }));
   }
 
   repayLoan(amount: number): ActionResult<number> {
-    return this.run('bank-bayar', (d) => repayLoan(d, amount), (p) => (this.store.get().bank.loan ? `Cicilan ${formatRupiah(p)} dibayar.` : `Pinjaman lunas! (${formatRupiah(p)})`));
+    return this.run('bank-bayar', (d) => repayLoan(d, amount), (p) => (this.store.get().bank.loan ? tr('Cicilan {p} dibayar.', { p: formatRupiah(p) }) : tr('Pinjaman lunas! ({p})', { p: formatRupiah(p) })));
   }
 
   /** Layani satu rombongan: tentukan hasil pesanan dari stok terkini lalu catat penjualannya. */
@@ -195,11 +214,11 @@ export class GameActions {
   }
 
   buyAd(adId: string): ActionResult<AdDef> {
-    return this.run('pasang-iklan', (draft) => buyAd(draft, adId), (ad) => `${ad.name} dipasang untuk hari ini (${formatRupiah(ad.cost)}).`);
+    return this.run('pasang-iklan', (draft) => buyAd(draft, adId), (ad) => tr('{name} dipasang untuk hari ini ({cost}).', { name: ad.name, cost: formatRupiah(ad.cost) }));
   }
 
   cancelAd(adId: string): ActionResult<AdDef> {
-    return this.run('batal-iklan', (draft) => cancelAd(draft, adId), (ad) => `${ad.name} dibatalkan, uang dikembalikan.`);
+    return this.run('batal-iklan', (draft) => cancelAd(draft, adId), (ad) => tr('{name} dibatalkan, uang dikembalikan.', { name: ad.name }));
   }
 
   /**
@@ -210,7 +229,7 @@ export class GameActions {
     return this.run(
       'hari-baru',
       (draft) => {
-        if (draft.phase === 'berjualan') throw new GameRuleError('wrong-phase', 'Tutup angkringan dulu sebelum ganti hari.');
+        if (draft.phase === 'berjualan') throw new GameRuleError('wrong-phase', tr('Tutup angkringan dulu sebelum ganti hari.'));
         const nextDay = draft.calendar.day + 1;
         const products = removeExpired(draft.inventory.products, nextDay);
         const ingredients = removeExpired(draft.inventory.ingredients, nextDay);
@@ -229,7 +248,7 @@ export class GameActions {
           wasteCost: Math.round(sum(products, 'cost') + sum(ingredients, 'cost')),
         };
       },
-      (r) => `Hari ${this.store.get().calendar.day} dimulai · ${WEATHER_EFFECTS[this.store.get().weather].label}.${this.store.get().event ? ` Event: ${eventById(this.store.get().event!.id).name}!` : ''}${r.wastedProducts + r.wastedIngredients > 0 ? ` Stok basi dibuang (modal ${formatRupiah(r.wasteCost)}).` : ''}`,
+      (r) => tr('Hari {day} dimulai · {label}.{2}{3}', { day: this.store.get().calendar.day, label: WEATHER_EFFECTS[this.store.get().weather].label, 2: this.store.get().event ? tr(' Event: {name}!', { name: eventById(this.store.get().event!.id).name }) : '', 3: r.wastedProducts + r.wastedIngredients > 0 ? tr(' Stok basi dibuang (modal {wasteCost}).', { wasteCost: formatRupiah(r.wasteCost) }) : '' }),
     );
   }
 
@@ -250,20 +269,20 @@ export class GameActions {
     return this.run(
       'online-terima',
       (draft) => ({ ...acceptOrder(draft, id, honorNote, source, this.catalog) }),
-      (o) => (o.source != null ? `Pesanan ${o.buyer} dikirim dari ${this.store.get().branches.list.find((b) => b.slot === o.source)?.name ?? 'cabang'}.` : `Pesanan ${o.buyer} diterima.`),
+      (o) => (o.source != null ? tr('Pesanan {buyer} dikirim dari {1}.', { buyer: o.buyer, 1: this.store.get().branches.list.find((b) => b.slot === o.source)?.name ?? tr('cabang') }) : tr('Pesanan {buyer} diterima.', { buyer: o.buyer })),
     );
   }
 
   rejectOnline(id: number): ActionResult<void> {
-    return this.run('online-tolak', (draft) => rejectOrder(draft, id), () => 'Pesanan ditolak.');
+    return this.run('online-tolak', (draft) => rejectOrder(draft, id), () => tr('Pesanan ditolak.'));
   }
 
   /** Kurir sendiri berangkat sekarang dengan pesanan yang sudah siap. */
   dispatchNow(): ActionResult<OnlineTickEvent[]> {
     return this.run('online-kirim', (draft) => {
-      if (draft.phase !== 'berjualan') throw new GameRuleError('wrong-phase', 'Kurir hanya mengantar saat berjualan.');
+      if (draft.phase !== 'berjualan') throw new GameRuleError('wrong-phase', tr('Kurir hanya mengantar saat berjualan.'));
       const ev = dispatchCourier(draft, this.catalog, draft.calendar.clockMinutes);
-      if (!ev.length) throw new GameRuleError('online-nothing', 'Belum ada pesanan yang siap diantar.');
+      if (!ev.length) throw new GameRuleError('online-nothing', tr('Belum ada pesanan yang siap diantar.'));
       return ev;
     }, (ev) => ev[ev.length - 1]?.message ?? '');
   }
@@ -272,40 +291,40 @@ export class GameActions {
     return this.run('online-mode', (draft) => {
       setDeliveryMode(draft, mode);
       return mode;
-    }, (m) => (m === 'kurir' ? 'Kurir sendiri siap mengantar mulai hari ini.' : 'Kemitraan ojol aktif. Pesanan online mulai masuk saat berjualan.'));
+    }, (m) => (m === 'kurir' ? tr('Kurir sendiri siap mengantar mulai hari ini.') : tr('Kemitraan ojol aktif. Pesanan online mulai masuk saat berjualan.')));
   }
 
   // ---------- Cabang (0.14.0) ----------
   openBranch(mapId: string): ActionResult<Branch> {
-    return this.run('cabang-buka', (draft) => openBranch(draft, mapId), (b) => `${b.name} dibuka di ${locationById(b.mapId).name}! Rekrut karyawan dan kirim stok supaya bisa berjualan.`);
+    return this.run('cabang-buka', (draft) => openBranch(draft, mapId), (b) => tr('{name} dibuka di {name2}! Rekrut karyawan dan kirim stok supaya bisa berjualan.', { name: b.name, name2: locationById(b.mapId).name }));
   }
 
   setBranchOpen(slot: number, open: boolean): ActionResult<Branch> {
-    return this.run('cabang-status', (draft) => setBranchOpen(draft, slot, open), (b) => (b.open ? `${b.name} dibuka lagi.` : `${b.name} ditutup sementara — tanpa biaya operasional.`));
+    return this.run('cabang-status', (draft) => setBranchOpen(draft, slot, open), (b) => (b.open ? tr('{name} dibuka lagi.', { name: b.name }) : tr('{name} ditutup sementara — tanpa biaya operasional.', { name: b.name })));
   }
 
   moveBranch(slot: number, mapId: string): ActionResult<Branch> {
-    return this.run('cabang-pindah', (draft) => moveBranch(draft, slot, mapId), (b) => `${b.name} pindah ke ${locationById(b.mapId).name}.`);
+    return this.run('cabang-pindah', (draft) => moveBranch(draft, slot, mapId), (b) => tr('{name} pindah ke {name2}.', { name: b.name, name2: locationById(b.mapId).name }));
   }
 
   hireBranchStaff(slot: number, plan: WagePlanId): ActionResult<Branch> {
-    return this.run('cabang-rekrut', (draft) => hireStaff(draft, slot, plan), (b) => `${b.staff!.name} mulai bekerja di ${b.name} (gaji ${wagePlanById(plan).name.toLowerCase()}).`);
+    return this.run('cabang-rekrut', (draft) => hireStaff(draft, slot, plan), (b) => tr('{name} mulai bekerja di {name2} (gaji {2}).', { name: b.staff!.name, name2: b.name, 2: wagePlanById(plan).name.toLowerCase() }));
   }
 
   changeBranchWage(slot: number, plan: WagePlanId): ActionResult<Branch> {
-    return this.run('cabang-gaji', (draft) => changeWagePlan(draft, slot, plan), (b) => `Gaji karyawan ${b.name} jadi ${wagePlanById(plan).name.toLowerCase()}.`);
+    return this.run('cabang-gaji', (draft) => changeWagePlan(draft, slot, plan), (b) => tr('Gaji karyawan {name} jadi {1}.', { name: b.name, 1: wagePlanById(plan).name.toLowerCase() }));
   }
 
   dismissBranchStaff(slot: number): ActionResult<Branch> {
-    return this.run('cabang-berhentikan', (draft) => dismissStaff(draft, slot), (b) => `Karyawan ${b.name} diberhentikan.`);
+    return this.run('cabang-berhentikan', (draft) => dismissStaff(draft, slot), (b) => tr('Karyawan {name} diberhentikan.', { name: b.name }));
   }
 
   shipToBranch(slot: number, items: Record<string, number>): ActionResult<{ qty: number; fee: number }> {
-    return this.run('cabang-kirim', (draft) => shipToBranch(draft, this.catalog, slot, items), (r) => `${r.qty} porsi dikirim ke cabang${r.fee ? ` (ongkir ${formatRupiah(r.fee)})` : ' (gratis ongkir)'}.`);
+    return this.run('cabang-kirim', (draft) => shipToBranch(draft, this.catalog, slot, items), (r) => tr('{qty} porsi dikirim ke cabang{1}.', { qty: r.qty, 1: r.fee ? tr(' (ongkir {fee})', { fee: formatRupiah(r.fee) }) : tr(' (gratis ongkir)') }));
   }
 
   buyBranchUpgrade(slot: number, upgradeId: string): ActionResult<Branch> {
-    return this.run('cabang-upgrade', (draft) => buyBranchUpgrade(draft, slot, upgradeId), (b) => `${branchUpgradeById(upgradeId).name} terpasang di ${b.name}.`);
+    return this.run('cabang-upgrade', (draft) => buyBranchUpgrade(draft, slot, upgradeId), (b) => tr('{name} terpasang di {name2}.', { name: branchUpgradeById(upgradeId).name, name2: b.name }));
   }
 
   markBranchHint(): void {
@@ -326,7 +345,94 @@ export class GameActions {
 
   /** Pelanggan bernama tiba (kabar yang dibawa masuk log). */
   storyArrive(visit: NamedVisit): void {
-    this.store.update('cerita-tiba', (draft) => namedArrived(draft, visit));
+    this.store.update('cerita-tiba', (draft) => {
+      namedArrived(draft, visit);
+      allyArrived(draft, visit.who);
+    });
+  }
+
+  // ---------- Tantangan kampung (0.18.0) ----------
+
+  /** Pastikan rencana tantangan hari ini ada (mis. game dimuat di tengah berjualan dari save lama). */
+  challengeStart(): ChallengeDay | null {
+    if (this.store.get().phase !== 'berjualan') return null;
+    let plan: ChallengeDay | null = null;
+    this.store.update('tantangan-mulai', (draft) => {
+      plan = startChallengeDay(draft);
+    });
+    return plan;
+  }
+
+  challengeCat(rng: SeededRandom): CatResult | null {
+    let result: CatResult | null = null;
+    try {
+      this.store.update('tantangan-kucing', (draft) => {
+        result = catArrives(draft, this.catalog, rng);
+      });
+    } catch {
+      return null;
+    }
+    return result;
+  }
+
+  challengeArrive(kind: 'odgj' | 'ormas'): void {
+    this.store.update('tantangan-datang', (draft) => markArrived(draft, kind));
+  }
+
+  odgjCalm(gifts: readonly string[], success: boolean): ActionResult<ChallengeLogEntry> {
+    return this.run('odgj-halus', (draft) => (success ? odgjCalmed(draft, gifts) : odgjCalmFailed(draft, gifts)), () => '');
+  }
+
+  odgjNeighbors(success: boolean): ActionResult<ChallengeLogEntry> {
+    return this.run('odgj-warga', (draft) => odgjNeighbors(draft, success), () => '');
+  }
+
+  odgjLeaves(): ChallengeLogEntry | null {
+    let entry: ChallengeLogEntry | null = null;
+    this.store.update('odgj-pergi', (draft) => {
+      entry = odgjLeaves(draft);
+    });
+    return entry;
+  }
+
+  ormasPay(): ActionResult<ChallengeLogEntry> {
+    return this.run('ormas-bayar', (draft) => ormasPay(draft), (e) => tr('Uang keamanan {cost} dibayar.', { cost: formatRupiah(e.cost) }));
+  }
+
+  ormasDuel(won: boolean): ActionResult<ChallengeLogEntry> {
+    return this.run('ormas-gertak', (draft) => ormasDuel(draft, won), () => '');
+  }
+
+  allyHandles(kind: 'odgj' | 'ormas'): ActionResult<ChallengeLogEntry> {
+    return this.run('kenalan-tangani', (draft) => allyHandles(draft, kind), () => '');
+  }
+
+  /** Mode debug: jadwalkan ODGJ/ormas pada menit tertentu hari ini. */
+  debugChallengeAt(kind: 'odgj' | 'ormas', minute: number): void {
+    this.store.update('debug-tantangan', (draft) => {
+      const t = startChallengeDay(draft);
+      if (kind === 'odgj') t.odgj = { minute, status: 'menunggu' };
+      else t.ormas = { minute, amount: ormasAmount(draft, 0.125), status: 'menunggu' };
+    });
+  }
+
+  /** Mode debug: atur hati kenalan (0–5). */
+  debugAllyHeart(id: string, heart: number): void {
+    this.store.update('debug-hati', (draft) => {
+      const a = (draft.challenges.allies[id] ??= { heart: 0, talks: 0, lastTalkDay: 0, lastVisitDay: 0 });
+      a.heart = Math.max(0, Math.min(5, Math.round(heart)));
+      a.lastTalkDay = 0;
+    });
+  }
+
+  challengeHintSeen(): void {
+    this.store.update('tantangan-tip', (draft) => {
+      draft.challenges.flags.hint = true;
+    });
+  }
+
+  allyTalk(id: string, guessedRight = false): ActionResult<number | null> {
+    return this.run('kenalan-obrol', (draft) => allyTalk(draft, id, guessedRight), () => '');
   }
 
   /** Selesai mengobrol lewat gelembung. */
@@ -345,7 +451,7 @@ export class GameActions {
     return this.run('cerita-keputusan', (draft) => {
       applyChoice(draft, id);
       return id;
-    }, () => 'Keputusan sudah diambil. Kabar akhirnya akan sampai dalam beberapa hari.');
+    }, () => tr('Keputusan sudah diambil. Kabar akhirnya akan sampai dalam beberapa hari.'));
   }
 
   markChapterSeen(id: number): void {
@@ -374,22 +480,22 @@ export class GameActions {
     return this.run(
       'buang-bahan',
       (draft) => discardIngredient(draft, this.catalog, ingredientId, qty),
-      (r) => `${r.qty} ${this.catalog.ingredient(r.ingredientId).unit} ${this.catalog.ingredient(r.ingredientId).name} dibuang (modal ${formatRupiah(r.cost)}).`,
+      (r) => tr('{qty} {unit} {name} dibuang (modal {cost}).', { qty: r.qty, unit: this.catalog.ingredient(r.ingredientId).unit, name: this.catalog.ingredient(r.ingredientId).name, cost: formatRupiah(r.cost) }),
     );
   }
 
   buyUpgrade(id: string): ActionResult<UpgradeDef> {
-    return this.run('beli-upgrade', (draft) => buyUpgrade(draft, id), (u) => `${u.name} terpasang! (${formatRupiah(u.cost)})`);
+    return this.run('beli-upgrade', (draft) => buyUpgrade(draft, id), (u) => tr('{name} terpasang! ({cost})', { name: u.name, cost: formatRupiah(u.cost) }));
   }
 
   setPrice(recipeId: string, price: number): ActionResult<number> {
-    return this.run('atur-harga', (draft) => setPrice(draft, this.catalog.recipe(recipeId), price), (p) => `Harga ${this.catalog.recipe(recipeId).name} jadi ${formatRupiah(p)}.`);
+    return this.run('atur-harga', (draft) => setPrice(draft, this.catalog.recipe(recipeId), price), (p) => tr('Harga {name} jadi {p}.', { name: this.catalog.recipe(recipeId).name, p: formatRupiah(p) }));
   }
 
   /** Harga khusus pesanan online (null = ikut harga di tempat). */
   setOnlinePrice(recipeId: string, price: number | null): ActionResult<number> {
     const name = this.catalog.recipe(recipeId).name;
-    return this.run('harga-online', (draft) => setOnlinePrice(draft, this.catalog.recipe(recipeId), price), (p) => (price === null ? `Harga online ${name} ikut harga di tempat.` : `Harga online ${name} jadi ${formatRupiah(p)}.`));
+    return this.run('harga-online', (draft) => setOnlinePrice(draft, this.catalog.recipe(recipeId), price), (p) => (price === null ? tr('Harga online {name} ikut harga di tempat.', { name }) : tr('Harga online {name} jadi {p}.', { name, p: formatRupiah(p) })));
   }
 
   /** Nyalakan / matikan pesanan online (pesanan yang sudah diterima tetap diantar). */
@@ -398,7 +504,7 @@ export class GameActions {
       draft.online.enabled = enabled;
       if (!enabled) for (const o of draft.online.orders) if (o.status === 'menunggu') o.status = 'ditolak';
       return enabled;
-    }, (on) => (on ? 'Pesanan online dibuka.' : 'Pesanan online ditutup sementara. Pesanan yang sudah diterima tetap diantar.'));
+    }, (on) => (on ? tr('Pesanan online dibuka.') : tr('Pesanan online ditutup sementara. Pesanan yang sudah diterima tetap diantar.')));
   }
 
   /** Periksa resep yang terbuka (dipanggil setelah memuat save). */

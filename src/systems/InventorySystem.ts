@@ -1,5 +1,6 @@
 import type { StockBatch } from '../core/GameState';
 import { GameRuleError } from './rules';
+import { tr } from '../i18n/i18n';
 
 /**
  * Sistem inventaris berbasis batch: setiap batch punya jumlah, hari kedaluwarsa, dan modal per satuan.
@@ -24,8 +25,8 @@ const expiryOrder = (e: number | null): number => (e === null ? Number.POSITIVE_
 
 /** Tambah stok. Batch dengan kedaluwarsa & modal sama digabung; urutan dijaga dari yang tercepat kedaluwarsa. */
 export function addStock(group: StockGroup, id: string, qty: number, expiresDay: number | null, unitCost: number): void {
-  if (!Number.isInteger(qty) || qty <= 0) throw new GameRuleError('qty-invalid', `Jumlah stok harus bilangan bulat positif (${qty})`);
-  if (!Number.isFinite(unitCost) || unitCost < 0) throw new GameRuleError('cost-invalid', 'Modal per satuan tidak valid');
+  if (!Number.isInteger(qty) || qty <= 0) throw new GameRuleError('qty-invalid', tr('Jumlah stok harus bilangan bulat positif ({qty})', { qty }));
+  if (!Number.isFinite(unitCost) || unitCost < 0) throw new GameRuleError('cost-invalid', tr('Modal per satuan tidak valid'));
   const batches = group[id] ?? [];
   const same = batches.find((b) => b.expiresDay === expiresDay && Math.abs(b.unitCost - unitCost) < 1e-6);
   if (same) {
@@ -42,10 +43,10 @@ export function addStock(group: StockGroup, id: string, qty: number, expiresDay:
  * Mengembalikan total modal dari stok yang terpakai.
  */
 export function consumeStock(group: StockGroup, id: string, qty: number): number {
-  if (!Number.isInteger(qty) || qty <= 0) throw new GameRuleError('qty-invalid', `Jumlah harus bilangan bulat positif (${qty})`);
+  if (!Number.isInteger(qty) || qty <= 0) throw new GameRuleError('qty-invalid', tr('Jumlah harus bilangan bulat positif ({qty})', { qty }));
   const batches = group[id] ?? [];
   const have = totalQty(batches);
-  if (have < qty) throw new GameRuleError('stock-short', `Stok ${id} kurang: butuh ${qty}, ada ${have}`, { id, need: qty, have });
+  if (have < qty) throw new GameRuleError('stock-short', tr('Stok {id} kurang: butuh {qty}, ada {have}', { id, qty, have }), { id, need: qty, have });
   let remaining = qty;
   let cost = 0;
   for (const batch of batches) {

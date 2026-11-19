@@ -1,5 +1,10 @@
-import raw from './locations.json';
+import rawBase from './locations.json';
+import rawEn from '../i18n/en/data/locations.json';
 import { getMap } from '../world/maps';
+import { localizeData } from '../i18n/i18n';
+
+// Teks data dalam bahasa aktif (tumpangan terjemahan Inggris di src/i18n/en/data/).
+const raw = localizeData(rawBase, rawEn);
 
 /** Lokasi usaha: peta + sifat gameplay yang membuatnya unik. */
 export interface LocationDef {

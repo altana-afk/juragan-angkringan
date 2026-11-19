@@ -1,5 +1,5 @@
 import { paintSellerFrames } from './characters';
-import { paintBubblesAndEmotes, paintCustomers } from './customers';
+import { paintBubblesAndEmotes, paintCats, paintChallengeFolk, paintCustomers } from './customers';
 import { paintEffects } from './effects';
 import {
   paintBenches,
@@ -10,6 +10,7 @@ import {
   paintMotorbikes,
   paintPlantPot,
   paintRiders,
+  paintRescueVehicles,
   paintSignBoard,
   paintPlasticChairs,
   paintUmbrellaTable,
@@ -17,7 +18,7 @@ import {
   paintStoveFireFrames,
   paintTrashBin,
 } from './props';
-import { paintCampus, paintCarousel, paintFerrisWheel, paintMarketStalls, paintRail, paintStation, paintStringLights, paintHouses, paintPosRonda, paintPowerPole, paintShops, paintStreetLamp, paintTrees } from './structures';
+import { paintCampusVariants, paintCarousel, paintFerrisWheel, paintMarketStalls, paintRail, paintStation, paintStringLights, paintHouses, paintPosRonda, paintPowerPole, paintShops, paintStreetLamp, paintTrees } from './structures';
 import type { ArtJob } from './types';
 
 /**
@@ -37,7 +38,7 @@ export const ART_JOBS: readonly ArtJob[] = [
   { label: 'Rumah warga', build: paintHouses },
   { label: 'Ruko', build: paintShops },
   { label: 'Pos ronda', build: () => [paintPosRonda()] },
-  { label: 'Gedung kampus', build: () => [paintCampus()] },
+  { label: 'Gedung kampus, RSJ & Mabes', build: paintCampusVariants },
   { label: 'Lapak pasar', build: paintMarketStalls },
   { label: 'Stasiun', build: () => [paintStation(), paintRail()] },
   { label: 'Wahana pasar malam', build: () => [paintFerrisWheel(), paintCarousel(), paintStringLights()] },
@@ -46,5 +47,6 @@ export const ART_JOBS: readonly ArtJob[] = [
   { label: 'Pepohonan', build: paintTrees },
   { label: 'Pelanggan', build: paintCustomers },
   { label: 'Pengantar online', build: paintRiders },
+  { label: 'Tantangan kampung', build: () => [...paintChallengeFolk(), ...paintCats(), ...paintRescueVehicles()] },
   { label: 'Ikon pesanan', build: paintBubblesAndEmotes },
 ];

@@ -2,6 +2,7 @@ import type { DepositTerm, GameState, Loan } from '../core/GameState';
 import { formatRupiah } from '../utils/formatting';
 import { GameRuleError } from './rules';
 import { effectsOf } from './UpgradeSystem';
+import { tr } from '../i18n/i18n';
 
 /**
  * BANK: deposito & pinjaman.
@@ -24,7 +25,7 @@ export const BANK_RULES = {
 const isTerm = (t: number): t is DepositTerm => (BANK_RULES.terms as readonly number[]).includes(t);
 
 function requirePrep(draft: GameState): void {
-  if (draft.phase !== 'persiapan') throw new GameRuleError('wrong-phase', 'Bank hanya melayani saat persiapan (sebelum buka).');
+  if (draft.phase !== 'persiapan') throw new GameRuleError('wrong-phase', tr('Bank hanya melayani saat persiapan (sebelum buka).'));
 }
 
 export function depositBalance(state: Readonly<GameState>): number {
@@ -42,10 +43,10 @@ export function maturityDay(startDay: number, termDays: number): number {
 
 export function openDeposit(draft: GameState, amount: number, term: number): number {
   requirePrep(draft);
-  if (!isTerm(term)) throw new GameRuleError('term-invalid', 'Tempo deposito: 1, 2, atau 4 minggu.');
-  if (!Number.isInteger(amount) || amount < BANK_RULES.minDeposit) throw new GameRuleError('amount-invalid', `Deposito minimal ${formatRupiah(BANK_RULES.minDeposit)}.`);
-  if (amount > draft.player.money) throw new GameRuleError('money-short', 'Uang kas tidak cukup.');
-  if (draft.bank.deposits.length >= BANK_RULES.maxDeposits) throw new GameRuleError('too-many', `Maksimal ${BANK_RULES.maxDeposits} deposito aktif.`);
+  if (!isTerm(term)) throw new GameRuleError('term-invalid', tr('Tempo deposito: 1, 2, atau 4 minggu.'));
+  if (!Number.isInteger(amount) || amount < BANK_RULES.minDeposit) throw new GameRuleError('amount-invalid', tr('Deposito minimal {minDeposit}.', { minDeposit: formatRupiah(BANK_RULES.minDeposit) }));
+  if (amount > draft.player.money) throw new GameRuleError('money-short', tr('Uang kas tidak cukup.'));
+  if (draft.bank.deposits.length >= BANK_RULES.maxDeposits) throw new GameRuleError('too-many', tr('Maksimal {maxDeposits} deposito aktif.', { maxDeposits: BANK_RULES.maxDeposits }));
   const id = draft.bank.nextId++;
   draft.player.money -= amount;
   draft.bank.deposits.push({ id, principal: amount, interest: 0, startDay: draft.calendar.day, termDays: term });
@@ -57,7 +58,7 @@ export function withdrawDeposit(draft: GameState, id: number): number {
   requirePrep(draft);
   const i = draft.bank.deposits.findIndex((d) => d.id === id);
   const dep = draft.bank.deposits[i];
-  if (!dep) throw new GameRuleError('deposit-unknown', 'Deposito tidak ditemukan.');
+  if (!dep) throw new GameRuleError('deposit-unknown', tr('Deposito tidak ditemukan.'));
   const total = dep.principal + dep.interest;
   draft.player.money += total;
   draft.bank.deposits.splice(i, 1);
@@ -73,11 +74,11 @@ export function loanLimit(state: Readonly<GameState>): number {
 
 export function takeLoan(draft: GameState, amount: number, term: number): void {
   requirePrep(draft);
-  if (draft.bank.loan) throw new GameRuleError('loan-active', 'Lunasi pinjaman yang ada dulu.');
-  if (!isTerm(term)) throw new GameRuleError('term-invalid', 'Tempo pinjaman: 1, 2, atau 4 minggu.');
+  if (draft.bank.loan) throw new GameRuleError('loan-active', tr('Lunasi pinjaman yang ada dulu.'));
+  if (!isTerm(term)) throw new GameRuleError('term-invalid', tr('Tempo pinjaman: 1, 2, atau 4 minggu.'));
   const limit = loanLimit(draft);
-  if (!Number.isInteger(amount) || amount < BANK_RULES.minLoan) throw new GameRuleError('amount-invalid', `Pinjaman minimal ${formatRupiah(BANK_RULES.minLoan)}.`);
-  if (amount > limit) throw new GameRuleError('over-limit', `Plafon pinjamanmu ${formatRupiah(limit)}.`);
+  if (!Number.isInteger(amount) || amount < BANK_RULES.minLoan) throw new GameRuleError('amount-invalid', tr('Pinjaman minimal {minLoan}.', { minLoan: formatRupiah(BANK_RULES.minLoan) }));
+  if (amount > limit) throw new GameRuleError('over-limit', tr('Plafon pinjamanmu {limit}.', { limit: formatRupiah(limit) }));
   draft.player.money += amount;
   draft.bank.loan = { principal: amount, interest: 0, borrowed: amount, startDay: draft.calendar.day, termDays: term };
 }
@@ -86,10 +87,10 @@ export function takeLoan(draft: GameState, amount: number, term: number): void {
 export function repayLoan(draft: GameState, amount: number): number {
   requirePrep(draft);
   const loan = draft.bank.loan;
-  if (!loan) throw new GameRuleError('no-loan', 'Tidak ada pinjaman.');
-  if (!Number.isInteger(amount) || amount <= 0) throw new GameRuleError('amount-invalid', 'Jumlah bayar tidak valid.');
+  if (!loan) throw new GameRuleError('no-loan', tr('Tidak ada pinjaman.'));
+  if (!Number.isInteger(amount) || amount <= 0) throw new GameRuleError('amount-invalid', tr('Jumlah bayar tidak valid.'));
   const pay = Math.min(amount, loanOutstanding(loan));
-  if (pay > draft.player.money) throw new GameRuleError('money-short', 'Uang kas tidak cukup.');
+  if (pay > draft.player.money) throw new GameRuleError('money-short', tr('Uang kas tidak cukup.'));
   draft.player.money -= pay;
   const toInterest = Math.min(pay, loan.interest);
   loan.interest -= toInterest;

@@ -3,6 +3,7 @@ import { branchUpgradeById, dailyWage, STAFF_RULES, wagePlanById, type WagePlanI
 import { formatRupiah } from '../utils/formatting';
 import { SeededRandom } from '../utils/random';
 import { GameRuleError } from './rules';
+import { tr } from '../i18n/i18n';
 
 /** Kinerja karyawan: 1 normal, naik karena pelatihan, turun setiap hari gaji telat. */
 export function staffPerformance(branch: Readonly<Branch>): number {
@@ -18,9 +19,9 @@ export function hireCost(branch: Readonly<Branch>): number {
 
 export function hireStaff(draft: GameState, slot: number, plan: WagePlanId): Branch {
   const b = branchAt(draft, slot);
-  if (b.staff) throw new GameRuleError('staff-exists', `${b.name} sudah punya karyawan.`);
+  if (b.staff) throw new GameRuleError('staff-exists', tr('{name} sudah punya karyawan.', { name: b.name }));
   const cost = hireCost(b);
-  if (draft.player.money < cost) throw new GameRuleError('money-short', `Biaya rekrut ${formatRupiah(cost)}, kas tidak cukup.`);
+  if (draft.player.money < cost) throw new GameRuleError('money-short', tr('Biaya rekrut {cost}, kas tidak cukup.', { cost: formatRupiah(cost) }));
   draft.player.money -= cost;
   draft.ledger.operationalCost += cost;
   const day = draft.calendar.day;
@@ -37,9 +38,9 @@ export function contractFree(state: Readonly<GameState>, branch: Readonly<Branch
 
 export function changeWagePlan(draft: GameState, slot: number, plan: WagePlanId): Branch {
   const b = branchAt(draft, slot);
-  if (!b.staff) throw new GameRuleError('no-staff', `${b.name} belum punya karyawan.`);
-  if (b.staff.plan === plan) throw new GameRuleError('same-plan', 'Pilihan gaji sudah sama.');
-  if (!contractFree(draft, b)) throw new GameRuleError('bound', `Gaji ${wagePlanById(b.staff.plan).name.toLowerCase()} masih terikat sampai hari ${b.staff.boundUntil}.`);
+  if (!b.staff) throw new GameRuleError('no-staff', tr('{name} belum punya karyawan.', { name: b.name }));
+  if (b.staff.plan === plan) throw new GameRuleError('same-plan', tr('Pilihan gaji sudah sama.'));
+  if (!contractFree(draft, b)) throw new GameRuleError('bound', tr('Gaji {0} masih terikat sampai hari {boundUntil}.', { 0: wagePlanById(b.staff.plan).name.toLowerCase(), boundUntil: b.staff.boundUntil }));
   const day = draft.calendar.day;
   b.staff.plan = plan;
   b.staff.boundUntil = day + wagePlanById(plan).periodDays - 1;
@@ -48,8 +49,8 @@ export function changeWagePlan(draft: GameState, slot: number, plan: WagePlanId)
 
 export function dismissStaff(draft: GameState, slot: number): Branch {
   const b = branchAt(draft, slot);
-  if (!b.staff) throw new GameRuleError('no-staff', `${b.name} belum punya karyawan.`);
-  if (!contractFree(draft, b)) throw new GameRuleError('bound', `Masih terikat kontrak sampai hari ${b.staff.boundUntil}.`);
+  if (!b.staff) throw new GameRuleError('no-staff', tr('{name} belum punya karyawan.', { name: b.name }));
+  if (!contractFree(draft, b)) throw new GameRuleError('bound', tr('Masih terikat kontrak sampai hari {boundUntil}.', { boundUntil: b.staff.boundUntil }));
   b.staff = null;
   return b;
 }
@@ -83,6 +84,6 @@ export function payWage(draft: GameState, branch: Branch): { wage: number; late:
 
 export function branchAt(draft: GameState, slot: number): Branch {
   const b = draft.branches.list.find((x) => x.slot === slot);
-  if (!b) throw new GameRuleError('no-branch', 'Cabang belum dibuka.');
+  if (!b) throw new GameRuleError('no-branch', tr('Cabang belum dibuka.'));
   return b;
 }

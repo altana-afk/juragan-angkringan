@@ -9,6 +9,7 @@ import { LightingSystem } from '../world/LightingSystem';
 import { getMap } from '../world/maps';
 import { buildWorld, type WorldView } from '../world/WorldBuilder';
 import { getAudio, getContext, getUI, SCENES } from './sceneKeys';
+import { tr } from '../i18n/i18n';
 
 /** Menu utama dengan latar angkringan pada malam hari dan kamera yang bergerak pelan. */
 export class MainMenuScene extends Phaser.Scene {
@@ -38,12 +39,12 @@ export class MainMenuScene extends Phaser.Scene {
       onContinue: () => this.startGame('continue'),
       onDeleteSave: () => {
         ctx.saves.clear();
-        ctx.notify('Data simpanan dihapus.', 'info');
+        ctx.notify(tr('Data simpanan dihapus.'), 'info');
       },
       onToggleFullscreen: () => ctx.bus.emit('system:toggle-fullscreen'),
       onAudioSettings: () => {
         const audio = getAudio(this);
-        if (audio) openAudioSettings(ui, audio, (lowPower) => ctx.bus.emit('settings:graphics-changed', { lowPower }));
+        if (audio) openAudioSettings(ui, audio, (lowPower) => ctx.bus.emit('settings:graphics-changed', { lowPower }), () => ctx.flushSave());
       },
       getSave: () => ctx.saves.summary(),
       cloud: ctx.cloud,
@@ -87,12 +88,12 @@ export class MainMenuScene extends Phaser.Scene {
       const result = ctx.continueGame();
       if (!result.ok) {
         getUI(this).openModal({
-          title: 'Simpanan tidak bisa dimuat',
-          body: `${result.message} Data lama akan dicadangkan, lalu kamu bisa mulai permainan baru.`,
+          title: tr('Simpanan tidak bisa dimuat'),
+          body: tr('{message} Data lama akan dicadangkan, lalu kamu bisa mulai permainan baru.', { message: result.message }),
           actions: [
-            { label: 'Batal' },
+            { label: tr('Batal') },
             {
-              label: 'Mulai baru',
+              label: tr('Mulai baru'),
               variant: 'primary',
               onClick: () => {
                 ctx.saves.quarantine();

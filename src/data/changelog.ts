@@ -2,6 +2,9 @@
  * Riwayat pembaruan game, terbaru di atas. Entri pertama HARUS sama dengan GAME_CONFIG.version
  * (dicek oleh test) — panel changelog muncul otomatis sekali tiap kali versi ini berubah.
  */
+import { isEnglish } from '../i18n/i18n';
+import { CHANGELOG_EN } from '../i18n/en/changelog';
+
 export interface ChangelogEntry {
   version: string;
   title: string;
@@ -9,6 +12,41 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: readonly ChangelogEntry[] = [
+  {
+    version: '0.18.1',
+    title: 'Minigame baru untuk tantangan kampung',
+    items: [
+      'Ormas: adu gertak diganti Kumpulkan warga. Ketuk tangan kuning warga dalam 10 detik sampai cukup orang berdiri di belakangmu. Hati-hati dengan tangan merah, itu anggota ormas yang menyamar.',
+      'Pelanggan bernama yang sudah akrab (tahap 2 ke atas) dan sedang duduk di angkringan langsung berdiri membelamu.',
+      'ODGJ, cara halus: Ikuti iramanya. Dia bersenandung lagu dolanan, dan kamu mengetuk mengikuti iramanya sampai dia tenang. Tetap bisa dimainkan tanpa suara.',
+      'ODGJ, bantuan warga: Telepon berantai. Telepon Pak Gito, Bu Surti, Pak RT, dan lainnya saat mereka online. Makin akrab, makin sering mereka mengangkat telepon.',
+      'Mbak Ratna dan Pak Bram sekarang menyebut pesanan kesukaannya dengan cara sendiri. Tebak dengan benar untuk hati +2.',
+    ],
+  },
+  {
+    version: '0.18.0',
+    title: 'Kampung tidak selalu tenang',
+    items: [
+      'Mulai hari ke-4, ada tiga tamu tak diundang. Makin terkenal angkringanmu, makin sering mereka datang.',
+      'Kucing liar suka mencuri 1–2 porsi dari papan Siap Dijual. Beli upgrade "Pelihara kucing", dan Si Belang yang berjaga di samping gerobak.',
+      'ODGJ kadang berdiri di dekat gerobak sampai jam 22.00, dan sebagian pelanggan menjauh. Ketuk balon "!!!": tawarkan yang hangat sesuai petunjuknya, atau ketuk kentongan memanggil warga.',
+      'Ormas datang meminta uang keamanan 10–15% dari hasil kemarin. Bayar, atau adu gertak 3 ronde dengan membaca gerak tubuh ketuanya. Kalah berarti bayar 20%.',
+      'Setiap minigame cuma 10–20 detik, dan jam berhenti selama minigame terbuka. Tidak mau main? Ada tombol Lewati.',
+      'Dua lokasi baru: Seberang RSJ dan Depan Mabes. Di sana kamu bisa berkenalan dengan Mbak Ratna (perawat) dan Pak Bram (polisi).',
+      'Ngobrol dengan mereka sekali sehari sampai 5 hati. Setelah itu mereka mampir di lokasi mana pun, dan kalau tantangan datang saat mereka sedang makan, ambulans atau mobil patroli yang menyelesaikannya.',
+      'Semua kejadian tercatat di laporan harian, termasuk uang keamanan yang keluar. Penjelasan lengkapnya ada di Panduan → Tantangan.',
+    ],
+  },
+  {
+    version: '0.17.0',
+    title: 'Sekarang ada bahasa Inggris',
+    items: [
+      'Game kini tersedia dalam bahasa Inggris. Ganti bahasa di Pengaturan → Bahasa, dari menu utama atau menu jeda.',
+      'Semua ikut diterjemahkan: menu, panduan, cerita Gang Melati, nama menu, upgrade, event, laporan, dan catatan pembaruan ini.',
+      'Dalam bahasa Inggris, uang dan jam memakai format Inggris (Rp1,500 · Rp75K · 17:00). Progres tidak berubah saat bahasa diganti.',
+      'Pemain baru mulai dengan bahasa browser-nya. Pemain lama tetap berbahasa Indonesia sampai menggantinya sendiri.',
+    ],
+  },
   {
     version: '0.16.0',
     title: 'Siapa juragan paling jago di kampung?',
@@ -255,3 +293,12 @@ export const CHANGELOG: readonly ChangelogEntry[] = [
     items: ['Angkringan isometrik malam hari, kamera yang bisa digeser & di-zoom, menu utama, dan HUD.'],
   },
 ];
+
+/** Catatan pembaruan dalam bahasa aktif (versi Inggris dari src/i18n/en/changelog.ts). */
+export function localizedChangelog(): readonly ChangelogEntry[] {
+  if (!isEnglish()) return CHANGELOG;
+  return CHANGELOG.map((e) => {
+    const en = CHANGELOG_EN[e.version];
+    return en ? { version: e.version, title: en.title, items: en.items } : e;
+  });
+}

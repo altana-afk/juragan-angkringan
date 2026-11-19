@@ -5,6 +5,7 @@ import { formatRupiah } from '../utils/formatting';
 import { addStock, totalQty, type StockGroup } from './InventorySystem';
 import { branchAt } from './BranchStaffSystem';
 import { GameRuleError } from './rules';
+import { tr } from '../i18n/i18n';
 
 /** Ambil batch (FEFO) dari stok — tanggal kedaluwarsa & modal ikut terbawa. */
 function takeBatches(group: StockGroup, id: string, qty: number): StockBatch[] {
@@ -38,17 +39,17 @@ export function shelfBonus(branch: Readonly<Branch>): number {
 /** Kirim produk siap jual dari toko utama ke cabang (saat persiapan, cabang harus buka). */
 export function shipToBranch(draft: GameState, catalog: Catalog, slot: number, items: Record<string, number>): { qty: number; fee: number } {
   const b = branchAt(draft, slot);
-  if (draft.phase !== 'persiapan') throw new GameRuleError('wrong-phase', 'Kirim stok ke cabang hanya saat persiapan.');
-  if (!b.open) throw new GameRuleError('branch-closed', `${b.name} sedang tutup. Buka dulu sebelum mengirim stok.`);
+  if (draft.phase !== 'persiapan') throw new GameRuleError('wrong-phase', tr('Kirim stok ke cabang hanya saat persiapan.'));
+  if (!b.open) throw new GameRuleError('branch-closed', tr('{name} sedang tutup. Buka dulu sebelum mengirim stok.', { name: b.name }));
   const lines = Object.entries(items).filter(([, q]) => q > 0);
-  if (!lines.length) throw new GameRuleError('qty-invalid', 'Pilih produk yang mau dikirim.');
+  if (!lines.length) throw new GameRuleError('qty-invalid', tr('Pilih produk yang mau dikirim.'));
   for (const [id, q] of lines) {
-    if (!Number.isInteger(q)) throw new GameRuleError('qty-invalid', 'Jumlah harus bilangan bulat.');
+    if (!Number.isInteger(q)) throw new GameRuleError('qty-invalid', tr('Jumlah harus bilangan bulat.'));
     const have = totalQty(draft.inventory.products[id]);
-    if (have < q) throw new GameRuleError('stock-short', `Stok ${catalog.recipe(id).name} kurang: ada ${have}.`);
+    if (have < q) throw new GameRuleError('stock-short', tr('Stok {name} kurang: ada {have}.', { name: catalog.recipe(id).name, have }));
   }
   const fee = shipFee(draft, b);
-  if (draft.player.money < fee) throw new GameRuleError('money-short', `Ongkos kirim ${formatRupiah(fee)}, kas tidak cukup.`);
+  if (draft.player.money < fee) throw new GameRuleError('money-short', tr('Ongkos kirim {fee}, kas tidak cukup.', { fee: formatRupiah(fee) }));
   draft.player.money -= fee;
   draft.ledger.operationalCost += fee;
   const bonus = shelfBonus(b);

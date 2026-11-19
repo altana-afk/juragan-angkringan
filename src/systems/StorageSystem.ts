@@ -2,6 +2,7 @@ import type { GameState } from '../core/GameState';
 import type { Catalog } from '../data/catalog';
 import { consumeStock, totalQty } from './InventorySystem';
 import { GameRuleError } from './rules';
+import { tr } from '../i18n/i18n';
 
 export interface DiscardResult {
   ingredientId: string;
@@ -16,10 +17,10 @@ export interface DiscardResult {
  */
 export function discardIngredient(draft: GameState, catalog: Catalog, ingredientId: string, qty: number): DiscardResult {
   const def = catalog.ingredient(ingredientId);
-  if (draft.phase === 'evaluasi') throw new GameRuleError('wrong-phase', 'Gudang bisa diatur saat persiapan atau berjualan.');
+  if (draft.phase === 'evaluasi') throw new GameRuleError('wrong-phase', tr('Gudang bisa diatur saat persiapan atau berjualan.'));
   const have = totalQty(draft.inventory.ingredients[ingredientId]);
-  if (have <= 0) throw new GameRuleError('stock-empty', `${def.name} tidak ada di gudang.`);
-  if (!Number.isInteger(qty) || qty <= 0) throw new GameRuleError('qty-invalid', 'Jumlah yang dibuang harus bilangan bulat positif.');
+  if (have <= 0) throw new GameRuleError('stock-empty', tr('{name} tidak ada di gudang.', { name: def.name }));
+  if (!Number.isInteger(qty) || qty <= 0) throw new GameRuleError('qty-invalid', tr('Jumlah yang dibuang harus bilangan bulat positif.'));
   const take = Math.min(qty, have);
   // urutkan batch: yang paling cepat basi dulu
   const batches = draft.inventory.ingredients[ingredientId] ?? [];

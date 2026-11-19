@@ -7,6 +7,7 @@ import { GAME_CONFIG } from '../config/gameConfig';
 import { formatRupiah } from '../utils/formatting';
 import { el, setText } from './dom';
 import type { ModalHandle, UIManager } from './UIManager';
+import { tr } from '../i18n/i18n';
 
 /** Perkiraan jumlah rombongan hari ini untuk pengubah permintaan tertentu. */
 function expectedCustomers(ctx: GameContext, ads: string[]): number {
@@ -30,12 +31,12 @@ export class PromoPanel {
   open(): void {
     if (this.modal) return;
     this.modal = this.ui.openModal({
-      title: 'Promosi Hari Ini',
+      title: tr('Promosi Hari Ini'),
       className: 'sheet sheet-promo',
       closeButton: true,
       body: el('div', {
         children: [
-          el('p', { className: 'panel-note', text: 'Iklan hanya berlaku hari ini dan tidak menaikkan popularitas langsung — popularitas naik dari pelayanan yang baik. Pastikan stok cukup untuk pelanggan tambahan!' }),
+          el('p', { className: 'panel-note', text: tr('Iklan hanya berlaku hari ini dan tidak menaikkan popularitas langsung — popularitas naik dari pelayanan yang baik. Pastikan stok cukup untuk pelanggan tambahan!') }),
           this.list,
         ],
       }),
@@ -62,7 +63,7 @@ export class PromoPanel {
         const extra = expectedCustomers(this.ctx, on ? active : [...active, ad.id]) - expectedCustomers(this.ctx, on ? active.filter((a) => a !== ad.id) : active);
         const btn = el('button', {
           className: `btn ${on ? 'btn-secondary' : 'btn-primary'} btn-sm`,
-          text: on ? 'Batalkan' : `Pasang ${formatRupiah(ad.cost)}`,
+          text: on ? tr('Batalkan') : tr('Pasang {cost}', { cost: formatRupiah(ad.cost) }),
           attrs: { type: 'button' },
           onClick: () => {
             const res = on ? this.ctx.actions.cancelAd(ad.id) : this.ctx.actions.buyAd(ad.id);
@@ -78,7 +79,7 @@ export class PromoPanel {
               children: [
                 el('div', { className: 'item-name', text: `${ad.name}${on ? ' ✓' : ''}` }),
                 el('div', { className: 'item-meta', text: ad.description }),
-                el('div', { className: 'item-meta', text: `${ad.effectLabel} · ±${extra.toFixed(1)} rombongan` }),
+                el('div', { className: 'item-meta', text: tr('{effectLabel} · ±{1} rombongan', { effectLabel: ad.effectLabel, 1: extra.toFixed(1) }) }),
               ],
             }),
             btn,
@@ -87,12 +88,12 @@ export class PromoPanel {
       }),
     );
     const expected = expectedCustomers(this.ctx, active);
-    setText(this.forecast, `Perkiraan pelanggan hari ini: ±${Math.round(expected)} rombongan (tanpa iklan ±${Math.round(base)}). Biaya promosi: ${formatRupiah(s.ledger.promotionCost)}.`);
+    setText(this.forecast, tr('Perkiraan pelanggan hari ini: ±{expected} rombongan (tanpa iklan ±{base}). Biaya promosi: {promotionCost}.', { expected: Math.round(expected), base: Math.round(base), promotionCost: formatRupiah(s.ledger.promotionCost) }));
     const portions = Object.values(s.inventory.products).reduce((n, b) => n + totalQty(b), 0);
     setText(
       this.warning,
       active.length && portions < expected * 1.5
-        ? `Stok siap jual hanya ${portions} porsi — pelanggan tambahan bisa kecewa dan menurunkan popularitas.`
+        ? tr('Stok siap jual hanya {portions} porsi — pelanggan tambahan bisa kecewa dan menurunkan popularitas.', { portions })
         : '',
     );
   }

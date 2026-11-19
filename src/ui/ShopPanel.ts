@@ -11,13 +11,14 @@ import { formatRupiah } from '../utils/formatting';
 import { el, setText } from './dom';
 import { itemIcon, stepper, type Stepper } from './itemIcon';
 import type { ModalHandle, UIManager } from './UIManager';
+import { tr } from '../i18n/i18n';
 
 /** Teks umur stok: "awet", "basi akhir hari ini", "sampai Hari 5". */
 export function expiryText(expiresDay: number | null, today: number): string {
-  if (expiresDay === null) return 'awet';
-  if (expiresDay < today) return 'sudah kedaluwarsa';
-  if (expiresDay === today) return 'habis hari ini';
-  return `sampai Hari ${expiresDay}`;
+  if (expiresDay === null) return tr('awet');
+  if (expiresDay < today) return tr('sudah kedaluwarsa');
+  if (expiresDay === today) return tr('habis hari ini');
+  return tr('sampai Hari {expiresDay}', { expiresDay });
 }
 
 /** Kategori tab Belanja (maks. 6). Bahan baru yang belum dipetakan masuk "Lainnya". */
@@ -33,12 +34,12 @@ function normalize(s: string): string {
 }
 
 const SHOP_TABS = [
-  { id: 'lauk', label: 'Lauk', items: ['telur', 'tempe', 'tahu', 'sosis', 'bakso', 'ayam', 'ati_ampela', 'usus'] },
-  { id: 'sayur', label: 'Sayur', items: ['cabai', 'bawang', 'jahe', 'jagung', 'pisang'] },
-  { id: 'karbo', label: 'Karbo', items: ['beras', 'mi_instan', 'bihun', 'roti'] },
-  { id: 'bumbu', label: 'Bumbu', items: ['kecap', 'minyak', 'gula'] },
-  { id: 'minuman', label: 'Minuman', items: ['teh', 'kopi', 'sirup', 'susu', 'air_minum', 'air_mineral', 'es_batu', 'jeruk'] },
-  { id: 'lainnya', label: 'Lainnya', items: [] as string[] },
+  { id: 'lauk', label: tr('Lauk'), items: ['telur', 'tempe', 'tahu', 'sosis', 'bakso', 'ayam', 'ati_ampela', 'usus'] },
+  { id: 'sayur', label: tr('Sayur'), items: ['cabai', 'bawang', 'jahe', 'jagung', 'pisang'] },
+  { id: 'karbo', label: tr('Karbo'), items: ['beras', 'mi_instan', 'bihun', 'roti'] },
+  { id: 'bumbu', label: tr('Bumbu'), items: ['kecap', 'minyak', 'gula'] },
+  { id: 'minuman', label: tr('Minuman'), items: ['teh', 'kopi', 'sirup', 'susu', 'air_minum', 'air_mineral', 'es_batu', 'jeruk'] },
+  { id: 'lainnya', label: tr('Lainnya'), items: [] as string[] },
 ] as const;
 type TabId = 'semua' | (typeof SHOP_TABS)[number]['id'];
 
@@ -48,10 +49,10 @@ export function shopCategory(ingredientId: string): Exclude<TabId, 'semua'> {
 
 type ChipId = 'turun' | 'dipakai' | 'menipis' | 'basi';
 const SHOP_CHIPS: { id: ChipId; label: string; hint: string }[] = [
-  { id: 'turun', label: 'Harga turun', hint: 'Harga hari ini lebih murah dari kemarin' },
-  { id: 'dipakai', label: 'Daftar persiapan', hint: 'Bahan yang dibutuhkan menu di Daftar persiapan (Persiapan Dapur)' },
-  { id: 'menipis', label: 'Stok menipis', hint: 'Stok kurang dari satu kemasan' },
-  { id: 'basi', label: 'Cepat basi', hint: 'Masa simpan 2 hari atau kurang' },
+  { id: 'turun', label: tr('Harga turun'), hint: tr('Harga hari ini lebih murah dari kemarin') },
+  { id: 'dipakai', label: tr('Daftar persiapan'), hint: tr('Bahan yang dibutuhkan menu di Daftar persiapan (Persiapan Dapur)') },
+  { id: 'menipis', label: tr('Stok menipis'), hint: tr('Stok kurang dari satu kemasan') },
+  { id: 'basi', label: tr('Cepat basi'), hint: tr('Masa simpan 2 hari atau kurang') },
 ];
 
 interface Row {
@@ -77,12 +78,12 @@ export class ShopPanel {
   private query = '';
   private readonly searchInput = el('input', {
     className: 'shop-search-input',
-    attrs: { type: 'search', placeholder: 'Cari bahan…', 'aria-label': 'Cari nama bahan', autocomplete: 'off', spellcheck: 'false', enterkeyhint: 'search' },
+    attrs: { type: 'search', placeholder: tr('Cari bahan…'), 'aria-label': tr('Cari nama bahan'), autocomplete: 'off', spellcheck: 'false', enterkeyhint: 'search' },
   }) as HTMLInputElement;
   private readonly searchClear = el('button', {
     className: 'shop-search-clear',
     text: '×',
-    attrs: { type: 'button', 'aria-label': 'Hapus pencarian', hidden: '' },
+    attrs: { type: 'button', 'aria-label': tr('Hapus pencarian'), hidden: '' },
     onClick: () => {
       this.setQuery('');
       this.searchInput.focus();
@@ -90,7 +91,7 @@ export class ShopPanel {
   });
   private readonly searchBox = el('div', {
     className: 'shop-search',
-    children: [el('span', { className: 'shop-search-icon', text: '⌕', attrs: { 'aria-hidden': 'true' } }), this.searchInput, this.searchClear, el('kbd', { className: 'shop-search-kbd', text: '/', attrs: { 'aria-hidden': 'true', title: 'Tekan / untuk mencari' } })],
+    children: [el('span', { className: 'shop-search-icon', text: '⌕', attrs: { 'aria-hidden': 'true' } }), this.searchInput, this.searchClear, el('kbd', { className: 'shop-search-kbd', text: '/', attrs: { 'aria-hidden': 'true', title: tr('Tekan / untuk mencari') } })],
   });
   private offKeys: (() => void) | null = null;
   private emptyNote = el('p', { className: 'panel-note muted shop-empty', attrs: { role: 'status' } });
@@ -100,8 +101,8 @@ export class ShopPanel {
   private totalEl = el('strong', { className: 'sum-value' });
   private remainEl = el('strong', { className: 'sum-value' });
   private moneyEl = el('span', { className: 'panel-money' });
-  private buyBtn = el('button', { className: 'btn btn-primary', text: 'Beli', attrs: { type: 'button' } });
-  private clearBtn = el('button', { className: 'btn btn-secondary', text: 'Kosongkan', attrs: { type: 'button' } });
+  private buyBtn = el('button', { className: 'btn btn-primary', text: tr('Beli'), attrs: { type: 'button' } });
+  private clearBtn = el('button', { className: 'btn btn-secondary', text: tr('Kosongkan'), attrs: { type: 'button' } });
   private warning = el('p', { className: 'panel-warning', attrs: { role: 'alert' } });
 
   constructor(
@@ -143,11 +144,11 @@ export class ShopPanel {
         el('div', {
           className: 'shop-topline',
           children: [
-            el('p', { className: 'panel-note', text: `Harga hari ini (Hari ${state.calendar.day}). Harga bisa naik-turun tiap hari.` }),
+            el('p', { className: 'panel-note', text: tr('Harga hari ini (Hari {day}). Harga bisa naik-turun tiap hari.', { day: state.calendar.day }) }),
             el('button', {
               className: 'btn btn-secondary btn-sm',
-              text: `Gudang ${storedUnits(state)}/${storageCapacity(state)}`,
-              attrs: { type: 'button', title: 'Lihat isi gudang & buang bahan yang tidak perlu' },
+              text: tr('Gudang {state}/{state2}', { state: storedUnits(state), state2: storageCapacity(state) }),
+              attrs: { type: 'button', title: tr('Lihat isi gudang & buang bahan yang tidak perlu') },
               onClick: () => this.ctx.bus.emit('ui:open-panel', { panel: 'storage' }),
             }),
           ],
@@ -155,7 +156,7 @@ export class ShopPanel {
         this.filterBar,
         list,
         this.emptyNote,
-        lockedCount > 0 ? el('p', { className: 'panel-note muted', text: `${lockedCount} bahan lain tersedia setelah menu barunya terbuka.` }) : null,
+        lockedCount > 0 ? el('p', { className: 'panel-note muted', text: tr('{lockedCount} bahan lain tersedia setelah menu barunya terbuka.', { lockedCount }) }) : null,
       ],
     });
     const footer = el('div', {
@@ -164,8 +165,8 @@ export class ShopPanel {
         el('div', {
           className: 'panel-sums',
           children: [
-            el('div', { className: 'sum', children: [el('span', { text: 'Total belanja' }), this.totalEl] }),
-            el('div', { className: 'sum', children: [el('span', { text: 'Sisa uang' }), this.remainEl] }),
+            el('div', { className: 'sum', children: [el('span', { text: tr('Total belanja') }), this.totalEl] }),
+            el('div', { className: 'sum', children: [el('span', { text: tr('Sisa uang') }), this.remainEl] }),
           ],
         }),
         this.warning,
@@ -173,7 +174,7 @@ export class ShopPanel {
       ],
     });
     this.modal = this.ui.openModal({
-      title: 'Belanja Bahan',
+      title: tr('Belanja Bahan'),
       className: 'sheet sheet-shop',
       closeButton: true,
       headerExtra: this.moneyEl,
@@ -224,7 +225,7 @@ export class ShopPanel {
           className: 'item-info',
           children: [
             el('div', { className: 'item-name', text: def.name }),
-            el('div', { className: 'item-meta', text: `${def.pack} · ${def.packSize} ${def.unit}` }),
+            el('div', { className: 'item-meta', text: tr('{pack} · {packSize} {unit}', { pack: def.pack, packSize: def.packSize, unit: def.unit }) }),
             stock,
           ],
         }),
@@ -273,7 +274,7 @@ export class ShopPanel {
 
   private renderFilters(): void {
     const present = new Set(this.rows.map((r) => shopCategory(r.def.id)));
-    const tabs: { id: TabId; label: string }[] = [{ id: 'semua', label: 'Semua' }, ...SHOP_TABS.filter((t) => present.has(t.id))];
+    const tabs: { id: TabId; label: string }[] = [{ id: 'semua', label: tr('Semua') }, ...SHOP_TABS.filter((t) => present.has(t.id))];
     if (!tabs.some((t) => t.id === this.tab)) this.tab = 'semua';
     const tabBtns = tabs.map((t) =>
       el('button', {
@@ -304,8 +305,8 @@ export class ShopPanel {
     );
     this.filterBar.replaceChildren(
       this.searchBox,
-      el('div', { className: 'shop-tabs', attrs: { role: 'tablist', 'aria-label': 'Kategori bahan' }, children: tabBtns }),
-      el('div', { className: 'shop-chips', attrs: { role: 'group', 'aria-label': 'Saring status' }, children: chipBtns }),
+      el('div', { className: 'shop-tabs', attrs: { role: 'tablist', 'aria-label': tr('Kategori bahan') }, children: tabBtns }),
+      el('div', { className: 'shop-chips', attrs: { role: 'group', 'aria-label': tr('Saring status') }, children: chipBtns }),
     );
   }
 
@@ -340,11 +341,11 @@ export class ShopPanel {
       const trend = mult > 1 ? 'naik' : mult < 1 ? 'turun' : priceTrend(row.def, day);
       setText(row.price, `${formatRupiah(p)}${trend === 'naik' ? ' ▲' : trend === 'turun' ? ' ▼' : ''}`);
       row.price.dataset.trend = trend;
-      row.price.title = mult !== 1 ? `Event hari ini: harga ${mult > 1 ? 'naik' : 'turun'} ${Math.round(Math.abs(mult - 1) * 100)}%` : '';
-      if (mult !== 1) row.price.append(el('small', { className: 'event-tag', text: mult > 1 ? ' event ↑' : ' event ↓' }));
+      row.price.title = mult !== 1 ? tr('Event hari ini: harga {0} {1}%', { 0: mult > 1 ? tr('naik') : tr('turun'), 1: Math.round(Math.abs(mult - 1) * 100) }) : '';
+      if (mult !== 1) row.price.append(el('small', { className: 'event-tag', text: mult > 1 ? tr(' event ↑') : tr(' event ↓') }));
       const batches = state.inventory.ingredients[row.def.id];
       const have = totalQty(batches);
-      setText(row.stock, have > 0 ? `Stok: ${have} ${row.def.unit} · ${expiryText(nearestExpiry(batches), day)}` : 'Stok: kosong');
+      setText(row.stock, have > 0 ? tr('Stok: {have} {unit} · {2}', { have, unit: row.def.unit, 2: expiryText(nearestExpiry(batches), day) }) : tr('Stok: kosong'));
       row.stock.classList.toggle('is-empty', have === 0);
       const packs = this.cart.get(row.def.id) ?? 0;
       row.stepper.set(packs);
@@ -359,22 +360,22 @@ export class ShopPanel {
     setText(
       this.emptyNote,
       shown === 0
-        ? `${this.chips.has('dipakai') && PREP_PLAN.size === 0 ? 'Daftar persiapan masih kosong — tambahkan menu di Persiapan Dapur dulu.' : (this.query.trim() ? `Tidak ada bahan bernama "${this.query.trim()}".` : 'Tidak ada bahan yang cocok dengan filter ini.')}${hiddenInCart ? ` ${hiddenInCart} bahan di keranjang tersembunyi.` : ''}`
+        ? `${this.chips.has('dipakai') && PREP_PLAN.size === 0 ? tr('Daftar persiapan masih kosong — tambahkan menu di Persiapan Dapur dulu.') : (this.query.trim() ? tr('Tidak ada bahan bernama "{0}".', { 0: this.query.trim() }) : tr('Tidak ada bahan yang cocok dengan filter ini.'))}${hiddenInCart ? tr(' {hiddenInCart} bahan di keranjang tersembunyi.', { hiddenInCart }) : ''}`
         : hiddenInCart
-          ? `${hiddenInCart} bahan di keranjang tidak terlihat karena filter — tetap ikut dibeli.`
+          ? tr('{hiddenInCart} bahan di keranjang tidak terlihat karena filter — tetap ikut dibeli.', { hiddenInCart })
           : '',
     );
     this.emptyNote.hidden = shown > 0 && hiddenInCart === 0;
     const quote = quotePurchase(this.ctx.catalog, this.cartLines(), day, (id) => buyPriceFactor(this.ctx.store.get(), id));
     const remaining = state.player.money - quote.total;
-    setText(this.moneyEl, `Kas ${formatRupiah(state.player.money)}`);
+    setText(this.moneyEl, tr('Kas {money}', { money: formatRupiah(state.player.money) }));
     setText(this.totalEl, formatRupiah(quote.total));
     setText(this.remainEl, formatRupiah(remaining));
     this.remainEl.classList.toggle('is-bad', remaining < 0);
-    setText(this.warning, remaining < 0 ? `Uang kurang ${formatRupiah(-remaining)}. Kurangi belanjaan.` : '');
+    setText(this.warning, remaining < 0 ? tr('Uang kurang {0}. Kurangi belanjaan.', { 0: formatRupiah(-remaining) }) : '');
     this.buyBtn.disabled = quote.lines.length === 0 || remaining < 0;
     this.clearBtn.disabled = quote.lines.length === 0;
-    setText(this.buyBtn, quote.lines.length ? `Beli (${formatRupiah(quote.total)})` : 'Beli');
+    setText(this.buyBtn, quote.lines.length ? tr('Beli ({total})', { total: formatRupiah(quote.total) }) : tr('Beli'));
   }
 
   private buy(): void {

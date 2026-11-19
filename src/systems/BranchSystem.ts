@@ -13,10 +13,11 @@ import { weekdayFactor } from './LocationSystem';
 import { priceAppealFactor, salePriceOf } from './PricingSystem';
 import { GameRuleError } from './rules';
 import { effectsOf } from './UpgradeSystem';
+import { tr } from '../i18n/i18n';
 
 /** Lokasi yang ditempati angkringan yang sedang buka (toko utama + cabang buka), kecuali cabang `exceptSlot`. */
 export function occupiedLocations(state: Readonly<GameState>, exceptSlot: number | null = null): Map<string, string> {
-  const m = new Map<string, string>([[state.mapId, 'Toko utama']]);
+  const m = new Map<string, string>([[state.mapId, tr('Toko utama')]]);
   for (const b of state.branches.list) if (b.open && b.slot !== exceptSlot) m.set(b.mapId, b.name);
   return m;
 }
@@ -36,24 +37,24 @@ export interface OpenCheck {
 /** Syarat membuka cabang berikutnya: level usaha, kas, popularitas, slot & lokasi kosong. */
 export function canOpenBranch(state: Readonly<GameState>): OpenCheck {
   const slot = state.branches.list.length;
-  if (slot >= MAX_BRANCHES) return { ok: false, reasons: [`Sudah ${MAX_BRANCHES} cabang (cabang yang ditutup tetap dihitung).`], cost: 0, slot: null };
+  if (slot >= MAX_BRANCHES) return { ok: false, reasons: [tr('Sudah {MAX_BRANCHES} cabang (cabang yang ditutup tetap dihitung).', { MAX_BRANCHES })], cost: 0, slot: null };
   const def = BRANCH_SLOTS[slot]!;
   const reasons: string[] = [];
   const level = effectsOf(state).businessLevel;
-  if (level < def.minLevel) reasons.push(`Butuh level usaha ${def.minLevel} (sekarang ${level}).`);
-  if (state.player.popularity < def.minPopularity) reasons.push(`Butuh popularitas ${def.minPopularity} (sekarang ${Math.floor(state.player.popularity)}).`);
-  if (state.player.money < def.openCost) reasons.push(`Butuh kas ${formatRupiah(def.openCost)}.`);
-  if (!freeLocations(state).length) reasons.push('Semua lokasi sedang dipakai angkringan yang buka.');
+  if (level < def.minLevel) reasons.push(tr('Butuh level usaha {minLevel} (sekarang {level}).', { minLevel: def.minLevel, level }));
+  if (state.player.popularity < def.minPopularity) reasons.push(tr('Butuh popularitas {minPopularity} (sekarang {popularity}).', { minPopularity: def.minPopularity, popularity: Math.floor(state.player.popularity) }));
+  if (state.player.money < def.openCost) reasons.push(tr('Butuh kas {openCost}.', { openCost: formatRupiah(def.openCost) }));
+  if (!freeLocations(state).length) reasons.push(tr('Semua lokasi sedang dipakai angkringan yang buka.'));
   return { ok: reasons.length === 0, reasons, cost: def.openCost, slot };
 }
 
 export function openBranch(draft: GameState, mapId: string): Branch {
-  if (draft.phase !== 'persiapan') throw new GameRuleError('wrong-phase', 'Cabang hanya bisa dibuka saat persiapan.');
+  if (draft.phase !== 'persiapan') throw new GameRuleError('wrong-phase', tr('Cabang hanya bisa dibuka saat persiapan.'));
   const check = canOpenBranch(draft);
-  if (!check.ok || check.slot === null) throw new GameRuleError('branch-locked', check.reasons[0] ?? 'Cabang belum bisa dibuka.');
+  if (!check.ok || check.slot === null) throw new GameRuleError('branch-locked', check.reasons[0] ?? tr('Cabang belum bisa dibuka.'));
   const loc = locationById(mapId);
   const used = occupiedLocations(draft).get(loc.id);
-  if (used) throw new GameRuleError('location-used', `${loc.name} sedang dipakai ${used}.`);
+  if (used) throw new GameRuleError('location-used', tr('{name} sedang dipakai {used}.', { name: loc.name, used }));
   const def = BRANCH_SLOTS[check.slot]!;
   draft.player.money -= def.openCost;
   draft.ledger.upgradeCost += def.openCost;
@@ -80,11 +81,11 @@ export function openBranch(draft: GameState, mapId: string): Branch {
 /** Tutup cabang sementara (tanpa biaya operasional) atau buka lagi jika lokasinya masih kosong. */
 export function setBranchOpen(draft: GameState, slot: number, open: boolean): Branch {
   const b = branchAt(draft, slot);
-  if (draft.phase !== 'persiapan') throw new GameRuleError('wrong-phase', 'Buka/tutup cabang hanya saat persiapan.');
+  if (draft.phase !== 'persiapan') throw new GameRuleError('wrong-phase', tr('Buka/tutup cabang hanya saat persiapan.'));
   if (b.open === open) return b;
   if (open) {
     const used = occupiedLocations(draft, slot).get(b.mapId);
-    if (used) throw new GameRuleError('location-used', `${locationById(b.mapId).name} sedang dipakai ${used}. Pindahkan cabang dulu.`);
+    if (used) throw new GameRuleError('location-used', tr('{name} sedang dipakai {used}. Pindahkan cabang dulu.', { name: locationById(b.mapId).name, used }));
   }
   b.open = open;
   return b;
@@ -92,13 +93,13 @@ export function setBranchOpen(draft: GameState, slot: number, open: boolean): Br
 
 export function moveBranch(draft: GameState, slot: number, mapId: string): Branch {
   const b = branchAt(draft, slot);
-  if (draft.phase !== 'persiapan') throw new GameRuleError('wrong-phase', 'Pindah lokasi cabang hanya saat persiapan.');
+  if (draft.phase !== 'persiapan') throw new GameRuleError('wrong-phase', tr('Pindah lokasi cabang hanya saat persiapan.'));
   const dest = locationById(mapId);
-  if (b.mapId === dest.id) throw new GameRuleError('same-location', `${b.name} sudah di ${dest.name}.`);
-  if (b.lastMoveDay === draft.calendar.day) throw new GameRuleError('moved-today', `${b.name} sudah dipindah hari ini.`);
+  if (b.mapId === dest.id) throw new GameRuleError('same-location', tr('{name} sudah di {name2}.', { name: b.name, name2: dest.name }));
+  if (b.lastMoveDay === draft.calendar.day) throw new GameRuleError('moved-today', tr('{name} sudah dipindah hari ini.', { name: b.name }));
   const used = occupiedLocations(draft, slot).get(dest.id);
-  if (used) throw new GameRuleError('location-used', `${dest.name} sedang dipakai ${used}.`);
-  if (draft.player.money < dest.moveCost) throw new GameRuleError('money-short', `Biaya pindah ${formatRupiah(dest.moveCost)}, kas tidak cukup.`);
+  if (used) throw new GameRuleError('location-used', tr('{name} sedang dipakai {used}.', { name: dest.name, used }));
+  if (draft.player.money < dest.moveCost) throw new GameRuleError('money-short', tr('Biaya pindah {moveCost}, kas tidak cukup.', { moveCost: formatRupiah(dest.moveCost) }));
   draft.player.money -= dest.moveCost;
   draft.ledger.moveCost += dest.moveCost;
   b.mapId = dest.id;
@@ -110,9 +111,9 @@ export function moveBranch(draft: GameState, slot: number, mapId: string): Branc
 export function buyBranchUpgrade(draft: GameState, slot: number, upgradeId: string): Branch {
   const b = branchAt(draft, slot);
   const u = branchUpgradeById(upgradeId);
-  if (draft.phase !== 'persiapan') throw new GameRuleError('wrong-phase', 'Upgrade cabang hanya saat persiapan.');
-  if (b.upgrades.includes(u.id)) throw new GameRuleError('owned', `${u.name} sudah terpasang di ${b.name}.`);
-  if (draft.player.money < u.cost) throw new GameRuleError('money-short', `${u.name} butuh ${formatRupiah(u.cost)}.`);
+  if (draft.phase !== 'persiapan') throw new GameRuleError('wrong-phase', tr('Upgrade cabang hanya saat persiapan.'));
+  if (b.upgrades.includes(u.id)) throw new GameRuleError('owned', tr('{name} sudah terpasang di {name2}.', { name: u.name, name2: b.name }));
+  if (draft.player.money < u.cost) throw new GameRuleError('money-short', tr('{name} butuh {cost}.', { name: u.name, cost: formatRupiah(u.cost) }));
   draft.player.money -= u.cost;
   draft.ledger.upgradeCost += u.cost;
   b.upgrades.push(u.id);
@@ -249,4 +250,18 @@ export function closeBranches(draft: GameState, catalog: Catalog): BranchDayRepo
     b.onlineOut = {};
   }
   return reports;
+}
+
+/**
+ * Nama cabang ikut tersimpan di save & laporan. Pemain tidak bisa mengganti nama cabang, jadi saat save
+ * dimuat namanya disamakan dengan bahasa aktif ("Cabang 1" ⇄ "Branch 1").
+ */
+export function syncBranchNames(state: GameState): void {
+  const fix = (x: { slot: number; name: string }): void => {
+    const name = BRANCH_SLOTS.find((d) => d.slot === x.slot)?.name;
+    if (name) x.name = name;
+  };
+  state.branches.list.forEach(fix);
+  state.lastReport?.branches?.forEach(fix);
+  for (const h of state.history) h.report?.branches?.forEach(fix);
 }

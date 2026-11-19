@@ -95,7 +95,7 @@ const BUILTIN_OBJECT_TYPES: Readonly<Record<BuiltinObjectTypeId, ObjectTypeDef>>
   ferris_wheel: def({ id: 'ferris_wheel', label: 'Bianglala', footprint: { w: 48, d: 32 }, depthMode: 'center', variants: ['default'], blocking: true }),
   carousel: def({ id: 'carousel', label: 'Komidi putar', footprint: { w: 48, d: 48 }, depthMode: 'center', variants: ['default'], blocking: true }),
   string_lights: def({ id: 'string_lights', label: 'Lampu hias', footprint: { w: 4, d: 64 }, depthMode: 'front', variants: ['default'], blocking: false }),
-  campus: def({ id: 'campus', label: 'Gedung kampus', footprint: { w: 64, d: 176 }, depthMode: 'center', variants: ['default'], blocking: true }),
+  campus: def({ id: 'campus', label: 'Gedung kampus', footprint: { w: 64, d: 176 }, depthMode: 'center', variants: ['default', 'rsj', 'mabes'], blocking: true }),
   sign_board: def({ id: 'sign_board', label: 'Papan nama', footprint: { w: 28, d: 3 }, depthMode: 'center', variants: ['default'], blocking: true }),
   seller: def({ id: 'seller', label: 'Penjual', footprint: { w: 0, d: 0 }, depthMode: 'center', variants: ['default'], blocking: false, fx: ['idle'] }),
 };

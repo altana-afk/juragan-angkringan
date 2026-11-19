@@ -1,6 +1,7 @@
 import type { GameContext } from '../core/GameContext';
 import { TUTORIAL_DONE, TUTORIAL_STEPS } from '../systems/TutorialSystem';
 import { el, setText, type UIComponent } from './dom';
+import { tr } from '../i18n/i18n';
 
 /**
  * Tutorial singkat berupa kartu petunjuk di atas bilah aksi.
@@ -10,10 +11,10 @@ type HintKind = 'bubble' | 'order' | 'bar' | 'branch';
 
 /** Petunjuk sekali yang tampil di atas tutorial biasa. */
 const HINTS: Record<HintKind, { icon: string; title: string; text: string }> = {
-  bubble: { icon: '💬', title: 'Ada yang mau bercerita', text: 'Ketuk gelembung "..." di atas pelanggan bernama untuk mendengar kabar kampung. Waktu berhenti selama kalian mengobrol.' },
-  order: { icon: '📱', title: 'Pesanan online masuk!', text: 'Ketuk tombol Pesanan di bawah untuk menerima atau menolak. Pesanan memakai stok yang sama dengan pembeli di tempat — kalau stok habis, pesanan batal.' },
-  branch: { icon: '🏪', title: 'Cabang pertamamu!', text: 'Cabang berjualan sendiri selama jam jualan. Rekrut karyawan dan kirim produk siap jual dari panel Cabang setiap persiapan. Cabang buka tetap membayar sewa & gaji — tutup jika tidak dipakai.' },
-  bar: { icon: '💼', title: 'Tombol baru: Usaha', text: 'Upgrade, Promosi, Statistik, dan Bank kini ada di tombol Usaha. Bank juga bisa dibuka dengan mengetuk kas di kiri atas.' },
+  bubble: { icon: '💬', title: tr('Ada yang mau bercerita'), text: tr('Ketuk gelembung "..." di atas pelanggan bernama untuk mendengar kabar kampung. Waktu berhenti selama kalian mengobrol.') },
+  order: { icon: '📱', title: tr('Pesanan online masuk!'), text: tr('Ketuk tombol Pesanan di bawah untuk menerima atau menolak. Pesanan memakai stok yang sama dengan pembeli di tempat — kalau stok habis, pesanan batal.') },
+  branch: { icon: '🏪', title: tr('Cabang pertamamu!'), text: tr('Cabang berjualan sendiri selama jam jualan. Rekrut karyawan dan kirim produk siap jual dari panel Cabang setiap persiapan. Cabang buka tetap membayar sewa & gaji — tutup jika tidak dipakai.') },
+  bar: { icon: '💼', title: tr('Tombol baru: Usaha'), text: tr('Upgrade, Promosi, Statistik, dan Bank kini ada di tombol Usaha. Bank juga bisa dibuka dengan mengetuk kas di kiri atas.') },
 };
 
 function hintSeen(s: Readonly<import('../core/GameState').GameState>, kind: HintKind): boolean {
@@ -45,13 +46,13 @@ export class TutorialCoach implements UIComponent {
         this.text,
         (this.skip = el('button', {
           className: 'link-btn coach-skip',
-          text: 'Lewati tutorial',
+          text: tr('Lewati tutorial'),
           attrs: { type: 'button' },
           onClick: () => this.ctx.actions.updateTutorial(true),
         })),
         (this.ok = el('button', {
           className: 'link-btn coach-skip',
-          text: 'Mengerti',
+          text: tr('Mengerti'),
           attrs: { type: 'button' },
           onClick: () => this.hideStoryHint(),
         })),
@@ -105,7 +106,7 @@ export class TutorialCoach implements UIComponent {
     this.root.classList.toggle('is-visible', active);
     this.setHint(active && step?.highlight ? step.highlight : null);
     if (!active || !step) return;
-    setText(this.counter, `${s.tutorial + 1}/${TUTORIAL_STEPS.length}`);
+    setText(this.counter, tr('{0}/{length}', { 0: s.tutorial + 1, length: TUTORIAL_STEPS.length }));
     setText(this.title, step.title);
     setText(this.text, step.text);
   }

@@ -1,5 +1,6 @@
 import type { Branch, BranchStatus, GameState } from '../core/GameState';
 import { totalQty } from './InventorySystem';
+import { tr, trc } from '../i18n/i18n';
 
 /** Jumlah produk siap jual di cabang. */
 export function branchStockTotal(branch: Readonly<Branch>): number {
@@ -18,11 +19,11 @@ export function branchStatus(branch: Readonly<Branch>): BranchStatus {
 }
 
 export const BRANCH_STATUS_LABEL: Record<BranchStatus, string> = {
-  penuh: 'Buka penuh',
-  tanpa_produk: 'Buka tanpa produk',
-  tanpa_karyawan: 'Buka tanpa karyawan',
-  kosong: 'Buka tanpa karyawan & produk',
-  tutup: 'Tutup',
+  penuh: tr('Buka penuh'),
+  tanpa_produk: tr('Buka tanpa produk'),
+  tanpa_karyawan: tr('Buka tanpa karyawan'),
+  kosong: tr('Buka tanpa karyawan & produk'),
+  tutup: trc('status', 'Tutup'),
 };
 
 export const BRANCH_STATUS_TONE: Record<BranchStatus, 'good' | 'warn' | 'bad' | 'neutral'> = {

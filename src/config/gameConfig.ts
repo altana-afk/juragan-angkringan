@@ -2,13 +2,14 @@
  * Konfigurasi umum game: identitas, tampilan, kalender, kamera.
  * Semua angka yang memengaruhi gameplay ada di file config, bukan di UI/scene.
  */
+import { tr } from '../i18n/i18n';
 
 export const GAME_CONFIG = {
   /** Nama sementara proyek — cukup ubah di sini untuk mengganti judul di seluruh game. */
   title: 'Juragan Angkringan',
   subtitle: 'Simulator',
-  version: '0.16.0',
-  stage: 'Akun & Leaderboard',
+  version: '0.18.1',
+  stage: tr('Pilihan bahasa'),
   backgroundColor: '#140f1f',
 
   /** Tanggal kalender untuk Hari 1 (bulan 1–12). 6 Juli 2026 jatuh pada hari Senin. */

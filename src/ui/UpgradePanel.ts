@@ -5,13 +5,14 @@ import { UPGRADE_CATEGORIES, UPGRADES, describeEffects, effectsOf, upgradeBlocke
 import { formatRupiah } from '../utils/formatting';
 import { el, setText } from './dom';
 import type { ModalHandle, UIManager } from './UIManager';
+import { tr } from '../i18n/i18n';
 
 /** Panel Upgrade: kategori gerobak/peralatan/kapasitas/lingkungan, syarat & efek nyata. */
 export class UpgradePanel {
   private modal: ModalHandle | null = null;
   private off: (() => void) | null = null;
   private tab: UpgradeCategory = 'gerobak';
-  private readonly tabs = el('div', { className: 'tab-row', attrs: { role: 'tablist', 'aria-label': 'Kategori upgrade' } });
+  private readonly tabs = el('div', { className: 'tab-row', attrs: { role: 'tablist', 'aria-label': tr('Kategori upgrade') } });
   private readonly list = el('div', { className: 'item-list' });
   private readonly summary = el('p', { className: 'panel-note' });
 
@@ -20,12 +21,12 @@ export class UpgradePanel {
   open(): void {
     if (this.modal) return;
     this.modal = this.ui.openModal({
-      title: 'Upgrade Angkringan',
+      title: tr('Upgrade Angkringan'),
       className: 'sheet sheet-upgrade',
       closeButton: true,
       body: el('div', {
         children: [
-          el('p', { className: 'panel-note', text: 'Investasi dibayar sekali dan langsung berlaku. Gerobak yang lebih baik menaikkan level usaha dan membuka menu spesial.' }),
+          el('p', { className: 'panel-note', text: tr('Investasi dibayar sekali dan langsung berlaku. Gerobak yang lebih baik menaikkan level usaha dan membuka menu spesial.') }),
           this.tabs,
           this.list,
         ],
@@ -51,7 +52,7 @@ export class UpgradePanel {
         const total = UPGRADES.filter((u) => u.category === c.id).length;
         return el('button', {
           className: `tab-btn${this.tab === c.id ? ' is-active' : ''}`,
-          text: `${c.label} ${owned}/${total}`,
+          text: tr('{label} {owned}/{total}', { label: c.label, owned, total }),
           attrs: { type: 'button', role: 'tab', 'aria-selected': String(this.tab === c.id) },
           onClick: () => {
             this.tab = c.id;
@@ -64,11 +65,11 @@ export class UpgradePanel {
       ...UPGRADES.filter((u) => u.category === this.tab).map((u) => {
         const owned = s.upgrades.includes(u.id);
         const blockers = upgradeBlockers(s, u);
-        const locked = !owned && blockers.some((b) => !b.startsWith('Kurang'));
+        const locked = !owned && blockers.some((b) => !b.startsWith(tr('Kurang {0}', { 0: '' })));
         const btn = el('button', {
           className: `btn ${owned ? 'btn-secondary' : 'btn-primary'} btn-sm`,
-          text: owned ? 'Terpasang ✓' : formatRupiah(u.cost),
-          attrs: { type: 'button', 'aria-label': owned ? `${u.name} sudah terpasang` : `Beli ${u.name} seharga ${formatRupiah(u.cost)}` },
+          text: owned ? tr('Terpasang ✓') : formatRupiah(u.cost),
+          attrs: { type: 'button', 'aria-label': owned ? tr('{name} sudah terpasang', { name: u.name }) : tr('Beli {name} seharga {cost}', { name: u.name, cost: formatRupiah(u.cost) }) },
           onClick: () => {
             const res = this.ctx.actions.buyUpgrade(u.id);
             this.ctx.notify(res.message, res.ok ? 'success' : 'error');
@@ -96,7 +97,7 @@ export class UpgradePanel {
     const fx = effectsOf(s);
     setText(
       this.summary,
-      `Level usaha ${fx.businessLevel} · kursi ${10 + fx.seats} · gudang ${storedUnits(s)}/${storageCapacity(s)} · maks ${maxPortionsPerOrder(s)} porsi/masak · kepuasan +${fx.satisfaction}`,
+      tr('Level usaha {businessLevel} · kursi {1} · gudang {s}/{s2} · maks {s3} porsi/masak · kepuasan +{satisfaction}', { businessLevel: fx.businessLevel, 1: 10 + fx.seats, s: storedUnits(s), s2: storageCapacity(s), s3: maxPortionsPerOrder(s), satisfaction: fx.satisfaction }),
     );
   }
 }

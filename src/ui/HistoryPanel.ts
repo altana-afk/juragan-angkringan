@@ -11,6 +11,7 @@ import { formatRupiah, formatRupiahShort } from '../utils/formatting';
 import { formatDateLong, formatDateShort } from '../utils/calendar';
 import { el } from './dom';
 import type { UIManager } from './UIManager';
+import { tr, trc } from '../i18n/i18n';
 
 type Range = 7 | 30 | 60;
 /** Desktop/tablet lebar: daftar + detail berdampingan, tanpa sheet bertumpuk. */
@@ -39,7 +40,7 @@ function change(cur: number, prev: number | null): string | null {
   if (prev === null || prev === 0) return null;
   const pct = Math.round(((cur - prev) / Math.abs(prev)) * 100);
   if (!Number.isFinite(pct)) return null;
-  return `${pct >= 0 ? '▲' : '▼'} ${Math.abs(pct)}%`;
+  return tr('{0} {pct}%', { 0: pct >= 0 ? '▲' : '▼', pct: Math.abs(pct) });
 }
 
 /**
@@ -61,7 +62,7 @@ export function renderHistory(ctx: GameContext, ui: UIManager): HTMLElement {
   const render = (): void => {
     const all = ctx.store.get().history;
     if (!all.length) {
-      root.replaceChildren(el('p', { className: 'panel-note muted', text: 'Belum ada hari yang ditutup. Riwayat muncul setelah hari pertama selesai.' }));
+      root.replaceChildren(el('p', { className: 'panel-note muted', text: tr('Belum ada hari yang ditutup. Riwayat muncul setelah hari pertama selesai.') }));
       return;
     }
     const days = all.slice(-range);
@@ -74,11 +75,11 @@ export function renderHistory(ctx: GameContext, ui: UIManager): HTMLElement {
     // 1. Pilihan rentang
     const seg = el('div', {
       className: 'history-seg',
-      attrs: { role: 'radiogroup', 'aria-label': 'Rentang riwayat' },
+      attrs: { role: 'radiogroup', 'aria-label': tr('Rentang riwayat') },
       children: ([7, 30, 60] as const).map((r) =>
         el('button', {
           className: `history-seg-btn${range === r ? ' is-active' : ''}`,
-          text: `${r} hari`,
+          text: tr('{r} hari', { r }),
           attrs: { type: 'button', role: 'radio', 'aria-checked': String(range === r) },
           onClick: () => {
             range = r;
@@ -101,9 +102,9 @@ export function renderHistory(ctx: GameContext, ui: UIManager): HTMLElement {
     const tiles = el('div', {
       className: 'history-tiles',
       children: [
-        tile('Pendapatan', formatRupiahShort(rev), change(rev, prev ? sum(prev, 'revenue') : null)),
-        tile(profit < 0 ? 'Rugi' : 'Laba', formatRupiahShort(Math.abs(profit)), change(profit, prev ? sum(prev, 'netProfit') : null), profit < 0),
-        tile('Rata-rata/hari', signed(avg), null, avg < 0),
+        tile(tr('Pendapatan'), formatRupiahShort(rev), change(rev, prev ? sum(prev, 'revenue') : null)),
+        tile(profit < 0 ? tr('Rugi') : tr('Laba'), formatRupiahShort(Math.abs(profit)), change(profit, prev ? sum(prev, 'netProfit') : null), profit < 0),
+        tile(tr('Rata-rata/hari'), signed(avg), null, avg < 0),
       ],
     });
 
@@ -111,11 +112,11 @@ export function renderHistory(ctx: GameContext, ui: UIManager): HTMLElement {
     const max = Math.max(1, ...days.map((h) => h.revenue));
     const chart = el('div', {
       className: `history-chart${range > 7 ? ' is-dense' : ''}`,
-      attrs: { role: 'group', 'aria-label': `Grafik pendapatan ${range} hari` },
+      attrs: { role: 'group', 'aria-label': tr('Grafik pendapatan {range} hari', { range }) },
       children: days.map((h) => {
         const bar = el('button', {
           className: `history-bar${h.netProfit < 0 ? ' is-neg' : ''}`,
-          attrs: { type: 'button', 'aria-label': `${formatDateShort(h.day)}: pendapatan ${formatRupiah(h.revenue)}, ${h.netProfit < 0 ? 'rugi' : 'laba'} ${formatRupiah(Math.abs(h.netProfit))}` },
+          attrs: { type: 'button', 'aria-label': tr('{day}: pendapatan {revenue}, {2} {netProfit}', { day: formatDateShort(h.day), revenue: formatRupiah(h.revenue), 2: h.netProfit < 0 ? tr('rugi') : tr('laba'), netProfit: formatRupiah(Math.abs(h.netProfit)) }) },
           onClick: () => pick(h),
         });
         bar.style.setProperty('--h', `${Math.max(3, (h.revenue / max) * 100)}%`);
@@ -133,26 +134,26 @@ export function renderHistory(ctx: GameContext, ui: UIManager): HTMLElement {
       children: [...days].reverse().map((h) => {
         const ev = safeEvent(h.eventId);
         const sub = [
-          ev ? `${ev.icon} ${ev.name}` : null,
+          ev ? tr('{icon} {name}', { icon: ev.icon, name: ev.name }) : null,
           h.weather ? WEATHER_ICON[h.weather] : null,
-          isWeekend(h.day) ? 'Akhir pekan' : null,
+          isWeekend(h.day) ? tr('Akhir pekan') : null,
         ]
           .filter(Boolean)
           .join(' · ');
         return el('button', {
           className: `history-row${wide() && h.day === selectedDay ? ' is-selected' : ''}`,
-          attrs: { type: 'button', 'aria-label': `Detail ${formatDateLong(h.day)}` },
+          attrs: { type: 'button', 'aria-label': tr('Detail {day}', { day: formatDateLong(h.day) }) },
           onClick: () => pick(h),
           children: [
             el('span', {
               className: 'history-row-main',
-              children: [el('span', { className: 'history-row-date', text: `${formatDateShort(h.day)} · H${h.day}` }), el('span', { className: 'history-row-sub', text: sub || 'Hari biasa' })],
+              children: [el('span', { className: 'history-row-date', text: tr('{day} · H{day2}', { day: formatDateShort(h.day), day2: h.day }) }), el('span', { className: 'history-row-sub', text: sub || tr('Hari biasa') })],
             }),
             el('span', {
               className: 'history-row-money',
               children: [
                 el('span', { className: 'history-row-rev', text: formatRupiahShort(h.revenue) }),
-                el('span', { className: h.netProfit < 0 ? 'is-bad' : 'is-good', text: `${h.netProfit < 0 ? 'rugi' : 'laba'} ${formatRupiahShort(Math.abs(h.netProfit))}` }),
+                el('span', { className: h.netProfit < 0 ? 'is-bad' : 'is-good', text: tr('{0} {netProfit}', { 0: h.netProfit < 0 ? tr('rugi') : tr('laba'), netProfit: formatRupiahShort(Math.abs(h.netProfit)) }) }),
               ],
             }),
             el('span', { className: 'history-row-chev', text: '›', attrs: { 'aria-hidden': 'true' } }),
@@ -166,9 +167,9 @@ export function renderHistory(ctx: GameContext, ui: UIManager): HTMLElement {
       tiles,
       chart,
       axis,
-      el('div', { className: 'history-legend', text: `Batang = pendapatan · merah = hari rugi · ${wide() ? 'klik' : 'ketuk'} batang/baris untuk detail` }),
+      el('div', { className: 'history-legend', text: tr('Batang = pendapatan · merah = hari rugi · {0} batang/baris untuk detail', { 0: wide() ? tr('klik') : tr('ketuk') }) }),
       list,
-      el('p', { className: 'history-note', text: `Riwayat ${HISTORY_LIMIT} hari terakhir` }),
+      el('p', { className: 'history-note', text: tr('Riwayat {HISTORY_LIMIT} hari terakhir', { HISTORY_LIMIT }) }),
     ];
     if (!wide()) {
       root.classList.remove('is-wide');
@@ -211,11 +212,11 @@ export function renderHistory(ctx: GameContext, ui: UIManager): HTMLElement {
 /** Detail satu hari di sheet bawah (ponsel), dibagi akordeon (Keuangan terbuka, sisanya tertutup). */
 function openDay(ctx: GameContext, ui: UIManager, h: HistoryEntry): void {
   ui.openModal({
-    title: `${formatDateLong(h.day)} · Hari ${h.day}`,
+    title: tr('{day} · Hari {day2}', { day: formatDateLong(h.day), day2: h.day }),
     className: 'sheet sheet-report sheet-history-day',
     closeButton: true,
     body: dayBody(ctx, h, false),
-    actions: [{ label: 'Tutup', variant: 'primary' }],
+    actions: [{ label: tr('Tutup'), variant: 'primary' }],
   });
 }
 
@@ -224,7 +225,7 @@ function dayBody(ctx: GameContext, h: HistoryEntry, wide: boolean): HTMLElement 
   const r = h.report ?? null;
   const rp = (v: number): string => formatRupiah(Math.abs(v));
   const row = (label: string, value: string, cls = ''): HTMLElement => el('div', { className: `report-row ${cls}`, children: [el('span', { text: label }), el('strong', { text: value })] });
-  const cost = (label: string, v: number | undefined): HTMLElement | null => (v ? row(label, `−${rp(v)}`) : null);
+  const cost = (label: string, v: number | undefined): HTMLElement | null => (v ? row(label, tr('−{v}', { v: rp(v) })) : null);
   const plusMinus = (label: string, v: number | undefined): HTMLElement | null => (v ? row(label, `${v < 0 ? '−' : '+'}${rp(v)}`, v < 0 ? 'is-bad' : '') : null);
   const name = (id: string): string => {
     try {
@@ -273,92 +274,92 @@ function dayBody(ctx: GameContext, h: HistoryEntry, wide: boolean): HTMLElement 
   const head = el('div', {
     className: 'history-day-head',
     children: [
-      el('span', { className: 'history-tile-label', text: h.netProfit < 0 ? 'Rugi bersih' : 'Laba bersih' }),
+      el('span', { className: 'history-tile-label', text: h.netProfit < 0 ? tr('Rugi bersih') : tr('Laba bersih') }),
       el('strong', { className: h.netProfit < 0 ? 'is-bad' : 'is-good', text: rp(h.netProfit) }),
-      el('span', { className: 'muted', text: `Pendapatan ${formatRupiah(h.revenue)}` }),
+      el('span', { className: 'muted', text: tr('Pendapatan {revenue}', { revenue: formatRupiah(h.revenue) }) }),
       el('div', {
         className: 'history-facts',
         children: [
-          fact('Pelanggan', String(h.customers)),
-          fact('Kepuasan', `${Math.round(h.avgSatisfaction)}%`),
-          fact('Popularitas', popDelta === null ? String(Math.round(h.popularity)) : `${Math.round(h.popularity)} (${popDelta >= 0 ? '+' : ''}${popDelta})`, popDelta !== null && popDelta < 0 ? 'is-bad' : ''),
+          fact(tr('Pelanggan'), String(h.customers)),
+          fact(tr('Kepuasan'), `${Math.round(h.avgSatisfaction)}%`),
+          fact(tr('Popularitas'), popDelta === null ? String(Math.round(h.popularity)) : tr('{popularity} ({1}{popDelta})', { popularity: Math.round(h.popularity), 1: popDelta >= 0 ? '+' : '', popDelta }), popDelta !== null && popDelta < 0 ? 'is-bad' : ''),
         ],
       }),
     ],
   });
 
   // Keuangan
-  const finance = section('Keuangan', `${h.netProfit < 0 ? '−' : '+'}${formatRupiahShort(Math.abs(h.netProfit))}`, true, [
-    row('Pendapatan', formatRupiah(h.revenue)),
-    cost('Belanja bahan', r?.ingredientCost ?? h.ingredientCost),
-    cost('Promosi', r?.promotionCost),
-    cost('Operasional & sewa', r?.operationalCost ?? h.operationalCost),
-    cost('Upgrade', r?.upgradeCost),
-    cost('Pindah lokasi', r?.moveCost),
-    r && r.bankIncome ? row('Bunga deposito', `+${rp(r.bankIncome)}`) : null,
-    cost('Cicilan & bunga pinjaman', r?.loanCost),
-    plusMinus('Bersih pesanan online', h.onlineNet),
-    plusMinus('Bersih cabang', h.branchNet),
-    row(h.netProfit < 0 ? 'Rugi bersih' : 'Laba bersih', rp(h.netProfit), `history-total ${h.netProfit < 0 ? 'is-bad' : 'is-good'}`),
-    row('Kas akhir hari', formatRupiah(h.money)),
+  const finance = section(tr('Keuangan'), `${h.netProfit < 0 ? '−' : '+'}${formatRupiahShort(Math.abs(h.netProfit))}`, true, [
+    row(tr('Pendapatan'), formatRupiah(h.revenue)),
+    cost(tr('Belanja bahan'), r?.ingredientCost ?? h.ingredientCost),
+    cost(tr('Promosi'), r?.promotionCost),
+    cost(tr('Operasional & sewa'), r?.operationalCost ?? h.operationalCost),
+    cost(tr('Upgrade'), r?.upgradeCost),
+    cost(tr('Pindah lokasi'), r?.moveCost),
+    r && r.bankIncome ? row(tr('Bunga deposito'), tr('+{bankIncome}', { bankIncome: rp(r.bankIncome) })) : null,
+    cost(tr('Cicilan & bunga pinjaman'), r?.loanCost),
+    plusMinus(tr('Bersih pesanan online'), h.onlineNet),
+    plusMinus(tr('Bersih cabang'), h.branchNet),
+    row(h.netProfit < 0 ? tr('Rugi bersih') : tr('Laba bersih'), rp(h.netProfit), `history-total ${h.netProfit < 0 ? 'is-bad' : 'is-good'}`),
+    row(tr('Kas akhir hari'), formatRupiah(h.money)),
   ]);
 
   // Produk: lima kelompok sebagai chip, kelompok kosong disembunyikan.
   const top = r?.topSellers ?? h.topSellers ?? [];
   const productGroups = [
-    chips('Terlaris', top.slice(0, 5).map(([id, n]) => [name(id), `${n}`])),
-    chips('Kurang diminati', (r?.leastSold ?? []).map(([id, sold, made]) => [name(id), `${sold}/${made}`]), 'is-warn'),
-    chips('Kehabisan stok (dicari)', (r?.soldOut ?? []).map(([id, n]) => [name(id), `${n}×`]), 'is-warn'),
-    chips('Tersisa', (r?.leftovers ?? []).map(([id, n]) => [name(id), `${n}`])),
-    chips('Terbuang', (r?.wasted ?? []).map(([id, n, kind]) => [`${name(id)}${kind === 'bahan' ? ' (bahan)' : ''}`, `${n}`]), 'is-bad'),
-    r && r.wasteCost ? el('p', { className: 'history-small is-bad', text: `Nilai yang terbuang ${formatRupiah(r.wasteCost)}` }) : null,
+    chips(tr('Terlaris'), top.slice(0, 5).map(([id, n]) => [name(id), `${n}`])),
+    chips(tr('Kurang diminati'), (r?.leastSold ?? []).map(([id, sold, made]) => [name(id), tr('{sold}/{made}', { sold, made })]), 'is-warn'),
+    chips(tr('Kehabisan stok (dicari)'), (r?.soldOut ?? []).map(([id, n]) => [name(id), tr('{n}×', { n })]), 'is-warn'),
+    chips(tr('Tersisa'), (r?.leftovers ?? []).map(([id, n]) => [name(id), `${n}`])),
+    chips(tr('Terbuang'), (r?.wasted ?? []).map(([id, n, kind]) => [`${name(id)}${kind === 'bahan' ? tr(' (bahan)') : ''}`, `${n}`]), 'is-bad'),
+    r && r.wasteCost ? el('p', { className: 'history-small is-bad', text: tr('Nilai yang terbuang {wasteCost}', { wasteCost: formatRupiah(r.wasteCost) }) }) : null,
   ];
   const soldTotal = top.reduce((n, [, q]) => n + q, 0);
   const products = section(
-    'Produk',
-    r ? `${r.soldOut.length ? `${r.soldOut.length} habis · ` : ''}${r.wasted.length ? `${r.wasted.length} terbuang` : 'tidak ada yang terbuang'}` : soldTotal ? `${soldTotal} porsi terlaris` : '',
+    tr('Produk'),
+    r ? `${r.soldOut.length ? tr('{length} habis · ', { length: r.soldOut.length }) : ''}${r.wasted.length ? tr('{length} terbuang', { length: r.wasted.length }) : tr('tidak ada yang terbuang')}` : soldTotal ? tr('{soldTotal} porsi terlaris', { soldTotal }) : '',
     wide,
-    productGroups.some(Boolean) ? productGroups : [el('p', { className: 'history-small muted', text: r ? 'Tidak ada produk terjual hari ini.' : 'Tidak tercatat di riwayat lama.' })],
+    productGroups.some(Boolean) ? productGroups : [el('p', { className: 'history-small muted', text: r ? tr('Tidak ada produk terjual hari ini.') : tr('Tidak tercatat di riwayat lama.') })],
   );
 
   // Pelanggan
-  const customers = section('Pelanggan', `${h.customers} rombongan`, false, [
-    row('Rombongan datang', String(h.customers)),
-    r ? row('Dilayani penuh', String(r.served)) : h.served !== undefined ? row('Dilayani', String(h.served)) : null,
-    r && r.partial ? row('Dilayani sebagian', String(r.partial)) : null,
-    (r?.leftEmpty ?? h.leftEmpty) ? row('Pergi karena menu habis', String(r?.leftEmpty ?? h.leftEmpty), 'is-bad') : null,
-    r && r.leftWaiting ? row('Pergi karena menunggu lama', String(r.leftWaiting), 'is-bad') : null,
-    row('Rata-rata kepuasan', `${Math.round(h.avgSatisfaction)}%`),
-    r ? row('Popularitas', `${Math.round(r.popularityBefore)} → ${Math.round(r.popularityAfter)}`) : row('Popularitas akhir', String(Math.round(h.popularity))),
-    r ? row('Loyalitas', `${Math.round(r.loyaltyAfter)}/100`) : null,
-    r && r.reviewDelta ? row('Ulasan food vlogger', `${r.reviewDelta > 0 ? '+' : ''}${r.reviewDelta} popularitas`, r.reviewDelta < 0 ? 'is-bad' : '') : null,
+  const customers = section(tr('Pelanggan'), tr('{customers} rombongan', { customers: h.customers }), false, [
+    row(tr('Rombongan datang'), String(h.customers)),
+    r ? row(tr('Dilayani penuh'), String(r.served)) : h.served !== undefined ? row(tr('Dilayani'), String(h.served)) : null,
+    r && r.partial ? row(tr('Dilayani sebagian'), String(r.partial)) : null,
+    (r?.leftEmpty ?? h.leftEmpty) ? row(tr('Pergi karena menu habis'), String(r?.leftEmpty ?? h.leftEmpty), 'is-bad') : null,
+    r && r.leftWaiting ? row(tr('Pergi karena menunggu lama'), String(r.leftWaiting), 'is-bad') : null,
+    row(tr('Rata-rata kepuasan'), `${Math.round(h.avgSatisfaction)}%`),
+    r ? row(tr('Popularitas'), tr('{popularityBefore} → {popularityAfter}', { popularityBefore: Math.round(r.popularityBefore), popularityAfter: Math.round(r.popularityAfter) })) : row(tr('Popularitas akhir'), String(Math.round(h.popularity))),
+    r ? row(tr('Loyalitas'), tr('{loyaltyAfter}/100', { loyaltyAfter: Math.round(r.loyaltyAfter) })) : null,
+    r && r.reviewDelta ? row(tr('Ulasan food vlogger'), tr('{0}{reviewDelta} popularitas', { 0: r.reviewDelta > 0 ? '+' : '', reviewDelta: r.reviewDelta }), r.reviewDelta < 0 ? 'is-bad' : '') : null,
   ]);
 
   // Pesanan online
   const o = r?.online ?? null;
   const online = o
-    ? section('Pesanan online', `${o.delivered} terantar`, false, [
-        row('Pesanan masuk', String(o.generated)),
-        row('Diterima / terantar', `${o.accepted} / ${o.delivered}`),
-        o.late ? row('Terlambat', String(o.late), 'is-bad') : null,
-        o.cancelled ? row('Batal (stok habis / tak terantar)', String(o.cancelled), 'is-bad') : null,
-        o.rejected || o.expired ? row('Ditolak / tidak dijawab', `${o.rejected} / ${o.expired}`) : null,
-        row('Nilai menu terkirim', formatRupiah(o.gross)),
-        cost('Komisi ojol', o.commission),
-        o.feesKept ? row('Ongkir masuk kas', `+${rp(o.feesKept)}`) : null,
-        cost('Gaji kurir', o.wage),
-        row('Bersih online', `${h.onlineNet && h.onlineNet < 0 ? '−' : '+'}${rp(h.onlineNet ?? 0)}`, 'history-total'),
-        row('Rating kemitraan', `${o.ratingChange >= 0 ? '+' : ''}${Math.round(o.ratingChange)}`, o.ratingChange < 0 ? 'is-bad' : ''),
+    ? section(tr('Pesanan online'), tr('{delivered} terantar', { delivered: o.delivered }), false, [
+        row(tr('Pesanan masuk'), String(o.generated)),
+        row(tr('Diterima / terantar'), tr('{accepted} / {delivered}', { accepted: o.accepted, delivered: o.delivered })),
+        o.late ? row(tr('Terlambat'), String(o.late), 'is-bad') : null,
+        o.cancelled ? row(tr('Batal (stok habis / tak terantar)'), String(o.cancelled), 'is-bad') : null,
+        o.rejected || o.expired ? row(tr('Ditolak / tidak dijawab'), tr('{rejected} / {expired}', { rejected: o.rejected, expired: o.expired })) : null,
+        row(tr('Nilai menu terkirim'), formatRupiah(o.gross)),
+        cost(tr('Komisi ojol'), o.commission),
+        o.feesKept ? row(tr('Ongkir masuk kas'), tr('+{feesKept}', { feesKept: rp(o.feesKept) })) : null,
+        cost(tr('Gaji kurir'), o.wage),
+        row(tr('Bersih online'), `${h.onlineNet && h.onlineNet < 0 ? '−' : '+'}${rp(h.onlineNet ?? 0)}`, 'history-total'),
+        row(tr('Rating kemitraan'), `${o.ratingChange >= 0 ? '+' : ''}${Math.round(o.ratingChange)}`, o.ratingChange < 0 ? 'is-bad' : ''),
       ])
     : h.onlineDelivered
-      ? section('Pesanan online', `${h.onlineDelivered} terantar`, false, [row('Terantar', String(h.onlineDelivered)), plusMinus('Bersih online', h.onlineNet)])
+      ? section(tr('Pesanan online'), tr('{onlineDelivered} terantar', { onlineDelivered: h.onlineDelivered }), false, [row(tr('Terantar'), String(h.onlineDelivered)), plusMinus(tr('Bersih online'), h.onlineNet)])
       : null;
 
   // Cabang: satu kartu kecil per cabang.
   const br = r?.branches ?? [];
   const branches = br.length
     ? section(
-        'Cabang',
+        tr('Cabang'),
         `${(h.branchNet ?? 0) < 0 ? '−' : '+'}${formatRupiahShort(Math.abs(h.branchNet ?? 0))}`,
         false,
         br.map((b) => {
@@ -377,9 +378,9 @@ function dayBody(ctx: GameContext, h: HistoryEntry, wide: boolean): HTMLElement 
           const table = ids.length
             ? el('div', {
                 className: 'branch-table history-branch-table',
-                attrs: { role: 'table', 'aria-label': `Rincian produk ${b.name}` },
+                attrs: { role: 'table', 'aria-label': tr('Rincian produk {name}', { name: b.name }) },
                 children: [
-                  el('div', { className: 'branch-tr branch-th', attrs: { role: 'row' }, children: ['Produk', 'Diterima', 'Terjual', 'Tersisa', 'Terbuang'].map((t) => el('span', { text: t, attrs: { role: 'columnheader' } })) }),
+                  el('div', { className: 'branch-tr branch-th', attrs: { role: 'row' }, children: [tr('Produk'), tr('Diterima'), tr('Terjual'), tr('Tersisa'), tr('Terbuang')].map((t) => el('span', { text: t, attrs: { role: 'columnheader' } })) }),
                   ...ids.map((id) =>
                     el('div', {
                       className: 'branch-tr',
@@ -388,12 +389,12 @@ function dayBody(ctx: GameContext, h: HistoryEntry, wide: boolean): HTMLElement 
                         el('span', { className: 'branch-td-name', text: name(id), attrs: { role: 'cell' } }),
                         ...(
                           [
-                            ['Diterima', b.received[id] ?? 0],
-                            ['Terjual', b.sold[id] ?? 0],
-                            ['Tersisa', b.left[id] ?? 0],
-                            ['Terbuang', b.wasted[id] ?? 0],
+                            [tr('Diterima'), b.received[id] ?? 0],
+                            [tr('Terjual'), b.sold[id] ?? 0],
+                            [tr('Tersisa'), b.left[id] ?? 0],
+                            [tr('Terbuang'), b.wasted[id] ?? 0],
                           ] as const
-                        ).map(([label, v]) => el('span', { className: label === 'Terbuang' && v ? 'is-bad' : '', text: String(v), attrs: { role: 'cell', 'data-label': label } })),
+                        ).map(([label, v]) => el('span', { className: label === tr('Terbuang') && v ? 'is-bad' : '', text: String(v), attrs: { role: 'cell', 'data-label': label } })),
                       ],
                     }),
                   ),
@@ -405,25 +406,25 @@ function dayBody(ctx: GameContext, h: HistoryEntry, wide: boolean): HTMLElement 
             : el('div', {
                 className: 'history-branch-money',
                 children: [
-                  el('span', { text: `Pendapatan ${formatRupiah(b.revenue)}` }),
-                  b.shrink ? el('span', { text: `Selisih kas −${formatRupiah(b.shrink)}` }) : null,
-                  el('span', { text: `Operasional −${formatRupiah(b.operational)}` }),
-                  b.wage ? el('span', { text: `Gaji${b.staffName ? ` ${b.staffName}` : ''} −${formatRupiah(b.wage)}` }) : null,
+                  el('span', { text: tr('Pendapatan {revenue}', { revenue: formatRupiah(b.revenue) }) }),
+                  b.shrink ? el('span', { text: tr('Selisih kas −{shrink}', { shrink: formatRupiah(b.shrink) }) }) : null,
+                  el('span', { text: tr('Operasional −{operational}', { operational: formatRupiah(b.operational) }) }),
+                  b.wage ? el('span', { text: tr('Gaji{0} −{wage}', { 0: b.staffName ? tr(' {staffName}', { staffName: b.staffName }) : '', wage: formatRupiah(b.wage) }) }) : null,
                 ].filter((n): n is HTMLElement => n !== null),
               });
           return el('div', {
             className: 'history-branch',
             children: [
-              el('div', { className: 'history-branch-head', children: [el('strong', { text: `${b.name} · ${bl}` }), el('strong', { className: b.net < 0 ? 'is-bad' : 'is-good', text: `${b.net < 0 ? '−' : '+'}${formatRupiahShort(Math.abs(b.net))}` })] }),
+              el('div', { className: 'history-branch-head', children: [el('strong', { text: tr('{name} · {bl}', { name: b.name, bl }) }), el('strong', { className: b.net < 0 ? 'is-bad' : 'is-good', text: `${b.net < 0 ? '−' : '+'}${formatRupiahShort(Math.abs(b.net))}` })] }),
               el('span', {
                 className: 'history-small muted',
                 text:
                   b.status === 'tutup'
-                    ? 'Tutup'
-                    : `${BRANCH_STATUS_LABEL[b.status]} · ${b.portions} porsi terjual${left ? ` · sisa ${left}` : ''}${wasted ? ` · terbuang ${wasted}` : ''}${b.wageLate ? ' · gaji telat' : ''}${b.staffQuit ? ' · karyawan keluar' : ''}`,
+                    ? trc('status', 'Tutup')
+                    : tr('{0} · {portions} porsi terjual{2}{3}{4}{5}', { 0: BRANCH_STATUS_LABEL[b.status], portions: b.portions, 2: left ? tr(' · sisa {left}', { left }) : '', 3: wasted ? tr(' · terbuang {wasted}', { wasted }) : '', 4: b.wageLate ? tr(' · gaji telat') : '', 5: b.staffQuit ? tr(' · karyawan keluar') : '' }),
               }),
               money,
-              table ?? (b.status === 'tutup' ? null : el('p', { className: 'history-small muted', text: 'Tidak ada produk di cabang hari itu.' })),
+              table ?? (b.status === 'tutup' ? null : el('p', { className: 'history-small muted', text: tr('Tidak ada produk di cabang hari itu.') })),
             ].filter((n): n is HTMLElement => n !== null),
           });
         }),
@@ -432,13 +433,13 @@ function dayBody(ctx: GameContext, h: HistoryEntry, wide: boolean): HTMLElement 
 
   // Kejadian
   const bulk = r?.event?.bulk ?? null;
-  const events = section('Kejadian', ev ? `${ev.icon} ${ev.name}` : h.weather ? `${WEATHER_ICON[h.weather]} ${WEATHER_LABELS[h.weather]}` : '', false, [
-    loc ? row('Lokasi', loc) : null,
-    row('Event', ev ? `${ev.icon} ${ev.name}` : r || h.weather ? 'Tidak ada' : '—'),
-    bulk ? row(`Pesanan borongan ${name(bulk.recipeId)} ×${bulk.qty}`, bulk.status === 'terkirim' ? 'Terkirim' : bulk.status === 'gagal' ? 'Gagal' : 'Menunggu', bulk.status === 'gagal' ? 'is-bad' : '') : null,
-    h.weather ? row('Cuaca', `${WEATHER_ICON[h.weather]} ${WEATHER_LABELS[h.weather]}`) : null,
-    row('Hari', isWeekend(h.day) ? 'Akhir pekan' : 'Hari kerja'),
-    r && r.ads.length ? row('Promosi aktif', r.ads.map((a) => {
+  const events = section(tr('Kejadian'), ev ? tr('{icon} {name}', { icon: ev.icon, name: ev.name }) : h.weather ? `${WEATHER_ICON[h.weather]} ${WEATHER_LABELS[h.weather]}` : '', false, [
+    loc ? row(tr('Lokasi'), loc) : null,
+    row(tr('Event'), ev ? tr('{icon} {name}', { icon: ev.icon, name: ev.name }) : r || h.weather ? tr('Tidak ada') : '—'),
+    bulk ? row(tr('Pesanan borongan {recipeId} ×{qty}', { recipeId: name(bulk.recipeId), qty: bulk.qty }), bulk.status === 'terkirim' ? tr('Terkirim') : bulk.status === 'gagal' ? tr('Gagal') : tr('Menunggu'), bulk.status === 'gagal' ? 'is-bad' : '') : null,
+    h.weather ? row(tr('Cuaca'), `${WEATHER_ICON[h.weather]} ${WEATHER_LABELS[h.weather]}`) : null,
+    row(tr('Hari'), isWeekend(h.day) ? tr('Akhir pekan') : tr('Hari kerja')),
+    r && r.ads.length ? row(tr('Promosi aktif'), r.ads.map((a) => {
       try {
         return adById(a).name;
       } catch {
@@ -451,6 +452,6 @@ function dayBody(ctx: GameContext, h: HistoryEntry, wide: boolean): HTMLElement 
     className: 'history-day',
     children: [head, finance, products, customers, online, branches, events].filter((n): n is HTMLElement => n !== null),
   });
-  if (wide) body.prepend(el('h3', { className: 'history-side-title', text: `${formatDateLong(h.day)} · Hari ${h.day}` }));
+  if (wide) body.prepend(el('h3', { className: 'history-side-title', text: tr('{day} · Hari {day2}', { day: formatDateLong(h.day), day2: h.day }) }));
   return body;
 }

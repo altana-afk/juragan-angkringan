@@ -1,0 +1,11 @@
+{
+  "types": [
+    { "id": "mahasiswa", "name": "Students" },
+    { "id": "pekerja", "name": "Workers" },
+    { "id": "ojol", "name": "Ride-hail drivers" },
+    { "id": "keluarga", "name": "Families" },
+    { "id": "tetap", "name": "Regulars" },
+    { "id": "penasaran", "name": "Curious customers" },
+    { "id": "royal", "name": "Big spenders" }
+  ]
+}

@@ -7,6 +7,7 @@ import { registerArt } from '../graphics/TextureFactory';
 import { getMap } from '../world/maps';
 import { ensureGroundTexture, ensureWorldAnimations } from '../world/WorldBuilder';
 import { SCENES } from './sceneKeys';
+import { tr } from '../i18n/i18n';
 
 /**
  * Membuat semua aset placeholder secara prosedural, sedikit demi sedikit per frame
@@ -31,7 +32,7 @@ export class LoadingScene extends Phaser.Scene {
     this.cameras.main.setBackgroundColor(GAME_CONFIG.backgroundColor);
     this.bar = this.add.graphics();
     this.label = this.add
-      .text(0, 0, 'Menyiapkan angkringan…', { fontFamily: 'system-ui, sans-serif', fontSize: '14px', color: '#f3e3c3' })
+      .text(0, 0, tr('Menyiapkan angkringan…'), { fontFamily: 'system-ui, sans-serif', fontSize: '14px', color: '#f3e3c3' })
       .setOrigin(0.5, 1);
     this.jobIndex = 0;
     this.layout(0);
@@ -59,11 +60,11 @@ export class LoadingScene extends Phaser.Scene {
   private runJob(index: number): void {
     const job = ART_JOBS[index];
     if (job) {
-      this.label.setText(`Menyiapkan ${job.label.toLowerCase()}…`);
+      this.label.setText(tr('Menyiapkan {0}…', { 0: job.label.toLowerCase() }));
       for (const entry of job.build()) registerArt(this.textures, entry);
       return;
     }
-    this.label.setText('Menata jalanan…');
+    this.label.setText(tr('Menata jalanan…'));
     ensureGroundTexture(this.textures, getMap(GAME_CONFIG.world.mapId));
   }
 

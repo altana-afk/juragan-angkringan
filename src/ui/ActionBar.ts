@@ -5,6 +5,7 @@ import { el, setText, type UIComponent } from './dom';
 import { icon, type IconName } from './icons';
 import { BusinessSheet, businessNeedsAttention } from './BusinessSheet';
 import { pendingOrders } from '../systems/OnlineOrderSystem';
+import { tr } from '../i18n/i18n';
 
 /**
  * Panel tombol bawah (0.13.0: maksimal 4 tombol + tombol utama, di semua ukuran layar):
@@ -23,7 +24,7 @@ export class ActionBar implements UIComponent {
   private readonly ordersBadge = el('span', { className: 'action-badge' });
 
   constructor(private readonly ctx: GameContext, parent: HTMLElement) {
-    this.root = el('nav', { className: 'action-bar', attrs: { 'aria-label': 'Aksi angkringan' } });
+    this.root = el('nav', { className: 'action-bar', attrs: { 'aria-label': tr('Aksi angkringan') } });
     parent.append(this.root);
     this.phase = ctx.store.get().phase;
     this.sheet = new BusinessSheet(ctx, parent);
@@ -62,10 +63,10 @@ export class ActionBar implements UIComponent {
     const items: HTMLElement[] = [];
     if (this.phase === 'persiapan') {
       items.push(
-        this.button('Belanja', 'basket', 'Beli bahan baku (B)', open('shop')),
-        this.button('Persiapan', 'pot', 'Masak produk untuk dijual (P)', open('kitchen'), '', 'Masak'),
+        this.button(tr('Belanja'), 'basket', tr('Beli bahan baku (B)'), open('shop')),
+        this.button(tr('Persiapan'), 'pot', tr('Masak produk untuk dijual (P)'), open('kitchen'), '', tr('Masak')),
       );
-      this.usahaButton = this.button('Usaha', 'briefcase', 'Upgrade, Promosi, Pengantaran, Statistik, Bank', () => {
+      this.usahaButton = this.button(tr('Usaha'), 'briefcase', tr('Upgrade, Promosi, Pengantaran, Statistik, Bank'), () => {
         this.ctx.bus.emit('story:hint', { show: false, kind: 'bar' });
         this.ctx.actions.markOnlineFlag('barHint');
         this.sheet.toggle(this.usahaButton!);
@@ -80,15 +81,15 @@ export class ActionBar implements UIComponent {
       this.usahaButton.append(el('span', { className: 'action-dot', attrs: { 'aria-hidden': 'true' } }));
       items.push(
         this.usahaButton,
-        this.button('Mulai Berjualan', 'store', 'Buka angkringan (Enter)', () => this.ctx.bus.emit('sales:start-request'), 'action-primary', 'Buka'),
+        this.button(tr('Mulai Berjualan'), 'store', tr('Buka angkringan (Enter)'), () => this.ctx.bus.emit('sales:start-request'), 'action-primary', tr('Buka')),
       );
     } else if (this.phase === 'berjualan') {
-      items.push(this.button('Persiapan', 'pot', 'Masak lagi — jam berhenti selama panel terbuka (P)', open('kitchen'), '', 'Masak'));
-      this.ordersButton = this.button('Pesanan', 'phone', 'Pesanan online — terima atau tolak (O)', open('orders'), 'action-orders');
+      items.push(this.button(tr('Persiapan'), 'pot', tr('Masak lagi — jam berhenti selama panel terbuka (P)'), open('kitchen'), '', tr('Masak')));
+      this.ordersButton = this.button(tr('Pesanan'), 'phone', tr('Pesanan online — terima atau tolak (O)'), open('orders'), 'action-orders');
       this.ordersButton.append(this.ordersBadge);
       items.push(this.ordersButton);
-      const speeds: [SimSpeed, string, string][] = [[0, '❚❚', 'Jeda (Spasi)'], [1, '1×', 'Normal (1)'], [2, '2×', 'Cepat (2)'], [3, '3×', 'Sangat cepat (3)']];
-      const group = el('div', { className: 'speed-group', attrs: { role: 'group', 'aria-label': 'Kecepatan waktu' } });
+      const speeds: [SimSpeed, string, string][] = [[0, '❚❚', tr('Jeda (Spasi)')], [1, '1×', tr('Normal (1)')], [2, '2×', tr('Cepat (2)')], [3, '3×', tr('Sangat cepat (3)')]];
+      const group = el('div', { className: 'speed-group', attrs: { role: 'group', 'aria-label': tr('Kecepatan waktu') } });
       for (const [speed, label, hint] of speeds) {
         const b = el('button', {
           className: `speed-btn${this.speed === speed ? ' is-active' : ''}`,
@@ -116,7 +117,7 @@ export class ActionBar implements UIComponent {
     this.ordersBadge.hidden = n === 0;
     this.ordersButton?.classList.toggle('has-orders', n > 0);
     if (this.ordersButton) {
-      this.ordersButton.setAttribute('aria-label', n ? `Pesanan, ${n} menunggu` : 'Pesanan');
+      this.ordersButton.setAttribute('aria-label', n ? tr('Pesanan, {n} menunggu', { n }) : tr('Pesanan'));
       this.ordersButton.classList.toggle('is-off', !s.online.mode || !s.online.enabled);
     }
   }

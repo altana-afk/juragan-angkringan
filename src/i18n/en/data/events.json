@@ -1,0 +1,23 @@
+{
+  "events": [
+    { "id": "nobar_bola", "name": "Football watch party", "description": "There's a match screening at the neighborhood guard post. The night gets busier as workers & ride-hail drivers pour in." },
+    { "id": "hajatan", "name": "Neighbor's celebration", "description": "A neighbor placed a bulk order! Prepare the portions before opening; they pay above the usual price." },
+    { "id": "acara_kampus", "name": "Campus event", "description": "There's a festival on campus. Students flood the area until late." },
+    { "id": "pesanan_himpunan", "name": "Student association order", "description": "A student association placed a bulk order for their late-night meeting. Prepare the portions before opening." },
+    { "id": "cabai_mahal", "name": "Chili prices spike", "description": "Chili supplies are tight, so prices jump today." },
+    { "id": "telur_murah", "name": "Cheap eggs at the market", "description": "Farmers had a bumper harvest, so egg prices drop today." },
+    { "id": "gula_mahal", "name": "Sugar shortage", "description": "Sugar is scarce, so prices go up." },
+    { "id": "listrik_padam", "name": "Rolling blackout", "description": "Part of the neighborhood is dark. Fewer visitors." },
+    { "id": "penertiban", "name": "Parking crackdown", "description": "There's a crackdown on illegal parking on the street. Fewer visitors." },
+    { "id": "rombongan_ojol", "name": "Ride-hail meetup", "description": "A ride-hail drivers' community is gathering nearby tonight." },
+    { "id": "food_vlogger", "name": "Food vlogger visit", "description": "A food vlogger drops by. If average satisfaction is ≥ 70, popularity rises; if it's poor, it drops." },
+    { "id": "gajian", "name": "Payday", "description": "People just got paid, so customers have looser budgets." },
+    { "id": "konser_dangdut", "name": "Dangdut concert on stage", "description": "There's a dangdut concert on the night market stage. Visitors pour in until late!" },
+    { "id": "kembang_api", "name": "Fireworks party", "description": "The organizers set off fireworks. Lots of curious new visitors drop by." },
+    { "id": "pesanan_panitia", "name": "Night market crew order", "description": "The organizers & ride operators placed a bulk food order for the night crew. Prepare it before opening." },
+    { "id": "rombongan_wisata", "name": "Tour bus group", "description": "A group of tourists placed a bulk drink order for the bus. Prepare it before opening." },
+    { "id": "retribusi", "name": "Cleaning levy", "description": "Officials are collecting an extra levy to clean up after tonight's event (Rp20,000)." },
+    { "id": "wahana_rusak", "name": "Ferris wheel broken", "description": "The Ferris wheel is under repair, so fewer people come to the night market." },
+    { "id": "pesanan_pedagang", "name": "Market traders' order", "description": "The traders placed a bulk order of fried snacks & food to keep them going on their watch. Prepare it before opening." }
+  ]
+}

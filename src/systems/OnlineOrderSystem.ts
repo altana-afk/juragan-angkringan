@@ -13,6 +13,7 @@ import { clampPopularity } from './PopularitySystem';
 import { onlinePriceOf, priceAppealFactor } from './PricingSystem';
 import { GameRuleError } from './rules';
 import { effectsOf } from './UpgradeSystem';
+import { tr } from '../i18n/i18n';
 
 /**
  * Pesanan online (0.13.0): pesanan masuk saat berjualan, bisa diterima atau ditolak.
@@ -177,10 +178,10 @@ export function stockShortfall(state: Readonly<GameState>, order: OnlineOrder, h
 
 /** Alasan pesanan belum bisa diterima (null = bisa). */
 export function acceptBlocker(state: Readonly<GameState>, order: OnlineOrder): string | null {
-  if (state.phase !== 'berjualan') return 'Pesanan hanya bisa diterima saat berjualan.';
-  if (order.status !== 'menunggu') return 'Pesanan ini sudah tidak menunggu.';
-  if (!state.online.mode) return 'Pilih cara mengantar dulu.';
-  if (acceptedToday(state) >= dailyLimit(state)) return `Batas ${dailyLimit(state)} pesanan online hari ini sudah tercapai.`;
+  if (state.phase !== 'berjualan') return tr('Pesanan hanya bisa diterima saat berjualan.');
+  if (order.status !== 'menunggu') return tr('Pesanan ini sudah tidak menunggu.');
+  if (!state.online.mode) return tr('Pilih cara mengantar dulu.');
+  if (acceptedToday(state) >= dailyLimit(state)) return tr('Batas {state} pesanan online hari ini sudah tercapai.', { state: dailyLimit(state) });
   return null;
 }
 
@@ -188,17 +189,17 @@ export function acceptBlocker(state: Readonly<GameState>, order: OnlineOrder): s
 
 export function acceptOrder(draft: GameState, id: number, honorNote: boolean, source: OnlineSource = 'utama', catalog?: Catalog): OnlineOrder {
   const o = draft.online.orders.find((x) => x.id === id);
-  if (!o) throw new GameRuleError('online-unknown', 'Pesanan tidak ditemukan.');
+  if (!o) throw new GameRuleError('online-unknown', tr('Pesanan tidak ditemukan.'));
   const blocker = acceptBlocker(draft, o);
   if (blocker) throw new GameRuleError('online-blocked', blocker);
   const minute = draft.calendar.clockMinutes;
   if (source !== 'utama') {
     if (!catalog) throw new Error('catalog wajib untuk pesanan dari cabang');
     const b = draft.branches.list.find((x) => x.slot === source);
-    if (!b) throw new GameRuleError('online-blocked', 'Cabang tidak ditemukan.');
+    if (!b) throw new GameRuleError('online-blocked', tr('Cabang tidak ditemukan.'));
     o.noteHonored = o.note !== null && honorNote;
     const opt = branchOption(draft, catalog, o, b, o.noteHonored);
-    if (!opt.ok) throw new GameRuleError('online-blocked', `${b.name}: ${opt.reason}.`);
+    if (!opt.ok) throw new GameRuleError('online-blocked', tr('{name}: {reason}.', { name: b.name, reason: opt.reason }));
     o.acceptedMinute = minute;
     dispatchFromBranch(draft, catalog, o, source);
     draft.online.today.accepted++;
@@ -221,13 +222,13 @@ export function acceptOrder(draft: GameState, id: number, honorNote: boolean, so
 
 export function rejectOrder(draft: GameState, id: number): void {
   const o = draft.online.orders.find((x) => x.id === id);
-  if (!o || o.status !== 'menunggu') throw new GameRuleError('online-unknown', 'Pesanan ini sudah tidak menunggu.');
+  if (!o || o.status !== 'menunggu') throw new GameRuleError('online-unknown', tr('Pesanan ini sudah tidak menunggu.'));
   o.status = 'ditolak';
   draft.online.today.rejected++;
 }
 
 export function setDeliveryMode(draft: GameState, mode: 'kurir' | 'ojol'): void {
-  if (draft.phase === 'berjualan') throw new GameRuleError('wrong-phase', 'Cara mengantar hanya bisa diganti saat persiapan.');
+  if (draft.phase === 'berjualan') throw new GameRuleError('wrong-phase', tr('Cara mengantar hanya bisa diganti saat persiapan.'));
   draft.online.mode = mode;
 }
 
@@ -322,7 +323,7 @@ export function tickOnline(draft: GameState, catalog: Catalog, minute: number, a
       on.nextId++;
       on.orders.push(o);
       on.today.generated++;
-      events.push({ kind: 'baru', order: o, message: `Pesanan online dari ${o.buyer} (${formatRupiah(o.value)}).` });
+      events.push({ kind: 'baru', order: o, message: tr('Pesanan online dari {buyer} ({value}).', { buyer: o.buyer, value: formatRupiah(o.value) }) });
     }
   }
 
@@ -332,7 +333,7 @@ export function tickOnline(draft: GameState, catalog: Catalog, minute: number, a
       o.status = 'kedaluwarsa';
       on.today.expired++;
       changeRating(draft, -1);
-      events.push({ kind: 'kedaluwarsa', order: o, message: `Pesanan ${o.buyer} tidak dijawab dan dibatalkan pembeli.` });
+      events.push({ kind: 'kedaluwarsa', order: o, message: tr('Pesanan {buyer} tidak dijawab dan dibatalkan pembeli.', { buyer: o.buyer }) });
     }
   }
 
@@ -344,13 +345,13 @@ export function tickOnline(draft: GameState, catalog: Catalog, minute: number, a
       if (o.status === 'diterima' && o.pickupMinute !== null && minute >= o.pickupMinute) {
         const short = takeStock(draft, catalog, o);
         if (short.length) {
-          cancel(draft, o, `Stok ${short.join(', ')} habis saat driver tiba`);
-          events.push({ kind: 'batal', order: o, message: `Pesanan ${o.buyer} batal: stok ${short.join(', ')} habis.` });
+          cancel(draft, o, tr('Stok {0} habis saat driver tiba', { 0: short.join(', ') }));
+          events.push({ kind: 'batal', order: o, message: tr('Pesanan {buyer} batal: stok {1} habis.', { buyer: o.buyer, 1: short.join(', ') }) });
           continue;
         }
         o.status = 'diantar';
         o.deliveredMinute = minute + travelMinutes(o.km, factor);
-        events.push({ kind: 'dijemput', order: o, message: `Driver menjemput pesanan ${o.buyer}.` });
+        events.push({ kind: 'dijemput', order: o, message: tr('Driver menjemput pesanan {buyer}.', { buyer: o.buyer }) });
       }
     }
   }
@@ -362,7 +363,7 @@ export function tickOnline(draft: GameState, catalog: Catalog, minute: number, a
   for (const o of on.orders) {
     if (o.status === 'diantar' && o.deliveredMinute !== null && minute >= o.deliveredMinute) {
       deliver(draft, o, o.deliveredMinute);
-      events.push({ kind: 'selesai', order: o, message: `Pesanan ${o.buyer} sampai${o.late ? ' (terlambat)' : ''}.` });
+      events.push({ kind: 'selesai', order: o, message: tr('Pesanan {buyer} sampai{1}.', { buyer: o.buyer, 1: o.late ? tr(' (terlambat)') : '' }) });
     }
   }
   return events;
@@ -380,8 +381,8 @@ export function dispatchCourier(draft: GameState, catalog: Catalog, minute: numb
   for (const o of ready) {
     const short = takeStock(draft, catalog, o);
     if (short.length) {
-      cancel(draft, o, `Stok ${short.join(', ')} habis saat kurir berangkat`);
-      events.push({ kind: 'batal', order: o, message: `Pesanan ${o.buyer} batal: stok ${short.join(', ')} habis.` });
+      cancel(draft, o, tr('Stok {0} habis saat kurir berangkat', { 0: short.join(', ') }));
+      events.push({ kind: 'batal', order: o, message: tr('Pesanan {buyer} batal: stok {1} habis.', { buyer: o.buyer, 1: short.join(', ') }) });
     } else going.push(o);
   }
   if (!going.length) return events;
@@ -395,7 +396,7 @@ export function dispatchCourier(draft: GameState, catalog: Catalog, minute: numb
     o.pickupMinute = minute;
     o.deliveredMinute = plan.deliveries.get(o.id) ?? minute;
   }
-  events.push({ kind: 'berangkat', order: going[0] as OnlineOrder, message: `${def.courierName} berangkat mengantar ${going.length} pesanan.` });
+  events.push({ kind: 'berangkat', order: going[0] as OnlineOrder, message: tr('{courierName} berangkat mengantar {length} pesanan.', { courierName: def.courierName, length: going.length }) });
   return events;
 }
 
@@ -417,7 +418,7 @@ export function finishOnlineDay(draft: GameState, catalog: Catalog): OnlineTickE
     events.push(...tickOnline(draft, catalog, m, false));
   }
   for (const o of activeOrders(draft)) {
-    if (o.status === 'diterima') cancel(draft, o, 'Tidak sempat diantar sebelum tutup');
+    if (o.status === 'diterima') cancel(draft, o, tr('Tidak sempat diantar sebelum tutup'));
     else deliver(draft, o, o.deliveredMinute ?? close);
   }
   return events;

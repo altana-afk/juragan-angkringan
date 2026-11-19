@@ -6,6 +6,7 @@ import { travelFactor, travelMinutes } from './CourierSystem';
 import { consumeStock, totalQty } from './InventorySystem';
 import { orderNeeds, stockShortfall } from './OnlineOrderSystem';
 import { effectsOf } from './UpgradeSystem';
+import { tr } from '../i18n/i18n';
 
 /** Sumber pengiriman pesanan online: 'utama' atau nomor slot cabang. */
 export type OnlineSource = 'utama' | number;
@@ -64,9 +65,9 @@ function mainOption(state: Readonly<GameState>, order: OnlineOrder, honorNote: b
   for (const id of orderNeeds(order, honorNote).keys()) available[id] = totalQty(state.inventory.products[id]);
   return {
     source: 'utama',
-    label: 'Toko utama',
+    label: tr('Toko utama'),
     ok: short.length === 0,
-    reason: short.length ? 'stok kurang' : null,
+    reason: short.length ? tr('stok kurang') : null,
     eta: Math.round(Math.max(prepMinutes(order, honorNote), wait) + travel),
     fee: 0,
     available,
@@ -82,14 +83,14 @@ export function branchOption(state: Readonly<GameState>, catalog: Catalog, order
   const factor = travelFactor('kurir', state.weather, 0) * (hasMotor(branch) ? 1 : BRANCH_RULES.onlineSlowNoMotor);
   const eta = prepMinutes(order, honorNote) + travelMinutes(order.km, factor);
   let reason: string | null = null;
-  if (!branch.open) reason = 'cabang tutup';
-  else if (!branch.staff) reason = 'tidak ada karyawan jaga';
+  if (!branch.open) reason = tr('cabang tutup');
+  else if (!branch.staff) reason = tr('tidak ada karyawan jaga');
   else {
     // Item tambahan dari catatan tidak wajib — kalau tidak ada, catatan saja yang tidak dipenuhi.
     const extra = honorNote ? order.note?.extraItem ?? null : null;
     const short = [...needs].filter(([id, n]) => available[id]! < n && !(id === extra && order.items.every((l) => l.recipeId !== id)));
-    if (short.length) reason = `stok kurang: ${short.map(([id]) => catalog.recipe(id).name).join(', ')}`;
-    else if (state.player.money < fee) reason = 'kas tidak cukup untuk biaya antar';
+    if (short.length) reason = tr('stok kurang: {0}', { 0: short.map(([id]) => catalog.recipe(id).name).join(', ') });
+    else if (state.player.money < fee) reason = tr('kas tidak cukup untuk biaya antar');
   }
   return { source: branch.slot, label: branch.name, ok: reason === null, reason, eta, fee, available };
 }
@@ -118,7 +119,7 @@ export function dispatchFromBranch(draft: GameState, catalog: Catalog, order: On
   const b = draft.branches.list.find((x) => x.slot === slot);
   if (!b) throw new Error('Cabang tidak ditemukan');
   const opt = branchOption(draft, catalog, order, b, order.noteHonored);
-  if (!opt.ok) throw new Error(opt.reason ?? 'Cabang tidak bisa mengirim');
+  if (!opt.ok) throw new Error(opt.reason ?? tr('Cabang tidak bisa mengirim'));
   const needs = orderNeeds(order);
   const extra = order.note?.extraItem;
   if (extra && order.noteHonored && opt.available[extra]! < (needs.get(extra) ?? 0) && order.items.every((l) => l.recipeId !== extra)) {

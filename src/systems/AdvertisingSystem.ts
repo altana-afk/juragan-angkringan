@@ -1,6 +1,11 @@
-import adsJson from '../data/advertising.json';
+import adsJsonBase from '../data/advertising.json';
+import adsJsonEn from '../i18n/en/data/advertising.json';
 import type { GameState } from '../core/GameState';
 import { GameRuleError } from './rules';
+import { localizeData, tr } from '../i18n/i18n';
+
+// Teks data dalam bahasa aktif (tumpangan terjemahan Inggris di src/i18n/en/data/).
+const adsJson = localizeData(adsJsonBase, adsJsonEn);
 
 /**
  * Iklan & promosi satu hari: dibayar di fase persiapan, menambah calon pelanggan hari itu saja,
@@ -35,7 +40,7 @@ export function parseAds(raw: unknown): AdDef[] {
 export const ADS: readonly AdDef[] = parseAds(adsJson);
 export const adById = (id: string): AdDef => {
   const ad = ADS.find((a) => a.id === id);
-  if (!ad) throw new GameRuleError('ad-unknown', `Iklan "${id}" tidak dikenal`);
+  if (!ad) throw new GameRuleError('ad-unknown', tr('Iklan "{id}" tidak dikenal', { id }));
   return ad;
 };
 
@@ -57,9 +62,9 @@ export function activeAdEffect(adIds: readonly string[]): { arrivalBonus: number
 
 export function buyAd(draft: GameState, adId: string): AdDef {
   const ad = adById(adId);
-  if (draft.phase !== 'persiapan') throw new GameRuleError('wrong-phase', 'Iklan hanya bisa dipasang sebelum mulai berjualan.');
-  if (draft.ledger.ads.includes(adId)) throw new GameRuleError('ad-active', `${ad.name} sudah dipasang hari ini.`);
-  if (draft.player.money < ad.cost) throw new GameRuleError('money-short', 'Uang tidak cukup untuk iklan ini.');
+  if (draft.phase !== 'persiapan') throw new GameRuleError('wrong-phase', tr('Iklan hanya bisa dipasang sebelum mulai berjualan.'));
+  if (draft.ledger.ads.includes(adId)) throw new GameRuleError('ad-active', tr('{name} sudah dipasang hari ini.', { name: ad.name }));
+  if (draft.player.money < ad.cost) throw new GameRuleError('money-short', tr('Uang tidak cukup untuk iklan ini.'));
   draft.player.money -= ad.cost;
   draft.ledger.ads.push(adId);
   draft.ledger.promotionCost += ad.cost;
@@ -69,8 +74,8 @@ export function buyAd(draft: GameState, adId: string): AdDef {
 /** Batalkan iklan sebelum buka (uang kembali penuh). */
 export function cancelAd(draft: GameState, adId: string): AdDef {
   const ad = adById(adId);
-  if (draft.phase !== 'persiapan') throw new GameRuleError('wrong-phase', 'Iklan sudah berjalan.');
-  if (!draft.ledger.ads.includes(adId)) throw new GameRuleError('ad-inactive', `${ad.name} belum dipasang.`);
+  if (draft.phase !== 'persiapan') throw new GameRuleError('wrong-phase', tr('Iklan sudah berjalan.'));
+  if (!draft.ledger.ads.includes(adId)) throw new GameRuleError('ad-inactive', tr('{name} belum dipasang.', { name: ad.name }));
   draft.ledger.ads = draft.ledger.ads.filter((a) => a !== adId);
   draft.ledger.promotionCost -= ad.cost;
   draft.player.money += ad.cost;

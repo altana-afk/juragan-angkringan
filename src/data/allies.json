@@ -1,0 +1,126 @@
+{
+  "allies": [
+    {
+      "id": "ratna",
+      "kind": "nakes",
+      "name": "Mbak Ratna",
+      "role": "Perawat RSJ Tirta Husada",
+      "want": "Pasien pulang dengan selamat dan diterima warga",
+      "fear": "Orang dengan gangguan jiwa diperlakukan kasar di jalan",
+      "baseType": "pekerja",
+      "homeLocation": "dekat-rsj",
+      "fromDay": 1,
+      "visitChance": 0.8,
+      "visitWindow": [
+        1080,
+        1260
+      ],
+      "favorites": [
+        "teh_hangat",
+        "nasi_kucing",
+        "wedang_jahe"
+      ],
+      "dislikes": [
+        "kopi_joss"
+      ],
+      "palette": {
+        "hair": "#2a1c1c",
+        "shirt": "#e8f2f0",
+        "accent": "#3aa59a",
+        "pants": "#3aa59a"
+      },
+      "talk": [
+        [
+          "Teh hangat satu, Mbak. Baru selesai jaga sore.",
+          "Saya kerja di RSJ seberang. Jangan takut, pasien kami baik-baik kok."
+        ],
+        [
+          "Kalau ketemu orang bingung di jalan, sapa pelan saja. Jangan dibentak.",
+          "Nasi kucingnya pas buat ganjel perut sebelum jaga malam."
+        ],
+        [
+          "Kemarin ada pasien yang kabur. Untung warga mau bantu cari, bukan main pukul.",
+          "Saya senang ada angkringan dekat sini. Tempat ngobrol habis shift."
+        ],
+        [
+          "Kamu orangnya sabar. Cocok kerja di bangsal, hehe.",
+          "Kalau ada yang butuh bantuan, hubungi saya. Ambulans kami siaga."
+        ],
+        [
+          "Saya simpan nomor angkringanmu. Teman-teman perawat juga suka mampir.",
+          "Orang dengan gangguan jiwa itu sakit, bukan jahat. Kamu sudah paham itu."
+        ],
+        [
+          "Di mana pun gerobakmu, kalau saya lewat, saya mampir.",
+          "Kalau ada yang butuh pertolongan pas saya di sini, biar tim kami yang tangani."
+        ]
+      ],
+      "favoriteHints": {
+        "teh_hangat": "Yang hangat, manisnya sedikit saja. Buat ganti tenaga habis jaga.",
+        "nasi_kucing": "Yang kecil dibungkus daun, buat ganjel perut sebelum shift malam.",
+        "wedang_jahe": "Yang pedas-hangat di tenggorokan. Bangsal dingin sekali tadi."
+      }
+    },
+    {
+      "id": "bram",
+      "kind": "polisi",
+      "name": "Pak Bram",
+      "role": "Brigadir di Mabes, suka kopi tubruk",
+      "want": "Pedagang kecil bisa berjualan dengan tenang",
+      "fear": "Warga takut melapor kalau diperas",
+      "baseType": "pekerja",
+      "homeLocation": "dekat-mabes",
+      "fromDay": 1,
+      "visitChance": 0.8,
+      "visitWindow": [
+        1110,
+        1290
+      ],
+      "favorites": [
+        "kopi_panas",
+        "sate_usus",
+        "tempe_goreng"
+      ],
+      "dislikes": [
+        "es_sirup"
+      ],
+      "palette": {
+        "hair": "#1c1a1a",
+        "shirt": "#7a5a34",
+        "accent": "#d9c08a",
+        "pants": "#4a3a28"
+      },
+      "talk": [
+        [
+          "Kopi panas, jangan pakai gula.",
+          "Saya dinas di Mabes. Cuma mampir sebentar sebelum apel malam."
+        ],
+        [
+          "Ada yang minta uang keamanan di sini? Jangan dikasih terus, nanti ketagihan.",
+          "Satenya enak. Jangan bilang komandan saya sering ke sini."
+        ],
+        [
+          "Simpan surat izin dagangmu baik-baik. Itu pegangan kalau ada yang macam-macam.",
+          "Dulu bapak saya juga dagang. Saya tahu susahnya."
+        ],
+        [
+          "Kamu berani juga ya. Banyak pedagang memilih diam.",
+          "Kalau ada yang memeras, catat ciri-cirinya. Kami tindak lanjuti."
+        ],
+        [
+          "Saya sudah bilang ke teman-teman piket, angkringan ini aman diawasi.",
+          "Kopi buatanmu bikin melek sampai subuh."
+        ],
+        [
+          "Di mana pun kamu jualan, kalau saya lihat gerobakmu, saya berhenti.",
+          "Kalau ada yang memeras pas saya lagi ngopi, biar saya yang urus."
+        ]
+      ],
+      "favoriteHints": {
+        "kopi_panas": "Yang hitam, panas, tanpa gula. Biar melek sampai apel.",
+        "sate_usus": "Yang ditusuk dan dibakar, jangan yang manis.",
+        "tempe_goreng": "Gorengan yang paling sederhana. Yang biasa dimakan anak kos."
+      }
+    }
+  ]
+}

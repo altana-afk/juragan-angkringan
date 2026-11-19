@@ -1,12 +1,25 @@
 import { GAME_CONFIG } from '../config/gameConfig';
+import { isEnglish } from '../i18n/i18n';
 
-export const WEEKDAY_NAMES = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'] as const;
-export const WEEKDAY_SHORT = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'] as const;
-export const MONTH_NAMES = [
-  'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-  'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
-] as const;
-export const MONTH_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'] as const;
+const NAMES_ID = {
+  weekday: ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'],
+  weekdayShort: ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'],
+  month: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'],
+  monthShort: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
+} as const;
+const NAMES_EN = {
+  weekday: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+  weekdayShort: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+  month: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+  monthShort: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+} as const;
+const NAMES = isEnglish() ? NAMES_EN : NAMES_ID;
+
+/** Nama hari & bulan dalam bahasa aktif (dipilih sekali saat modul dimuat). */
+export const WEEKDAY_NAMES: readonly string[] = NAMES.weekday;
+export const WEEKDAY_SHORT: readonly string[] = NAMES.weekdayShort;
+export const MONTH_NAMES: readonly string[] = NAMES.month;
+export const MONTH_SHORT: readonly string[] = NAMES.monthShort;
 
 export interface CalendarDate {
   year: number;
@@ -48,14 +61,14 @@ export function getCalendarDate(gameDay: number, start: CalendarStart = GAME_CON
   };
 }
 
-/** "Sen, 6 Jul" */
+/** "Sen, 6 Jul" (Inggris: "Mon, Jul 6") */
 export function formatDateShort(gameDay: number, start?: CalendarStart): string {
   const d = getCalendarDate(gameDay, start);
-  return `${d.weekdayShort}, ${d.dayOfMonth} ${d.monthShort}`;
+  return isEnglish() ? `${d.weekdayShort}, ${d.monthShort} ${d.dayOfMonth}` : `${d.weekdayShort}, ${d.dayOfMonth} ${d.monthShort}`;
 }
 
-/** "Senin, 6 Juli 2026" */
+/** "Senin, 6 Juli 2026" (Inggris: "Monday, July 6, 2026") */
 export function formatDateLong(gameDay: number, start?: CalendarStart): string {
   const d = getCalendarDate(gameDay, start);
-  return `${d.weekdayName}, ${d.dayOfMonth} ${d.monthName} ${d.year}`;
+  return isEnglish() ? `${d.weekdayName}, ${d.monthName} ${d.dayOfMonth}, ${d.year}` : `${d.weekdayName}, ${d.dayOfMonth} ${d.monthName} ${d.year}`;
 }

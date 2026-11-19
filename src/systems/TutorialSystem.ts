@@ -1,5 +1,6 @@
 import type { GameState } from '../core/GameState';
 import { totalQty } from './InventorySystem';
+import { tr } from '../i18n/i18n';
 
 export const TUTORIAL_DONE = 99;
 
@@ -17,32 +18,32 @@ const hasProducts = (s: Readonly<GameState>): boolean => Object.values(s.invento
 
 export const TUTORIAL_STEPS: readonly TutorialStep[] = [
   {
-    title: 'Belanja bahan',
-    text: 'Selamat datang, Juragan! Buka Belanja dan beli bahan untuk menu awal: beras, telur, tempe, tahu, teh, gula, es…',
-    highlight: 'Belanja',
+    title: tr('Belanja bahan'),
+    text: tr('Selamat datang, Juragan! Buka Belanja dan beli bahan untuk menu awal: beras, telur, tempe, tahu, teh, gula, es…'),
+    highlight: tr('Belanja'),
     done: (s) => hasIngredients(s) || s.phase !== 'persiapan',
   },
   {
-    title: 'Masak dulu',
-    text: 'Buka Persiapan, pilih menu & jumlah porsi, lalu tekan Masak. Pelanggan hanya bisa membeli produk yang sudah matang.',
-    highlight: 'Persiapan',
+    title: tr('Masak dulu'),
+    text: tr('Buka Persiapan, pilih menu & jumlah porsi, lalu tekan Masak. Pelanggan hanya bisa membeli produk yang sudah matang.'),
+    highlight: tr('Persiapan'),
     done: (s) => hasProducts(s) || s.phase !== 'persiapan',
   },
   {
-    title: 'Buka angkringan',
-    text: 'Stok siap! Tekan Mulai Berjualan. Kamu juga bisa mengatur harga jual di Persiapan.',
-    highlight: 'Mulai Berjualan',
+    title: tr('Buka angkringan'),
+    text: tr('Stok siap! Tekan Mulai Berjualan. Kamu juga bisa mengatur harga jual di Persiapan.'),
+    highlight: tr('Mulai Berjualan'),
     done: (s) => s.phase !== 'persiapan',
   },
   {
-    title: 'Layani pelanggan',
-    text: 'Pelanggan datang, memesan & membayar otomatis. Percepat waktu dengan tombol 2×/3×, dan masak lagi lewat Persiapan jika stok menipis.',
+    title: tr('Layani pelanggan'),
+    text: tr('Pelanggan datang, memesan & membayar otomatis. Percepat waktu dengan tombol 2×/3×, dan masak lagi lewat Persiapan jika stok menipis.'),
     highlight: null,
     done: (s) => s.phase === 'evaluasi' || s.calendar.day > 1,
   },
   {
-    title: 'Kembangkan usaha',
-    text: 'Baca laporan harian, lalu lanjut ke hari berikutnya. Gunakan Promosi & Upgrade, dan ketuk 📍 lokasi di bawah jam untuk pindah tempat jualan saat persiapan.',
+    title: tr('Kembangkan usaha'),
+    text: tr('Baca laporan harian, lalu lanjut ke hari berikutnya. Gunakan Promosi & Upgrade, dan ketuk 📍 lokasi di bawah jam untuk pindah tempat jualan saat persiapan.'),
     highlight: null,
     done: (s) => s.calendar.day > 1,
   },

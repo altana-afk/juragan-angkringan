@@ -1,0 +1,104 @@
+{
+  "customers": [
+    {
+      "id": "gito",
+      "name": "Pak Gito",
+      "role": "Motorbike taxi driver, loyal customer",
+      "want": "A steady income and a safe neighborhood",
+      "fear": "Losing his waiting spot at the end of the alley",
+      "talk": {
+        "0": [
+          "One coffee, Mas. Uh, Mbak. Whoever's minding the cart these days.",
+          "Around this time I'm usually already sitting on this bench. A habit from Mbah Kardi's days.",
+          "The streets are quiet today. Passengers all order through the app now."
+        ],
+        "1": [
+          "Your coffee's starting to taste like Mbah Kardi's. Not the same yet, but close.",
+          "My kid asks why I always come home late. I tell him I stop by the angkringan first.",
+          "When it rains, I take shelter here while I wait for orders. Don't chase me off, okay?"
+        ],
+        "2": [
+          "I told the other drivers this angkringan has come back to life.",
+          "Bu Sri used to give me free tempeh when orders were slow. Such a kind woman.",
+          "If anything happens to this cart, tell me. The other drivers and I are ready to help."
+        ],
+        "3": [
+          "Without your cart, this alley feels like a street without lights.",
+          "I think of this angkringan as my second home. Thank you for sticking it out.",
+          "Whatever you decide later, I'm still your first customer."
+        ]
+      }
+    },
+    {
+      "id": "surti",
+      "name": "Bu Surti",
+      "role": "Neighbor, spreader of news",
+      "want": "A lively neighborhood where everyone hears the news",
+      "fear": "Losing her influence in the neighborhood",
+      "talk": {
+        "0": [
+          "Don't make the hot tea too sweet. Sugar's expensive, I feel sorry for you.",
+          "So how are you related to Mbah Kardi? You're not family, are you? Oh well, as long as you work hard.",
+          "I'm only stopping by for a moment. I've got a bit of news, but later."
+        ],
+        "1": [
+          "Your fried tofu is getting crispy. I've already told the ladies at the savings club.",
+          "Don't listen to Bu Darmi, she always exaggerates. Unlike me.",
+          "My kid lives in Jakarta and rarely comes home. That's why I like to chat here."
+        ],
+        "2": [
+          "You're like one of the neighborhood's own kids now. I'm proud of you, you know.",
+          "Sri used to ask me to taste her seasoning. My tongue is a judge's tongue.",
+          "If anyone tries anything with this cart, I'll be the first to step in."
+        ],
+        "3": [
+          "Sri would be happy to see her cart looked after like this.",
+          "I'm a chatterbox, but I know who's sincere. You're sincere.",
+          "From now on, whatever news I bring, you'll hear it first."
+        ]
+      }
+    },
+    {
+      "id": "bayu",
+      "name": "Mas Bayu",
+      "role": "Mbah Kardi's nephew, back from the city",
+      "want": "A business of his own that people respect",
+      "fear": "Failing and being seen as a show-off",
+      "talk": {
+        "0": [
+          "This coffee isn't bold enough. In the city, customers would complain about coffee like this.",
+          "I'm just stopping by. Don't think I'm my uncle's spy, okay?",
+          "Still the same old cart. Nothing's been replaced yet?"
+        ],
+        "1": [
+          "Okay, your coffee's not bad. Not bad, I said, not good yet.",
+          "My café is quiet in the afternoons. People here would rather sit at a cart.",
+          "If you run out of sugar or coffee, just grab some from my café. Pay me later."
+        ],
+        "2": [
+          "I used to be embarrassed to sell in an alley. Now, watching you, I'm rethinking that.",
+          "My uncle used to say selling isn't about profit, it's about who goes home full.",
+          "Are we rivals or friends? Eh, let's say both."
+        ],
+        "3": [
+          "Thank you for looking after my uncle's cart. That should have been my job.",
+          "Someday let's create a coffee menu together. My recipe, your cart.",
+          "I'm not afraid of failing anymore. Watching you, failure is just a day that isn't over yet."
+        ]
+      }
+    },
+    {
+      "id": "hendra",
+      "name": "Pak Hendra",
+      "role": "Developer behind the shophouse plan",
+      "want": "To build a big business complex",
+      "fear": "Being seen as the man who ruined the neighborhood",
+      "talk": {
+        "0": ["I'm just passing by. It's quite busy here, isn't it?"],
+        "1": ["I don't hate this place. I just look at the numbers."],
+        "2": ["If this neighborhood had shophouses, its young people wouldn't have to leave to find work."],
+        "3": ["You make me doubt myself. That rarely happens."]
+      }
+    }
+  ]
+}

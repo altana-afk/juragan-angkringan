@@ -11,6 +11,9 @@ import { MemoryStorage } from '../../src/systems/SaveSystem';
 import { SalesSimulation, modifiersOf } from '../../src/systems/SalesSimulation';
 import { UPGRADES, upgradeBlockers } from '../../src/systems/UpgradeSystem';
 import { activeAnchors } from '../../src/world/MapData';
+import { TUTORIAL_DONE } from '../../src/systems/TutorialSystem';
+import { CHALLENGE_CONFIG } from '../../src/data/challenges';
+import { SeededRandom } from '../../src/utils/random';
 
 
 export interface BotDay {
@@ -32,6 +35,8 @@ export interface BotOptions {
   /** Pengali harga jual semua menu. */
   priceFactor?: number;
   location?: string;
+  /** Jalankan tantangan kampung (0.18.0) dengan cara terburuk: tidak pernah menjawab, selalu membayar. */
+  challenges?: boolean;
 }
 
 /** Pemain bot sederhana: belanja & masak sesuai perkiraan, jualan, tutup, kadang upgrade. */
@@ -40,6 +45,9 @@ export function runBot(days: number, opts: BotOptions = {}): { ctx: GameContext;
   const { stockFactor = 1, buyUpgrades = true, priceFactor = 1 } = opts;
   const ctx = new GameContext({ storage: new MemoryStorage() });
   ctx.startNewGame(location);
+  if (opts.challenges) ctx.store.update('uji-lewati-tutorial', (d) => {
+    d.tutorial = TUTORIAL_DONE;
+  });
   const log: BotDay[] = [];
   for (let d = 0; d < days; d++) {
     let s = ctx.store.get();
@@ -103,7 +111,24 @@ export function runBot(days: number, opts: BotOptions = {}): { ctx: GameContext;
       setClock: (m) => ctx.actions.setClock(m),
     }, { seed: `bot-${d}`, startMinutes: GAME_CONFIG.dayCycle.openMinutes });
     let guard = 0;
-    while (!sim.isEnded && guard++ < 40_000) sim.advance(0.5);
+    let lastMinute = GAME_CONFIG.dayCycle.openMinutes;
+    while (!sim.isEnded && guard++ < 40_000) {
+      sim.advance(0.5);
+      if (!opts.challenges) continue;
+      const now = Math.floor(ctx.store.get().calendar.clockMinutes);
+      const plan = ctx.store.get().challenges.today;
+      for (let m = lastMinute + 1; m <= now && plan; m++) {
+        plan.cats.forEach((c, i) => c === m && ctx.actions.challengeCat(new SeededRandom(`bot-kucing-${d}-${i}`)));
+        if (plan.odgj?.minute === m) {
+          ctx.actions.challengeArrive('odgj');
+          sim.scare(CHALLENGE_CONFIG.odgj.fleeChance);
+        }
+        if (plan.ormas?.minute === m) ctx.actions.challengeArrive('ormas');
+        if (plan.ormas?.status === 'datang' && m >= plan.ormas.minute + CHALLENGE_CONFIG.ormas.patienceMinutes) ctx.actions.ormasPay();
+        if (plan.odgj?.status === 'datang' && m >= CHALLENGE_CONFIG.odgj.untilMinute) ctx.actions.odgjLeaves();
+      }
+      lastMinute = Math.max(lastMinute, now);
+    }
     const report = ctx.actions.finishSelling();
     s = ctx.store.get();
     log.push({

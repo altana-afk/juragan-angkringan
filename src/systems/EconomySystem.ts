@@ -6,6 +6,7 @@ import type { Catalog, IngredientDef } from '../data/catalog';
 import { hashNoise, hashString } from '../utils/random';
 import { addStock, totalQty } from './InventorySystem';
 import { GameRuleError } from './rules';
+import { tr } from '../i18n/i18n';
 
 /**
  * Ekonomi belanja: harga bahan yang bergerak bertahap per hari dan transaksi pembelian.
@@ -71,8 +72,8 @@ export function storedUnits(state: Readonly<GameState>): number {
 export function quotePurchase(catalog: Catalog, cart: readonly CartLine[], day: number, factor: (ingredientId: string) => number = () => 1): PurchaseQuote {
   const lines: QuoteLine[] = [];
   for (const line of cart) {
-    if (!Number.isInteger(line.packs) || line.packs < 0) throw new GameRuleError('qty-invalid', 'Jumlah belanja harus bilangan bulat ≥ 0');
-    if (line.packs > ECONOMY_CONFIG.maxPacksPerLine) throw new GameRuleError('qty-too-large', `Maksimal ${ECONOMY_CONFIG.maxPacksPerLine} kemasan per bahan`);
+    if (!Number.isInteger(line.packs) || line.packs < 0) throw new GameRuleError('qty-invalid', tr('Jumlah belanja harus bilangan bulat ≥ 0'));
+    if (line.packs > ECONOMY_CONFIG.maxPacksPerLine) throw new GameRuleError('qty-too-large', tr('Maksimal {maxPacksPerLine} kemasan per bahan', { maxPacksPerLine: ECONOMY_CONFIG.maxPacksPerLine }));
     if (line.packs === 0) continue;
     const def = catalog.ingredient(line.ingredientId);
     const packPrice = ingredientPrice(def, day, factor(def.id));
@@ -88,15 +89,15 @@ export function quotePurchase(catalog: Catalog, cart: readonly CartLine[], day: 
 export function applyPurchase(draft: GameState, catalog: Catalog, cart: readonly CartLine[]): PurchaseQuote {
   const day = draft.calendar.day;
   const quote = quotePurchase(catalog, cart, day, (id) => buyPriceFactor(draft, id));
-  if (quote.lines.length === 0) throw new GameRuleError('cart-empty', 'Keranjang belanja masih kosong.');
+  if (quote.lines.length === 0) throw new GameRuleError('cart-empty', tr('Keranjang belanja masih kosong.'));
   if (quote.total > draft.player.money) {
-    throw new GameRuleError('money-short', 'Uang tidak cukup untuk belanja ini.', { total: quote.total, money: draft.player.money });
+    throw new GameRuleError('money-short', tr('Uang tidak cukup untuk belanja ini.'), { total: quote.total, money: draft.player.money });
   }
   const capacity = storageCapacity(draft);
   const stored = storedUnits(draft);
   const incoming = quote.lines.reduce((s, l) => s + l.units, 0);
   if (stored + incoming > capacity) {
-    throw new GameRuleError('storage-full', `Gudang tidak muat: terisi ${stored}/${capacity} satuan, belanja ini ${incoming}. Upgrade penyimpanan untuk menambah.`, { stored, capacity, incoming });
+    throw new GameRuleError('storage-full', tr('Gudang tidak muat: terisi {stored}/{capacity} satuan, belanja ini {incoming}. Upgrade penyimpanan untuk menambah.', { stored, capacity, incoming }), { stored, capacity, incoming });
   }
   draft.player.money -= quote.total;
   const fx = effectsOf(draft);

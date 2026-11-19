@@ -3,6 +3,7 @@ import { namedPortrait } from '../graphics/art/customers';
 import { el, setText } from './dom';
 import { pixelDataUrl } from './pixelImage';
 import type { UIManager } from './UIManager';
+import { tr } from '../i18n/i18n';
 
 /**
  * Panel dialog di bawah layar (gaya RPG): potret di kiri, nama cyan, teks putih.
@@ -39,7 +40,7 @@ export function openDialogue(ui: UIManager, options: DialogueOptions): void {
   const next = el('button', { className: 'btn btn-primary dialogue-next', attrs: { type: 'button' } });
   const root = el('section', {
     className: 'dialogue-panel',
-    attrs: { role: 'dialog', 'aria-label': `Obrolan dengan ${def.name}`, 'aria-live': 'polite' },
+    attrs: { role: 'dialog', 'aria-label': tr('Obrolan dengan {name}', { name: def.name }), 'aria-live': 'polite' },
     children: [
       el('div', {
         className: 'dialogue-portrait',
@@ -52,7 +53,7 @@ export function openDialogue(ui: UIManager, options: DialogueOptions): void {
             className: 'dialogue-head',
             children: [
               el('strong', { className: 'dialogue-name', text: def.name }),
-              options.title ? el('span', { className: 'dialogue-title', text: `📰 ${options.title}` }) : null,
+              options.title ? el('span', { className: 'dialogue-title', text: tr('📰 {title}', { title: options.title }) }) : null,
             ],
           }),
           text,
@@ -65,8 +66,8 @@ export function openDialogue(ui: UIManager, options: DialogueOptions): void {
   const render = (): void => {
     setText(text, options.lines[index] ?? '');
     const last = index >= options.lines.length - 1;
-    setText(next, last ? 'Tutup' : 'Lanjut ▸');
-    setText(counter, options.lines.length > 1 ? `${index + 1}/${options.lines.length}` : '');
+    setText(next, last ? tr('Tutup') : tr('Lanjut ▸'));
+    setText(counter, options.lines.length > 1 ? tr('{0}/{length}', { 0: index + 1, length: options.lines.length }) : '');
     text.classList.remove('is-in');
     void text.offsetWidth;
     text.classList.add('is-in');

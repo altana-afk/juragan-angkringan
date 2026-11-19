@@ -4,6 +4,7 @@ import type { GameState } from '../core/GameState';
 import { el } from './dom';
 import { anyBranchNeedsAttention } from '../systems/BranchStatusSystem';
 import { icon, type IconName } from './icons';
+import { tr } from '../i18n/i18n';
 
 /**
  * Lembar "Usaha" (0.13.0): tempat menu yang jarang dipakai saat persiapan.
@@ -22,12 +23,12 @@ export interface BusinessItem {
 }
 
 export const BUSINESS_ITEMS: readonly BusinessItem[] = [
-  { panel: 'upgrade', label: 'Upgrade', icon: 'hammer', hint: 'Gerobak, peralatan & tempat', key: 'U' },
-  { panel: 'promo', label: 'Promosi', icon: 'megaphone', hint: 'Iklan satu hari', key: 'I' },
-  { panel: 'delivery', label: 'Pengantaran', icon: 'phone', hint: 'Kurir sendiri atau ojol', key: '', attention: (s) => s.online.mode === null },
-  { panel: 'branches', label: 'Cabang', icon: 'store', hint: 'Sampai 3 cabang', key: '', attention: anyBranchNeedsAttention },
-  { panel: 'stats', label: 'Statistik', icon: 'chart', hint: 'Riwayat & laporan', key: 'S' },
-  { panel: 'bank', label: 'Bank', icon: 'bank', hint: 'Juga lewat ketuk kas', key: 'K' },
+  { panel: 'upgrade', label: tr('Upgrade'), icon: 'hammer', hint: tr('Gerobak, peralatan & tempat'), key: 'U' },
+  { panel: 'promo', label: tr('Promosi'), icon: 'megaphone', hint: tr('Iklan satu hari'), key: 'I' },
+  { panel: 'delivery', label: tr('Pengantaran'), icon: 'phone', hint: tr('Kurir sendiri atau ojol'), key: '', attention: (s) => s.online.mode === null },
+  { panel: 'branches', label: tr('Cabang'), icon: 'store', hint: tr('Sampai 3 cabang'), key: '', attention: anyBranchNeedsAttention },
+  { panel: 'stats', label: tr('Statistik'), icon: 'chart', hint: tr('Riwayat & laporan'), key: 'S' },
+  { panel: 'bank', label: tr('Bank'), icon: 'bank', hint: tr('Juga lewat ketuk kas'), key: 'K' },
 ];
 
 /** True jika salah satu isi lembar Usaha butuh perhatian (titik merah di tombol Usaha). */
@@ -48,12 +49,12 @@ export class BusinessSheet {
     this.grid = el('div', { className: 'business-grid' });
     this.root = el('div', {
       className: 'business-sheet',
-      attrs: { role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Usaha', hidden: '' },
+      attrs: { role: 'dialog', 'aria-modal': 'true', 'aria-label': tr('Usaha'), hidden: '' },
       children: [
         el('div', { className: 'business-scrim', onClick: () => this.close() }),
         el('div', {
           className: 'business-panel',
-          children: [el('div', { className: 'business-handle', attrs: { 'aria-hidden': 'true' } }), el('h2', { className: 'business-title', text: 'Usaha' }), this.grid],
+          children: [el('div', { className: 'business-handle', attrs: { 'aria-hidden': 'true' } }), el('h2', { className: 'business-title', text: tr('Usaha') }), this.grid],
         }),
       ],
     });
@@ -78,11 +79,11 @@ export class BusinessSheet {
         const needs = item.attention?.(s) ?? false;
         return el('button', {
           className: `business-item${needs ? ' has-dot' : ''}`,
-          attrs: { type: 'button', title: item.key ? `${item.hint} (${item.key})` : item.hint, 'data-panel': item.panel },
+          attrs: { type: 'button', title: item.key ? tr('{hint} ({key})', { hint: item.hint, key: item.key }) : item.hint, 'data-panel': item.panel },
           children: [
             icon(item.icon, 'px-icon business-icon'),
             el('span', { className: 'business-text', children: [el('strong', { text: item.label }), el('small', { text: item.hint })] }),
-            needs ? el('span', { className: 'action-dot', attrs: { 'aria-label': 'butuh perhatian' } }) : null,
+            needs ? el('span', { className: 'action-dot', attrs: { 'aria-label': tr('butuh perhatian') } }) : null,
           ],
           onClick: () => {
             this.close(false);

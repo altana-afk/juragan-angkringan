@@ -1,4 +1,9 @@
-import raw from './events.json';
+import rawBase from './events.json';
+import rawEn from '../i18n/en/data/events.json';
+import { localizeData } from '../i18n/i18n';
+
+// Teks data dalam bahasa aktif (tumpangan terjemahan Inggris di src/i18n/en/data/).
+const raw = localizeData(rawBase, rawEn);
 
 export interface EventEffects {
   readonly arrival?: number;

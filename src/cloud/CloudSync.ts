@@ -6,6 +6,7 @@ import { formatRupiah } from '../utils/formatting';
 import { cloudConfigured } from './config';
 import { cloudSeal } from '../systems/saveSeal';
 import type { CloudUser } from './firebase';
+import { locale, tr } from '../i18n/i18n';
 
 type Fb = typeof import('./firebase');
 
@@ -38,9 +39,9 @@ export function scoreFromSave(text: string): Omit<import('./firebase').ScoreDoc,
 
 /** Alasan username ditolak, atau null jika boleh. */
 export function usernameProblem(name: string): string | null {
-  if (!/^[A-Za-z0-9_]{3,16}$/.test(name)) return 'Username 3–16 karakter: huruf, angka, atau garis bawah (_).';
+  if (!/^[A-Za-z0-9_]{3,16}$/.test(name)) return tr('Username 3–16 karakter: huruf, angka, atau garis bawah (_).');
   const lower = name.toLowerCase();
-  if (BLOCKED.some((w) => lower.includes(w))) return 'Username mengandung kata yang tidak diizinkan.';
+  if (BLOCKED.some((w) => lower.includes(w))) return tr('Username mengandung kata yang tidak diizinkan.');
   return null;
 }
 
@@ -165,7 +166,7 @@ export class CloudSync {
   async setUsername(name: string): Promise<void> {
     const problem = usernameProblem(name);
     if (problem) throw Object.assign(new Error(problem), { code: 'username/invalid', message: problem });
-    if (!this.user) throw new Error('Belum masuk akun.');
+    if (!this.user) throw new Error(tr('Belum masuk akun.'));
     const fb = await this.load();
     await fb.claimUsername(this.user.uid, name, this.profile?.username || null);
     this.profile = { username: name, changedAt: Date.now() };
@@ -282,7 +283,7 @@ export class CloudSync {
     }
     // Segel tidak cocok = dokumen diubah di luar game → abaikan save akun.
     if (cloud && cloud.sig !== (await cloudSeal(cloud.text))) {
-      this.ctx.notify('Save di akun tidak valid (diubah di luar game) dan diabaikan.', 'error', 6000);
+      this.ctx.notify(tr('Save di akun tidak valid (diubah di luar game) dan diabaikan.'), 'error', 6000);
       cloud = null;
     }
     const localText = this.ctx.saves.exportText();
@@ -313,28 +314,28 @@ export class CloudSync {
     try {
       this.ctx.saves.importText(text);
       this.lastUploaded = text;
-      this.ctx.notify('Progres dari akun dimuat ke perangkat ini.', 'success');
+      this.ctx.notify(tr('Progres dari akun dimuat ke perangkat ini.'), 'success');
       this.ctx.bus.emit('cloud:save-replaced');
     } catch (e) {
-      this.ctx.notify(`Save di akun tidak bisa dimuat: ${(e as Error).message}`, 'error', 6000);
+      this.ctx.notify(tr('Save di akun tidak bisa dimuat: {message}', { message: (e as Error).message }), 'error', 6000);
     }
   }
 
   private askConflict(local: ReturnType<typeof SaveSystem.summarize>, cloud: { day: number; money: number; savedAt: string }, cloudText: string): void {
-    const when = (iso: string): string => (iso ? new Date(iso).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '—');
-    const line = (s: { day: number; money: number; savedAt: string } | null): string => (s ? `Hari ${s.day} · ${formatRupiah(s.money)} · disimpan ${when(s.savedAt)}` : '—');
+    const when = (iso: string): string => (iso ? new Date(iso).toLocaleString(locale(), { dateStyle: 'medium', timeStyle: 'short' }) : '—');
+    const line = (s: { day: number; money: number; savedAt: string } | null): string => (s ? tr('Hari {day} · {money} · disimpan {savedAt}', { day: s.day, money: formatRupiah(s.money), savedAt: when(s.savedAt) }) : '—');
     const inGame = this.ctx.autosaveRunning;
     if (!this.ui) return;
     this.ui.openModal({
-      title: 'Ada dua progres berbeda',
-      body: `Akun: ${line(cloud)}\nPerangkat ini: ${line(local)}\n\nPilih progres yang mau dipakai. Yang tidak dipilih akan ditimpa (salinan cadangan tetap disimpan di perangkat).${inGame ? '\n\nMemakai progres akun akan membawamu kembali ke menu utama.' : ''}`,
+      title: tr('Ada dua progres berbeda'),
+      body: tr('Akun: {cloud}\nPerangkat ini: {local}\n\nPilih progres yang mau dipakai. Yang tidak dipilih akan ditimpa (salinan cadangan tetap disimpan di perangkat).{2}', { cloud: line(cloud), local: line(local), 2: inGame ? tr('\n\nMemakai progres akun akan membawamu kembali ke menu utama.') : '' }),
       actions: [
         {
-          label: 'Pakai perangkat ini',
+          label: tr('Pakai perangkat ini'),
           onClick: () => void this.upload(true),
         },
         {
-          label: 'Pakai akun',
+          label: tr('Pakai akun'),
           variant: 'primary',
           onClick: () => {
             // Jangan unggah progres perangkat saat kembali ke menu — progres akun yang dipakai.

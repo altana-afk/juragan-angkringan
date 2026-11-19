@@ -1,6 +1,16 @@
-import chaptersRaw from './storyChapters.json';
-import namedRaw from './namedCustomers.json';
-import newsRaw from './news.json';
+import chaptersRawBase from './storyChapters.json';
+import chaptersRawEn from '../i18n/en/data/storyChapters.json';
+import namedRawBase from './namedCustomers.json';
+import namedRawEn from '../i18n/en/data/namedCustomers.json';
+import newsRawBase from './news.json';
+import newsRawEn from '../i18n/en/data/news.json';
+import { localizeData } from '../i18n/i18n';
+import { allyById } from './challenges';
+
+// Teks data dalam bahasa aktif (tumpangan terjemahan Inggris di src/i18n/en/data/).
+const chaptersRaw = localizeData(chaptersRawBase, chaptersRawEn);
+const namedRaw = localizeData(namedRawBase, namedRawEn);
+const newsRaw = localizeData(newsRawBase, newsRawEn);
 
 /**
  * Data cerita "Kabar Kampung & Buku Dapur Kardi" (0.12.0):
@@ -102,7 +112,8 @@ function parseNamed(): NamedCustomerDef[] {
 export const NAMED_CUSTOMERS: readonly NamedCustomerDef[] = parseNamed();
 
 export function namedById(id: NamedId): NamedCustomerDef {
-  const c = NAMED_CUSTOMERS.find((x) => x.id === id);
+  // Kenalan tantangan (nakes & polisi, 0.18.0) memakai bentuk data yang sama.
+  const c = NAMED_CUSTOMERS.find((x) => x.id === id) ?? allyById(id);
   if (!c) throw new Error(`Pelanggan bernama tidak dikenal: ${id}`);
   return c;
 }

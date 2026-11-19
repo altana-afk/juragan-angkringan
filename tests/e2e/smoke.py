@@ -14,7 +14,7 @@ Pakai:
 import asyncio, json, sys
 from playwright.async_api import async_playwright
 
-URL = (sys.argv[1] if len(sys.argv) > 1 else 'http://localhost:4173') + '/?debug'
+URL = (sys.argv[1] if len(sys.argv) > 1 else 'http://localhost:4173') + '/?debug&lang=id'
 FF = """(mins) => { const s = window.__game.scene.getScene('AngkringanScene'); const sim = s.sales.sim; if (!sim) return 'nosim';
   const ev = sim.advance(mins); s.sales.layer.handleEvents(ev); if (ev.some(e => e.type==='ended')) s.sales.end(); return sim.minutes; }"""
 PROBE = """() => { const g=window.__game; const c=g.registry.get('gameContext'); return { listeners: c.bus.totalListeners(),

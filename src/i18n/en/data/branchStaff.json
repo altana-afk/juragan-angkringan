@@ -1,0 +1,7 @@
+{
+  "plans": [
+    { "id": "harian", "name": "Daily", "description": "Steady performance, can be changed any time." },
+    { "id": "mingguan", "name": "Weekly", "description": "Cheaper, locked in for one week." },
+    { "id": "bulanan", "name": "Monthly", "description": "Cheapest, locked in for one month, paid even when it's quiet or the branch is closed." }
+  ]
+}

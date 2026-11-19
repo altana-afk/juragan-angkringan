@@ -1,6 +1,7 @@
 import { quickSeal } from './saveSeal';
-import { createEmptyBank, createEmptyLedger, createInitialState, createOnlineState, createBranchesState, createStoryState, validateState, type GameState } from '../core/GameState';
+import { createEmptyBank, createEmptyLedger, createInitialState, createOnlineState, createChallengeState, createBranchesState, createStoryState, validateState, type GameState } from '../core/GameState';
 import { CATALOG, type Catalog } from '../data/catalog';
+import { tr } from '../i18n/i18n';
 
 /**
  * Penyimpanan progres berversi di LocalStorage.
@@ -8,7 +9,7 @@ import { CATALOG, type Catalog } from '../data/catalog';
  * sehingga save lama tetap bisa dimuat setelah game diperbarui.
  */
 
-export const SAVE_VERSION = 12;
+export const SAVE_VERSION = 13;
 export const SAVE_KEY = 'juragan-angkringan:save';
 
 export interface StorageLike {
@@ -116,6 +117,8 @@ const MIGRATIONS: Record<number, Migration> = {
   10: (s) => ({ ...s, online: { ...(s.online as object), enabled: true, prices: {} } }),
   // v11 → v12 (0.14.0): cabang angkringan.
   11: (s) => ({ ...s, branches: createBranchesState() }),
+  // v12 → v13 (0.18.0): tantangan kampung (kucing liar, ODGJ, ormas) & kenalan nakes/polisi.
+  12: (s) => ({ ...s, challenges: createChallengeState() }),
   // v8 → v9 (0.12.0): cerita kampung. Save lama memulai cerita dari hari saat ini (tanpa banjir kabar lama).
   8: (s) => {
     const calendar = (s.calendar ?? { day: 1 }) as GameState['calendar'];
@@ -142,16 +145,16 @@ const MIGRATIONS: Record<number, Migration> = {
 };
 
 export function migrateSave(raw: unknown): GameState {
-  if (typeof raw !== 'object' || raw === null) throw new SaveError('Data simpanan rusak.');
+  if (typeof raw !== 'object' || raw === null) throw new SaveError(tr('Data simpanan rusak.'));
   const file = raw as Partial<SaveFile>;
   let version = file.version;
-  if (typeof version !== 'number' || !Number.isInteger(version) || version < 1) throw new SaveError('Versi data simpanan tidak dikenal.');
-  if (version > SAVE_VERSION) throw new SaveError('Data simpanan berasal dari versi game yang lebih baru.');
+  if (typeof version !== 'number' || !Number.isInteger(version) || version < 1) throw new SaveError(tr('Versi data simpanan tidak dikenal.'));
+  if (version > SAVE_VERSION) throw new SaveError(tr('Data simpanan berasal dari versi game yang lebih baru.'));
   let state = file.state as unknown as Record<string, unknown>;
-  if (typeof state !== 'object' || state === null) throw new SaveError('Data simpanan tidak berisi state permainan.');
+  if (typeof state !== 'object' || state === null) throw new SaveError(tr('Data simpanan tidak berisi state permainan.'));
   while (version < SAVE_VERSION) {
     const migrate = MIGRATIONS[version];
-    if (!migrate) throw new SaveError(`Tidak ada migrasi dari versi ${version}.`);
+    if (!migrate) throw new SaveError(tr('Tidak ada migrasi dari versi {version}.', { version }));
     state = migrate(state);
     version++;
   }
@@ -208,13 +211,13 @@ export class SaveSystem {
     try {
       raw = JSON.parse(text);
     } catch {
-      throw new SaveError('Data simpanan rusak (bukan JSON yang valid).');
+      throw new SaveError(tr('Data simpanan rusak (bukan JSON yang valid).'));
     }
     const state = migrateSave(raw);
     try {
       validateState(state, this.catalog);
     } catch (error) {
-      throw new SaveError(`Data simpanan tidak valid: ${(error as Error).message}`);
+      throw new SaveError(tr('Data simpanan tidak valid: {message}', { message: (error as Error).message }));
     }
     // Isi diubah di luar game → tandai permanen (tidak boleh masuk leaderboard), permainan tetap jalan.
     if (!sealIntact(text)) state.tampered = true;
@@ -261,7 +264,7 @@ export class SaveSystem {
     try {
       raw = JSON.parse(text);
     } catch {
-      throw new SaveError('Data akun rusak (bukan JSON yang valid).');
+      throw new SaveError(tr('Data akun rusak (bukan JSON yang valid).'));
     }
     const state = migrateSave(raw);
     validateState(state, this.catalog);

@@ -4,21 +4,22 @@ import { BANK_RULES, depositBalance, loanLimit, loanOutstanding, maturityDay } f
 import { formatRupiah } from '../utils/formatting';
 import { el } from './dom';
 import type { ModalHandle, UIManager } from './UIManager';
+import { tr } from '../i18n/i18n';
 
-const TERM_LABEL: Record<DepositTerm, string> = { 7: '1 minggu', 14: '2 minggu', 28: '4 minggu' };
+const TERM_LABEL: Record<DepositTerm, string> = { 7: tr('1 minggu'), 14: tr('2 minggu'), 28: tr('4 minggu') };
 
 /** Input nominal Rupiah dengan tombol cepat. */
 function amountInput(initial: number, max: number, quick: readonly number[]): { root: HTMLElement; get: () => number } {
   const input = el('input', {
     className: 'amount-input',
-    attrs: { type: 'number', inputmode: 'numeric', min: '0', step: '10000', value: String(initial), 'aria-label': 'Jumlah (Rp)' },
+    attrs: { type: 'number', inputmode: 'numeric', min: '0', step: '10000', value: String(initial), 'aria-label': tr('Jumlah (Rp)') },
   }) as HTMLInputElement;
   const quickBtns = quick
     .filter((q) => q <= max)
     .map((q) =>
       el('button', {
         className: 'chip-btn',
-        text: q === max ? 'Semua' : formatRupiah(q).replace('Rp', ''),
+        text: q === max ? tr('Semua') : formatRupiah(q).replace('Rp', ''),
         attrs: { type: 'button' },
         onClick: () => {
           input.value = String(q);
@@ -32,7 +33,7 @@ function termPicker(name: string, initial: DepositTerm): { root: HTMLElement; ge
   let value = initial;
   const root = el('div', {
     className: 'term-row',
-    attrs: { role: 'radiogroup', 'aria-label': 'Tempo' },
+    attrs: { role: 'radiogroup', 'aria-label': tr('Tempo') },
     children: BANK_RULES.terms.map((t) => {
       const input = el('input', { attrs: { type: 'radio', name, value: String(t) } }) as HTMLInputElement;
       input.checked = t === initial;
@@ -59,7 +60,7 @@ export class BankPanel {
   open(): void {
     if (this.modal) return;
     this.modal = this.ui.openModal({
-      title: 'Bank Rakyat Juragan',
+      title: tr('Bank Rakyat Juragan'),
       className: 'sheet sheet-bank',
       closeButton: true,
       body: this.body,
@@ -88,12 +89,12 @@ export class BankPanel {
       el('div', {
         className: 'bank-summary',
         children: [
-          stat('Kas', formatRupiah(s.player.money)),
-          stat('Tabungan deposito', formatRupiah(depositBalance(s))),
-          stat('Utang', formatRupiah(loanOutstanding(s.bank.loan)), s.bank.loan ? 'is-bad' : ''),
+          stat(tr('Kas'), formatRupiah(s.player.money)),
+          stat(tr('Tabungan deposito'), formatRupiah(depositBalance(s))),
+          stat(tr('Utang'), formatRupiah(loanOutstanding(s.bank.loan)), s.bank.loan ? 'is-bad' : ''),
         ],
       }),
-      canAct ? null : el('p', { className: 'panel-warning', text: 'Bank hanya melayani transaksi saat persiapan (sebelum buka).' }),
+      canAct ? null : el('p', { className: 'panel-warning', text: tr('Bank hanya melayani transaksi saat persiapan (sebelum buka).') }),
       this.depositSection(s, canAct),
       this.loanSection(s, canAct),
     ];
@@ -105,7 +106,7 @@ export class BankPanel {
     const term = termPicker('dep-term', 14);
     const open = el('button', {
       className: 'btn btn-primary',
-      text: 'Buka deposito',
+      text: tr('Buka deposito'),
       attrs: { type: 'button' },
       onClick: () => this.act(this.ctx.actions.depositMoney(amount.get(), term.get())),
     });
@@ -117,8 +118,8 @@ export class BankPanel {
       const bonus = Math.round(d.principal * BANK_RULES.maturityBonus[d.termDays]);
       const btn = el('button', {
         className: 'btn btn-secondary btn-sm',
-        text: 'Tarik',
-        attrs: { type: 'button', 'aria-label': `Tarik deposito ${formatRupiah(d.principal)}` },
+        text: tr('Tarik'),
+        attrs: { type: 'button', 'aria-label': tr('Tarik deposito {principal}', { principal: formatRupiah(d.principal) }) },
         onClick: () => this.confirmWithdraw(d.id, d.principal + d.interest, bonus, left),
       });
       btn.disabled = !canAct;
@@ -128,11 +129,11 @@ export class BankPanel {
           el('div', {
             className: 'item-info',
             children: [
-              el('div', { className: 'item-name', text: `${formatRupiah(d.principal)} · ${TERM_LABEL[d.termDays]}` }),
-              el('div', { className: 'item-meta', text: `Bunga terkumpul ${formatRupiah(d.interest)} (+${formatRupiah(Math.round(d.principal * BANK_RULES.depositDailyRate))}/hari)` }),
+              el('div', { className: 'item-name', text: tr('{principal} · {1}', { principal: formatRupiah(d.principal), 1: TERM_LABEL[d.termDays] }) }),
+              el('div', { className: 'item-meta', text: tr('Bunga terkumpul {interest} (+{1}/hari)', { interest: formatRupiah(d.interest), 1: formatRupiah(Math.round(d.principal * BANK_RULES.depositDailyRate)) }) }),
               el('div', {
                 className: 'item-meta',
-                text: left <= 0 ? 'Cair malam ini saat tutup' : `Jatuh tempo Hari ${due} (${left} hari lagi) · bonus ${formatRupiah(bonus)}`,
+                text: left <= 0 ? tr('Cair malam ini saat tutup') : tr('Jatuh tempo Hari {due} ({left} hari lagi) · bonus {bonus}', { due, left, bonus: formatRupiah(bonus) }),
               }),
             ],
           }),
@@ -143,15 +144,15 @@ export class BankPanel {
     return el('section', {
       className: 'bank-section',
       children: [
-        el('h3', { className: 'settings-heading', text: 'Deposito' }),
+        el('h3', { className: 'settings-heading', text: tr('Deposito') }),
         el('p', {
           className: 'panel-note',
-          text: `Bunga 0,5% per hari dari pokok, masuk ke saldo deposito tiap tutup. Bisa ditarik kapan saja (pokok + bunga). Jika ditahan sampai jatuh tempo, otomatis cair ke kas dengan bonus: 1 minggu +1%, 2 minggu +3%, 4 minggu +8%. Minimal ${formatRupiah(BANK_RULES.minDeposit)}.`,
+          text: tr('Bunga 0,5% per hari dari pokok, masuk ke saldo deposito tiap tutup. Bisa ditarik kapan saja (pokok + bunga). Jika ditahan sampai jatuh tempo, otomatis cair ke kas dengan bonus: 1 minggu +1%, 2 minggu +3%, 4 minggu +8%. Minimal {minDeposit}.', { minDeposit: formatRupiah(BANK_RULES.minDeposit) }),
         }),
         amount.root,
         term.root,
         el('div', { className: 'panel-buttons', children: [open] }),
-        ...(rows.length ? rows : [el('p', { className: 'panel-note muted', text: 'Belum ada deposito.' })]),
+        ...(rows.length ? rows : [el('p', { className: 'panel-note muted', text: tr('Belum ada deposito.') })]),
       ],
     });
   }
@@ -165,7 +166,7 @@ export class BankPanel {
       const pay = amountInput(Math.min(outstanding, Math.max(0, s.player.money)), Math.min(outstanding, s.player.money), [50_000, 100_000, Math.min(outstanding, s.player.money)]);
       const btn = el('button', {
         className: 'btn btn-primary',
-        text: 'Bayar',
+        text: tr('Bayar'),
         attrs: { type: 'button' },
         onClick: () => this.act(this.ctx.actions.repayLoan(pay.get())),
       });
@@ -173,16 +174,16 @@ export class BankPanel {
       return el('section', {
         className: 'bank-section',
         children: [
-          el('h3', { className: 'settings-heading', text: 'Pinjaman' }),
+          el('h3', { className: 'settings-heading', text: tr('Pinjaman') }),
           el('div', {
             className: 'item-row bank-row is-loan',
             children: [
               el('div', {
                 className: 'item-info',
                 children: [
-                  el('div', { className: 'item-name', text: `Sisa utang ${formatRupiah(outstanding)}` }),
-                  el('div', { className: 'item-meta', text: `Pokok ${formatRupiah(loan.principal)} · bunga ${formatRupiah(loan.interest)} (+${formatRupiah(Math.round(loan.principal * BANK_RULES.loanDailyRate))}/hari)` }),
-                  el('div', { className: `item-meta${due - s.calendar.day <= 1 ? ' is-bad' : ''}`, text: `Jatuh tempo Hari ${due}: sisa utang dipotong otomatis dari kas.` }),
+                  el('div', { className: 'item-name', text: tr('Sisa utang {outstanding}', { outstanding: formatRupiah(outstanding) }) }),
+                  el('div', { className: 'item-meta', text: tr('Pokok {principal} · bunga {interest} (+{2}/hari)', { principal: formatRupiah(loan.principal), interest: formatRupiah(loan.interest), 2: formatRupiah(Math.round(loan.principal * BANK_RULES.loanDailyRate)) }) }),
+                  el('div', { className: `item-meta${due - s.calendar.day <= 1 ? ' is-bad' : ''}`, text: tr('Jatuh tempo Hari {due}: sisa utang dipotong otomatis dari kas.', { due }) }),
                 ],
               }),
             ],
@@ -196,7 +197,7 @@ export class BankPanel {
     const term = termPicker('loan-term', 14);
     const btn = el('button', {
       className: 'btn btn-secondary',
-      text: 'Ajukan pinjaman',
+      text: tr('Ajukan pinjaman'),
       attrs: { type: 'button' },
       onClick: () => this.confirmLoan(amount.get(), term.get()),
     });
@@ -204,10 +205,10 @@ export class BankPanel {
     return el('section', {
       className: 'bank-section',
       children: [
-        el('h3', { className: 'settings-heading', text: 'Pinjaman' }),
+        el('h3', { className: 'settings-heading', text: tr('Pinjaman') }),
         el('p', {
           className: 'panel-note',
-          text: `Plafon ${formatRupiah(limit)} (naik dengan level usaha & popularitas). Bunga 1% per hari dari sisa pokok. Bisa dicicil/dilunasi kapan saja; saat jatuh tempo sisa utang dipotong otomatis dari kas.`,
+          text: tr('Plafon {limit} (naik dengan level usaha & popularitas). Bunga 1% per hari dari sisa pokok. Bisa dicicil/dilunasi kapan saja; saat jatuh tempo sisa utang dipotong otomatis dari kas.', { limit: formatRupiah(limit) }),
         }),
         amount.root,
         term.root,
@@ -218,21 +219,21 @@ export class BankPanel {
 
   private confirmWithdraw(id: number, total: number, bonus: number, daysLeft: number): void {
     this.ui.openModal({
-      title: 'Tarik deposito?',
+      title: tr('Tarik deposito?'),
       body:
         daysLeft > 0
-          ? `Kamu menerima ${formatRupiah(total)} sekarang. Bonus jatuh tempo ${formatRupiah(bonus)} tidak didapat karena belum jatuh tempo (${daysLeft} hari lagi).`
-          : `Kamu menerima ${formatRupiah(total)} sekarang.`,
-      actions: [{ label: 'Batal' }, { label: 'Tarik', variant: 'primary', onClick: () => this.act(this.ctx.actions.withdrawDeposit(id)) }],
+          ? tr('Kamu menerima {total} sekarang. Bonus jatuh tempo {bonus} tidak didapat karena belum jatuh tempo ({daysLeft} hari lagi).', { total: formatRupiah(total), bonus: formatRupiah(bonus), daysLeft })
+          : tr('Kamu menerima {total} sekarang.', { total: formatRupiah(total) }),
+      actions: [{ label: tr('Batal') }, { label: tr('Tarik'), variant: 'primary', onClick: () => this.act(this.ctx.actions.withdrawDeposit(id)) }],
     });
   }
 
   private confirmLoan(amount: number, term: DepositTerm): void {
     const daily = Math.round(amount * BANK_RULES.loanDailyRate);
     this.ui.openModal({
-      title: 'Ajukan pinjaman?',
-      body: `Pinjam ${formatRupiah(amount)} selama ${TERM_LABEL[term]}. Bunga ±${formatRupiah(daily)} per hari (jika tidak dicicil, total bunga ±${formatRupiah(daily * term)}).`,
-      actions: [{ label: 'Batal' }, { label: 'Ya, pinjam', variant: 'primary', onClick: () => this.act(this.ctx.actions.borrow(amount, term)) }],
+      title: tr('Ajukan pinjaman?'),
+      body: tr('Pinjam {amount} selama {1}. Bunga ±{daily} per hari (jika tidak dicicil, total bunga ±{3}).', { amount: formatRupiah(amount), 1: TERM_LABEL[term], daily: formatRupiah(daily), 3: formatRupiah(daily * term) }),
+      actions: [{ label: tr('Batal') }, { label: tr('Ya, pinjam'), variant: 'primary', onClick: () => this.act(this.ctx.actions.borrow(amount, term)) }],
     });
   }
 }

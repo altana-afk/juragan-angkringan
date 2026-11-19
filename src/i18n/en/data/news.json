@@ -1,0 +1,277 @@
+{
+  "news": [
+    {
+      "id": "gerobak_kosong",
+      "title": "Mbah Kardi's cart stands empty",
+      "lines": [
+        "Oh my, so you're the one minding Mbah Kardi's cart now?",
+        "This cart has stood at the end of the alley for forty years. Ever since Mbah Kardi fell ill and his child took him to the city, the alley has been so quiet.",
+        "I'm Surti, mine's the house with the green fence. Whatever happens in this alley, I always know first.",
+        "Take good care of the cart, okay? People here still remember how it tasted."
+      ],
+      "summary": "Bu Surti, the neighbor with the green fence, welcomed you. Mbah Kardi's cart has stood at the end of the alley for 40 years and the neighbors still remember its taste."
+    },
+    {
+      "id": "gito_langganan",
+      "title": "The first customer",
+      "lines": [
+        "Well, look at that, the cart's open again! I'm Gito, from the motorbike taxi stand out front.",
+        "I used to have coffee here every afternoon before my night shift. This bench knows the shape of my body by heart.",
+        "If the coffee's good, I'll be a regular. If it's not, I'll still be a regular. Where else would I go?"
+      ],
+      "summary": "Pak Gito, a motorbike taxi driver from the stand, is back for coffee at the cart. He's been an afternoon regular since Mbah Kardi's days."
+    },
+    {
+      "id": "surti_buku",
+      "title": "A handwritten book",
+      "lines": [
+        "Have you opened that notebook in the cart's drawer yet?",
+        "That's Kardi's Kitchen Book. It's in Sri's handwriting, Mbah Kardi's wife. She's passed away.",
+        "Everyone here used to say it was Sri's hands that made this angkringan famous. That sambal of hers, oh my.",
+        "But after Sri died, Mbah Kardi never sold that sambal again. Nobody knows why."
+      ],
+      "summary": "The recipe book in the cart's drawer was written by Sri, Mbah Kardi's late wife. Since Sri died, Sri's sambal has never been sold again."
+    },
+    {
+      "id": "bayu_pulang",
+      "title": "Mas Bayu returns from the city",
+      "lines": [
+        "So you're the one my uncle left his cart with. I'm Bayu, his nephew.",
+        "I'm just stopping by. I'm scouting places to open a coffee business.",
+        "This coffee of yours... well, honestly, it can't compete with the cafés in the city yet. But the cart still smells of charcoal. You can't buy that."
+      ],
+      "summary": "Mas Bayu, Mbah Kardi's nephew, is back from the city. He wants to open a coffee business and had a few critical words about your coffee."
+    },
+    {
+      "id": "gito_malam",
+      "title": "A stranger at the end of the alley",
+      "lines": [
+        "This afternoon I saw a fancy car parked at the end of the alley. The man had a measuring tape.",
+        "Measuring the land, taking photos of the cart. I asked, and he said he was from the city.",
+        "Maybe it's just a survey. Maybe."
+      ],
+      "summary": "Pak Gito saw someone from the city measuring the land and photographing the cart at the end of the alley."
+    },
+    {
+      "id": "hendra_ukur",
+      "title": "The land at the end of the alley is being measured",
+      "lines": [
+        "Have you heard? I asked around with Pak RT, the neighborhood head.",
+        "The man measuring the land yesterday works for Pak Hendra. A developer. They say he wants to build a row of shophouses at the end of this alley.",
+        "Including the land where your cart stands.",
+        "Pak RT says nothing's been decided yet. But when city folks bring a measuring tape, it's usually not a joke."
+      ],
+      "summary": "A man working for Pak Hendra, a developer, measured the land at the end of the alley. He plans to build shophouses, including where your cart stands."
+    },
+    {
+      "id": "pasar_malam",
+      "title": "A night market is coming",
+      "lines": [
+        "Good news! The field near the end of the alley is going to host a night market.",
+        "A Ferris wheel, a carousel, lights everywhere. It'll be packed for sure. Try opening there sometime if you like.",
+        "But be careful, there'll be lots of vendors. Don't let your cart be outshone."
+      ],
+      "summary": "A night market is opening near the end of the alley. You can try selling there using the 📍 chip."
+    },
+    {
+      "id": "bayu_kedai",
+      "title": "A coffee shop across the alley",
+      "lines": [
+        "My café opens tomorrow. Across the alley, where the phone credit stall used to be.",
+        "I'm not trying to compete with you, you know. Mine's trendy coffee, yours is old-school kopi tubruk. Different crowds.",
+        "...Well, maybe I'm competing a little. But if you run out of supplies, just drop by."
+      ],
+      "summary": "Mas Bayu opened a café across the alley. A rival, but he offers to help if you run out of supplies."
+    },
+    {
+      "id": "warga_bisik",
+      "title": "Whispers at the savings club",
+      "lines": [
+        "At the savings club today, everyone was talking about the shophouses.",
+        "Bu Darmi says it's great, her kid could get a job as a cashier. Pak Narto says no, the alley would turn into a parking lot.",
+        "Me? I haven't taken sides yet. But I'm keeping track of everyone who talks."
+      ],
+      "summary": "The neighbors have started discussing the shophouse plan at the savings club. Some support it for the jobs, others oppose it."
+    },
+    {
+      "id": "hendra_tawaran",
+      "title": "Pak Hendra offers a deal",
+      "lines": [
+        "Good evening. I'm Hendra. You may have heard my name from the neighbors.",
+        "I haven't come to drive you out. I've come to offer you something.",
+        "If the shophouses are built, I'll need one food tenant at the end. A clean spot, with electricity and parking. This cart could become a kiosk there.",
+        "You don't need to answer now. Just think about it. This neighborhood needs jobs, and you need a place that's certain."
+      ],
+      "summary": "Pak Hendra came in person and offered you a kiosk in the shophouses he plans to build. He asked you to think it over first."
+    },
+    {
+      "id": "bayu_bantu",
+      "title": "Bayu's café is quiet",
+      "lines": [
+        "My café has been quiet all week. People walk by, look at the prices, and leave.",
+        "In the city, prices like mine are considered cheap. Here, that much money buys three meals.",
+        "Maybe my uncle was right. Selling in a neighborhood is about knowing your place, not about style."
+      ],
+      "summary": "Mas Bayu's café is quiet. He's starting to realize that selling in a neighborhood is different from the city."
+    },
+    {
+      "id": "warga_terbelah",
+      "title": "The neighborhood is splitting",
+      "lines": [
+        "Now there are two camps. For the shophouses and against them.",
+        "Yesterday some people wouldn't even greet each other at the guard post. All because of the shophouses!",
+        "Your cart has become a kind of symbol. If the cart survives, the neighborhood survives. That's what people say."
+      ],
+      "summary": "The neighbors are split for and against the shophouses. Your cart is starting to be seen as a symbol of the neighborhood."
+    },
+    {
+      "id": "gito_lapak",
+      "title": "The motorbike taxi stand is under threat",
+      "lines": [
+        "Our motorbike taxi stand is caught up in the shophouse plan too. They say it'll become a parking lot.",
+        "I've waited for passengers at that spot for twenty years. Where else am I supposed to go?",
+        "If your cart moves, I'll move with it. If your cart closes... well, I don't know."
+      ],
+      "summary": "Pak Gito's motorbike taxi stand may be turned into shophouse parking. He's worried about losing his spot."
+    },
+    {
+      "id": "gusur_14",
+      "title": "Eviction in 14 days",
+      "lines": [
+        "This is serious. The letter from the village office is out.",
+        "In fourteen days, the land at the end of the alley will be cleared. Unless the neighbors reach a joint decision.",
+        "Pak RT is asking everyone who runs a business at the end of the alley to take a stand.",
+        "You too. Your cart is right in the middle of it."
+      ],
+      "summary": "The village office's letter is out: in 14 days the land at the end of the alley will be cleared, unless the neighbors reach a joint decision."
+    },
+    {
+      "id": "bayu_ngaku",
+      "title": "Mas Bayu's confession",
+      "lines": [
+        "There's something I need to tell you.",
+        "Before my uncle got sick, he asked me to carry on this cart. I said no.",
+        "I said I wanted to make it in the city. But really, I was scared. Scared of failing in front of people who've known me since I was a kid.",
+        "That's why I was annoyed when he left it with you. Annoyed at myself, not at you."
+      ],
+      "summary": "Mas Bayu confessed that Mbah Kardi once asked him to carry on the cart, but he refused because he was afraid of failing."
+    },
+    {
+      "id": "surti_sri",
+      "title": "Bu Surti's story about Sri",
+      "lines": [
+        "Sri was my best friend since we were little. We went to the same primary school.",
+        "When Sri was sick, Kardi sold alone. Every night he took home the leftovers and shared them with neighbors who were struggling. Quietly.",
+        "Even chatty old me got some once. When my husband was laid off.",
+        "That's why I won't let that cart disappear. Not because of the cart. Because of who used to be there."
+      ],
+      "summary": "Bu Surti shared that Sri was her best friend. When Sri was sick, Mbah Kardi quietly shared his leftovers with struggling neighbors."
+    },
+    {
+      "id": "sambal_robek",
+      "title": "The torn page of Sri's sambal",
+      "lines": [
+        "Take a look at this. I found it in my uncle's box of things at the old house.",
+        "It's the missing page from the Kitchen Book. The recipe for Sri's sambal. But it's torn, and the final amounts are gone.",
+        "The spices used chilies and shallots that my aunt used to buy at Market Edge. Maybe the traders there still remember.",
+        "If you can complete it... this alley will remember the taste again."
+      ],
+      "summary": "Mas Bayu found the torn page of Sri's sambal recipe. Its ingredients used to be bought at Market Edge."
+    },
+    {
+      "id": "keputusan",
+      "title": "The neighbors' decision and a final offer",
+      "lines": [
+        "Tomorrow is the deadline. I want to hear it from you directly.",
+        "I've heard all sorts of things. Some want this cart to stay, some want a kiosk in the shophouses, some want me gone.",
+        "My offer: rent this land, sell me the cart, or show me that this neighborhood truly wants to keep it.",
+        "Whatever you choose, I'll respect it."
+      ],
+      "summary": "Pak Hendra came to hear your decision about the cart and the land at the end of the alley. Open the Decision tab in Village News."
+    }
+  ],
+  "decision": {
+    "choices": [
+      {
+        "id": "bertahan",
+        "title": "Stay and pay the rent",
+        "text": "You rent the land from Pak Hendra with your own money. The angkringan stays, but the neighbors feel they weren't consulted.",
+        "requirement": "At least Rp1,500,000 in cash",
+        "effects": "Cash −Rp1,500,000 · popularity −3"
+      },
+      {
+        "id": "gotong",
+        "title": "Rally the neighbors together",
+        "text": "You gather the neighbors, share rice with everyone who comes, and ask the whole neighborhood to stand together against the eviction.",
+        "requirement": "Popularity at least 55 and a combined bond stage of at least 5 with Bu Surti, Pak Gito, and Mas Bayu",
+        "effects": "Popularity +6 · loyalty +15"
+      },
+      {
+        "id": "warisan",
+        "title": "Hand the cart over to Mas Bayu",
+        "text": "The cart returns to Mbah Kardi's family. You and Mas Bayu run it together: his café's coffee, your cart's kitchen.",
+        "requirement": "Bond with Mas Bayu at least stage 2",
+        "effects": "Coffee menu unlocked · loyalty +10"
+      },
+      {
+        "id": "jual",
+        "title": "Sell the cart to Pak Hendra",
+        "text": "You take Pak Hendra's money. The cart moves into a shophouse kiosk. Lots of cash, but the alley loses something.",
+        "requirement": "Always available",
+        "effects": "Cash +Rp3,000,000 · popularity −15 · your bonds with Bu Surti and Pak Gito reset"
+      }
+    ]
+  },
+  "endings": [
+    {
+      "id": "lengkap",
+      "title": "Complete Ending: For Kardi, Don't Stop",
+      "lines": [
+        "Mbah Kardi called from the city. His voice was soft, but I could hear him laughing.",
+        "He said he'd heard Sri's sambal is being sold in this alley again.",
+        "He stopped back then because he couldn't bear to make it without Sri. Every time he ground the chilies, he remembered her hands.",
+        "Now he says someone has finally carried it on. The cart isn't his anymore. It belongs to this alley."
+      ]
+    },
+    {
+      "id": "gotong_royong",
+      "title": "Togetherness Ending",
+      "lines": [
+        "Did you see this morning? The whole neighborhood came to the end of the alley. With mats, thermoses, and their kids.",
+        "Pak Hendra came, saw the crowd, and just shook his head with a smile.",
+        "He said he didn't want to build on land that's loved this much. His plan is moving to the main road.",
+        "Your cart stays here. We all stay here."
+      ]
+    },
+    {
+      "id": "warisan",
+      "title": "Legacy Ending",
+      "lines": [
+        "My uncle has signed. This cart is officially a family business, and you're part of that family.",
+        "I've closed my café. I moved the coffee machine here. Trendy coffee at an old cart. Strange, but it sells.",
+        "Pak Hendra backed off, because the land is now in my uncle's family's name.",
+        "Thank you for giving me the courage to come home."
+      ]
+    },
+    {
+      "id": "bertahan",
+      "title": "Holding On Ending",
+      "lines": [
+        "I've received the rent. This land is yours for the next five years.",
+        "The shophouses will still be built next door. Your cart will stand beside the glass and neon.",
+        "The neighbors still argue about it. But the cart keeps its lights on every night.",
+        "I didn't expect to say this, but I'm glad you held on."
+      ]
+    },
+    {
+      "id": "kota",
+      "title": "City Ending",
+      "lines": [
+        "So the cart's been sold, then.",
+        "I'm not angry. I'm just... sad. The alley is so bright now, but it feels cold.",
+        "Pak Gito moved his waiting spot to the main road. The savings club ladies go to the café now.",
+        "Are you still selling at that kiosk? Well. I hope business is good. Sri would still pray for you."
+      ]
+    }
+  ]
+}

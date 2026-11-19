@@ -2,10 +2,12 @@ import { hasNewAchievement, unlockAchievements, type AchievementDef } from '../s
 import { formatRupiah } from '../utils/formatting';
 import { CATALOG, type Catalog } from '../data/catalog';
 import { GameActions } from '../systems/GameActions';
+import { syncBranchNames } from '../systems/BranchSystem';
 import { detectStorage, SaveError, SaveSystem, type StorageLike } from '../systems/SaveSystem';
 import { EventBus } from './EventBus';
 import type { GameEvents } from './GameEvents';
 import { GameStore } from './GameStore';
+import { tr } from '../i18n/i18n';
 
 const AUTOSAVE_DELAY_MS = 1500;
 /** Perubahan dengan alasan ini tidak memicu autosave. */
@@ -39,7 +41,7 @@ export class GameContext {
       this.store,
       this.catalog,
       (recipes) => {
-        for (const r of recipes) this.notify(`Menu baru terbuka: ${r.name}!`, 'success', 4500);
+        for (const r of recipes) this.notify(tr('Menu baru terbuka: {name}!', { name: r.name }), 'success', 4500);
       },
       (notice) => this.bus.emit('story:notice', notice),
     );
@@ -53,7 +55,7 @@ export class GameContext {
             got = unlockAchievements(d);
           });
           for (const a of got) {
-            this.notify(`${a.icon} Pencapaian: ${a.name}! Hadiah ${formatRupiah(a.reward)}`, 'success', 5000);
+            this.notify(tr('{icon} Pencapaian: {name}! Hadiah {reward}', { icon: a.icon, name: a.name, reward: formatRupiah(a.reward) }), 'success', 5000);
             this.bus.emit('achievement:unlocked', { id: a.id });
           }
         });
@@ -81,7 +83,8 @@ export class GameContext {
   continueGame(): { ok: true } | { ok: false; message: string } {
     try {
       const state = this.saves.load();
-      if (!state) return { ok: false, message: 'Belum ada data simpanan.' };
+      if (!state) return { ok: false, message: tr('Belum ada data simpanan.') };
+      syncBranchNames(state);
       this.store.replace(state, 'load');
       this.actions.syncUnlocks();
       this.autosaveEnabled = true;
@@ -114,7 +117,7 @@ export class GameContext {
     const ok = this.saves.save(this.store.get());
     if (!ok && !this.warnedSaveFailure) {
       this.warnedSaveFailure = true;
-      this.notify('Progres gagal disimpan: penyimpanan browser penuh atau diblokir.', 'error', 6000);
+      this.notify(tr('Progres gagal disimpan: penyimpanan browser penuh atau diblokir.'), 'error', 6000);
     }
     if (ok) this.bus.emit('save:completed', { savedAt: new Date().toISOString() });
     return ok;

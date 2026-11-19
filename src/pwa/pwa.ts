@@ -8,6 +8,8 @@
  * dan dilewati saat game disematkan di iframe (mis. halaman itch.io).
  */
 
+import { tr } from '../i18n/i18n';
+
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
   readonly userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
@@ -80,7 +82,7 @@ export function initPwa(notify: Notify): void {
   window.addEventListener('appinstalled', () => {
     deferredPrompt = null;
     emitChange();
-    notify('Game terpasang! Sekarang bisa dibuka dari layar utama, bahkan tanpa internet.', 'success', 5000);
+    notify(tr('Game terpasang! Sekarang bisa dibuka dari layar utama, bahkan tanpa internet.'), 'success', 5000);
   });
 
   if (isInstalled()) void requestPersistentStorage();
@@ -105,7 +107,7 @@ function applyWaitingUpdate(worker: ServiceWorker, notify: Notify): void {
     reloading = true;
     window.location.reload();
   });
-  notify('Memperbarui game ke versi terbaru…', 'info', 3000);
+  notify(tr('Memperbarui game ke versi terbaru…'), 'info', 3000);
   worker.postMessage({ type: 'SKIP_WAITING' });
 }
 
@@ -127,7 +129,7 @@ async function registerServiceWorker(notify: Notify): Promise<void> {
   }
 
   const announceUpdate = (): void =>
-    notify('Versi baru game sudah diunduh — otomatis dipakai saat game dibuka lagi.', 'info', 7000);
+    notify(tr('Versi baru game sudah diunduh — otomatis dipakai saat game dibuka lagi.'), 'info', 7000);
 
   const watchInstalling = (worker: ServiceWorker | null): void => {
     if (!worker) return;
@@ -135,7 +137,7 @@ async function registerServiceWorker(notify: Notify): Promise<void> {
       if (worker.state !== 'installed') return;
       // Tanpa controller = instalasi pertama (game kini siap offline).
       if (!navigator.serviceWorker.controller) {
-        if (isInstalled()) notify('Game siap dimainkan offline.', 'success', 4000);
+        if (isInstalled()) notify(tr('Game siap dimainkan offline.'), 'success', 4000);
         return;
       }
       // Pembaruan: langsung pasang kalau pemain masih di menu utama, kalau tidak tunda.

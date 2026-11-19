@@ -45,7 +45,7 @@
     { "type": "house_x", "x": 0, "y": 18, "variant": "peach" },
     { "type": "house_y", "x": 6.2, "y": 0.4, "variant": "cream" },
     { "type": "cart", "x": 8, "y": 10, "id": "cart" },
-    { "type": "stove", "x": 10.05, "y": 10.0, "id": "stove" },
+    { "type": "stove", "x": 10.05, "y": 10, "id": "stove" },
     { "type": "seller", "x": 10.95, "y": 9.45, "id": "seller" },
     { "type": "bench_x", "x": 8, "y": 11.3, "id": "bench-front" },
     { "type": "bench_y", "x": 11.05, "y": 9.9, "id": "bench-side" },
@@ -57,39 +57,43 @@
     { "type": "motorbike", "x": 9.6, "y": 14.05, "variant": "blue" },
     { "type": "tree", "x": 8.2, "y": 19.6, "variant": "round" },
     { "type": "tree", "x": 10.4, "y": 21.4, "variant": "tall" },
-    { "type": "tree", "x": 5.2, "y": 21.5, "variant": "round" },
-    { "type": "tree", "x": 1.0, "y": 22.6, "variant": "round" },
+    { "type": "tree", "x": 10.85, "y": 1.15, "variant": "round" },
+    { "type": "tree", "x": 7.05, "y": 22.95, "variant": "round" },
     { "type": "plant_pot", "x": 6.25, "y": 3.1 },
-    { "type": "plant_pot", "x": 7.6, "y": 3.1 },
+    { "type": "plant_pot", "x": 7.55, "y": 3.6 },
     { "type": "power_pole", "x": 17.25, "y": 1.6, "id": "pole-1" },
     { "type": "power_pole", "x": 17.25, "y": 8.8, "id": "pole-2" },
-    { "type": "power_pole", "x": 17.25, "y": 15.0, "id": "pole-3" },
+    { "type": "power_pole", "x": 17.25, "y": 15, "id": "pole-3" },
     { "type": "power_pole", "x": 17.25, "y": 22.4, "id": "pole-4" },
     { "type": "street_lamp", "x": 17.55, "y": 5.2 },
-    { "type": "street_lamp", "x": 17.55, "y": 12.0 },
+    { "type": "street_lamp", "x": 17.55, "y": 12 },
     { "type": "street_lamp", "x": 17.55, "y": 19.2 },
     { "type": "bench_y", "x": 7.25, "y": 9.6, "id": "bench-extra", "requires": "bangku_tambahan" },
     { "type": "mat", "x": 4.9, "y": 9.4, "id": "mat-2", "requires": "tikar_kedua" },
     { "type": "low_table", "x": 5.35, "y": 9.95, "id": "table-2", "requires": "tikar_kedua" },
     { "type": "bench_x", "x": 4.45, "y": 13.2, "id": "bench-area", "requires": "area_makan_luas" },
-    { "type": "sign_board", "x": 11.2, "y": 7.4, "id": "sign", "requires": "papan_nama" },
-    { "type": "street_lamp", "x": 4.2, "y": 13.95, "id": "garden-lamp", "requires": "penerangan" },
+    { "type": "sign_board", "x": 11, "y": 7, "id": "sign", "requires": "papan_nama" },
+    { "type": "street_lamp", "x": 6.65, "y": 15.2, "id": "garden-lamp", "requires": "penerangan" },
     { "type": "plant_pot", "x": 7.55, "y": 9.05, "id": "deco-1", "requires": "dekorasi" },
     { "type": "plant_pot", "x": 11.6, "y": 9.2, "id": "deco-2", "requires": "dekorasi" },
     { "type": "plant_pot", "x": 6.7, "y": 14.6, "id": "deco-3", "requires": "dekorasi" },
-    { "type": "tree", "x": 18.6, "y": 2.0, "variant": "tall" },
+    { "type": "tree", "x": 18.6, "y": 2, "variant": "tall" },
     { "type": "tree", "x": 22.4, "y": 3.2, "variant": "round" },
-    { "type": "tree", "x": 18.8, "y": 11.0, "variant": "round" },
+    { "type": "tree", "x": 18.8, "y": 11, "variant": "round" },
     { "type": "tree", "x": 22.6, "y": 12.4, "variant": "tall" },
     { "type": "tree", "x": 18.4, "y": 20.4, "variant": "round" },
     { "type": "tree", "x": 22.5, "y": 19.6, "variant": "tall" },
-    { "type": "bench_x", "x": 21.0, "y": 5.4, "id": "park-bench-1" },
-    { "type": "bench_x", "x": 21.0, "y": 14.2, "id": "park-bench-2" },
+    { "type": "bench_x", "x": 21, "y": 5.4, "id": "park-bench-1" },
+    { "type": "bench_x", "x": 21, "y": 14.2, "id": "park-bench-2" },
     { "type": "street_lamp", "x": 21.2, "y": 9.2, "id": "park-lamp" },
-    { "type": "plastic_chairs", "x": 8.0, "y": 14.7, "id": "plastic-chairs", "requires": "kursi_plastik" },
+    { "type": "plastic_chairs", "x": 8, "y": 14.7, "id": "plastic-chairs", "requires": "kursi_plastik" },
     { "type": "mat", "x": 4.9, "y": 7.25, "id": "mat-3", "requires": "tikar_ketiga" },
     { "type": "low_table", "x": 5.35, "y": 7.8, "id": "table-3", "requires": "tikar_ketiga" },
-    { "type": "umbrella_table", "x": 4.65, "y": 14.4, "id": "umbrella-table", "requires": "meja_payung" }
+    { "type": "umbrella_table", "x": 4.65, "y": 14.4, "id": "umbrella-table", "requires": "meja_payung" },
+    { "type": "plant_pot", "x": 3.05, "y": 19.25, "variant": "default" },
+    { "type": "plant_pot", "x": 3.05, "y": 20.55, "variant": "default" },
+    { "type": "trash_bin", "x": 3.1, "y": 18.1, "variant": "green" },
+    { "type": "motorbike", "x": 1.1, "y": 22.6, "variant": "red" }
   ],
   "anchors": {
     "cameraHome": { "x": 9.2, "y": 10.8 },
@@ -133,16 +137,16 @@
         "y": 11.55,
         "approach": [
           { "x": 9.3, "y": 12.3 },
-          { "x": 8.4, "y": 12.0 }
+          { "x": 8.4, "y": 12 }
         ]
       },
       {
         "id": "bangku-depan-2",
-        "x": 9.0,
+        "x": 9,
         "y": 11.55,
         "approach": [
           { "x": 9.3, "y": 12.3 },
-          { "x": 9.0, "y": 12.0 }
+          { "x": 9, "y": 12 }
         ]
       },
       {
@@ -151,7 +155,7 @@
         "y": 11.55,
         "approach": [
           { "x": 9.3, "y": 12.3 },
-          { "x": 9.6, "y": 12.0 }
+          { "x": 9.6, "y": 12 }
         ]
       },
       {
@@ -219,12 +223,12 @@
       {
         "id": "bangku-kiri-1",
         "x": 7.44,
-        "y": 10.0,
+        "y": 10,
         "requires": "bangku_tambahan",
         "approach": [
           { "x": 9.3, "y": 12.3 },
           { "x": 6.9, "y": 12.05 },
-          { "x": 6.9, "y": 10.0 }
+          { "x": 6.9, "y": 10 }
         ]
       },
       {
@@ -284,13 +288,13 @@
       },
       {
         "id": "lesehan2-4",
-        "x": 5.0,
-        "y": 10.0,
+        "x": 5,
+        "y": 10,
         "requires": "tikar_kedua",
         "approach": [
           { "x": 9.3, "y": 12.3 },
           { "x": 6.9, "y": 12.05 },
-          { "x": 5.0, "y": 10.0 }
+          { "x": 5, "y": 10 }
         ]
       },
       {
@@ -329,7 +333,7 @@
       {
         "id": "kursi-plastik-1",
         "x": 8.25,
-        "y": 15.0,
+        "y": 15,
         "requires": "kursi_plastik",
         "approach": [
           { "x": 9.3, "y": 12.3 },
@@ -340,7 +344,7 @@
       {
         "id": "kursi-plastik-2",
         "x": 9.45,
-        "y": 15.0,
+        "y": 15,
         "requires": "kursi_plastik",
         "approach": [
           { "x": 9.3, "y": 12.3 },
@@ -383,14 +387,14 @@
       },
       {
         "id": "lesehan3-4",
-        "x": 5.0,
+        "x": 5,
         "y": 7.85,
         "requires": "tikar_ketiga",
         "approach": [
           { "x": 9.3, "y": 12.3 },
           { "x": 6.9, "y": 12.05 },
-          { "x": 6.9, "y": 7.0 },
-          { "x": 5.0, "y": 7.0 }
+          { "x": 6.9, "y": 7 },
+          { "x": 5, "y": 7 }
         ]
       },
       {

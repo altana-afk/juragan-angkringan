@@ -6,6 +6,7 @@ import { storageCapacity, storedUnits } from '../systems/EconomySystem';
 import { totalQty } from '../systems/InventorySystem';
 import { el, setText, type UIComponent } from './dom';
 import { itemIcon } from './itemIcon';
+import { tr } from '../i18n/i18n';
 
 const COLLAPSE_KEY = 'juragan-angkringan:stockboard-collapsed';
 
@@ -47,19 +48,19 @@ export class StockBoard implements UIComponent {
     this.toggle = el('button', {
       className: 'board-toggle',
       attrs: { type: 'button', 'aria-expanded': String(!this.collapsed), 'aria-controls': 'stock-board-body' },
-      children: [el('strong', { text: 'Siap Dijual' }), this.summary, el('span', { className: 'board-caret', attrs: { 'aria-hidden': 'true' } })],
+      children: [el('strong', { text: tr('Siap Dijual') }), this.summary, el('span', { className: 'board-caret', attrs: { 'aria-hidden': 'true' } })],
       onClick: () => this.setCollapsed(!this.collapsed),
     }) as HTMLButtonElement;
     this.body.id = 'stock-board-body';
     const storageBtn = el('button', {
       className: 'board-storage',
-      attrs: { type: 'button', title: 'Lihat & atur isi gudang bahan' },
-      children: [el('span', { text: 'Gudang' }), this.storageText],
+      attrs: { type: 'button', title: tr('Lihat & atur isi gudang bahan') },
+      children: [el('span', { text: tr('Gudang') }), this.storageText],
       onClick: () => ctx.bus.emit('ui:open-panel', { panel: 'storage' }),
     });
     this.root = el('aside', {
       className: 'stock-board panel',
-      attrs: { 'aria-label': 'Menu siap dijual' },
+      attrs: { 'aria-label': tr('Menu siap dijual') },
       children: [this.toggle, this.bulk, this.body, storageBtn],
     });
     parent.append(this.root);
@@ -92,10 +93,10 @@ export class StockBoard implements UIComponent {
     const items = boardItems(state, this.ctx.catalog.recipes);
     const ready = items.reduce((s, i) => s + i.qty, 0);
     const soldOut = items.filter((i) => i.qty === 0).length;
-    setText(this.summary, items.length ? `${ready} porsi${soldOut ? ` · ${soldOut} habis` : ''}` : 'kosong');
-    setText(this.storageText, `${storedUnits(state)}/${storageCapacity(state)}`);
+    setText(this.summary, items.length ? tr('{ready} porsi{1}', { ready, 1: soldOut ? tr(' · {soldOut} habis', { soldOut }) : '' }) : tr('kosong'));
+    setText(this.storageText, tr('{state}/{state2}', { state: storedUnits(state), state2: storageCapacity(state) }));
     if (items.length === 0) {
-      this.body.replaceChildren(el('p', { className: 'board-empty', text: 'Belum ada yang dimasak. Buka Persiapan untuk memasak menu.' }));
+      this.body.replaceChildren(el('p', { className: 'board-empty', text: tr('Belum ada yang dimasak. Buka Persiapan untuk memasak menu.') }));
       return;
     }
     const section = (title: string, list: BoardItem[]): HTMLElement | null =>
@@ -107,12 +108,12 @@ export class StockBoard implements UIComponent {
               ...list.map((i) =>
                 el('div', {
                   className: `board-row${i.qty === 0 ? ' is-out' : i.qty <= 3 ? ' is-low' : ''}`,
-                  attrs: { title: `${i.recipe.name}: ${i.qty} porsi tersisa, ${i.sold} terjual hari ini` },
+                  attrs: { title: tr('{name}: {qty} porsi tersisa, {sold} terjual hari ini', { name: i.recipe.name, qty: i.qty, sold: i.sold }) },
                   children: [
                     itemIcon(i.recipe.icon, 'board-icon'),
                     el('span', { className: 'board-name', text: i.recipe.name }),
-                    el('span', { className: 'board-qty', text: `× ${i.qty}` }),
-                    i.qty === 0 ? el('span', { className: 'board-tag', text: 'Habis' }) : null,
+                    el('span', { className: 'board-qty', text: tr('× {qty}', { qty: i.qty }) }),
+                    i.qty === 0 ? el('span', { className: 'board-tag', text: tr('Habis') }) : null,
                   ],
                 }),
               ),
@@ -120,7 +121,7 @@ export class StockBoard implements UIComponent {
           })
         : null;
     this.body.replaceChildren(
-      ...[section('Makanan', items.filter((i) => i.recipe.category !== 'minuman')), section('Minuman', items.filter((i) => i.recipe.category === 'minuman'))].filter(
+      ...[section(tr('Makanan'), items.filter((i) => i.recipe.category !== 'minuman')), section(tr('Minuman'), items.filter((i) => i.recipe.category === 'minuman'))].filter(
         (x): x is HTMLElement => x !== null,
       ),
     );

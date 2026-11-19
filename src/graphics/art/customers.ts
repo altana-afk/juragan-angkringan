@@ -1,6 +1,7 @@
 import { CUSTOMER_TYPES, type CustomerTypeDef } from '../../data/customers';
 import { CATALOG } from '../../data/catalog';
 import { NAMED_CUSTOMERS, namedById } from '../../data/story';
+import { ALLIES } from '../../data/challenges';
 import { shade, type Color } from '../color';
 import { PixelCanvas } from '../PixelCanvas';
 import { drawItemIcon, parseHex } from './itemIcons';
@@ -76,8 +77,8 @@ export function paintCustomers(): ArtEntry[] {
       });
     });
   }
-  // Pelanggan bernama (cerita): satu palet khusus per tokoh.
-  NAMED_CUSTOMERS.forEach((c, i) => {
+  // Pelanggan bernama (cerita) & kenalan tantangan (0.18.0): satu palet khusus per tokoh.
+  [...NAMED_CUSTOMERS, ...ALLIES].forEach((c, i) => {
     namedFrames(c.id, i).forEach((canvas, fi) => {
       entries.push({ key: customerTextureKey(`named_${c.id}`, 0, fi), art: { canvas, anchorX: 6.5, anchorY: 20 } });
     });
@@ -94,6 +95,52 @@ function namedFrames(id: string, index: number): PixelCanvas[] {
     frame([...UPPER, ...LEGS.walkB], pal, 0),
     frame([...UPPER, ...SIT_LEGS], pal, 3),
   ];
+}
+
+/** Tokoh tantangan kampung (0.18.0): ODGJ, ormas (ketua & anggota), tim nakes, polisi. */
+export const CHALLENGE_LOOKS: Record<string, readonly { hair: string; shirt: string; accent: string; pants: string }[]> = {
+  odgj: [{ hair: '#8a8478', shirt: '#7a6a52', accent: '#5a4a3a', pants: '#4a4238' }],
+  ormas: [
+    { hair: '#141010', shirt: '#2a2a2e', accent: '#c0392b', pants: '#3a4a2e' },
+    { hair: '#1e1612', shirt: '#4a5a34', accent: '#2a2a2e', pants: '#2a2a2e' },
+  ],
+  nakes: [{ hair: '#201818', shirt: '#f2f6f6', accent: '#d64545', pants: '#e8eeee' }],
+  polisi: [{ hair: '#141212', shirt: '#7a5a34', accent: '#d9c08a', pants: '#3e3222' }],
+};
+
+export function paintChallengeFolk(): ArtEntry[] {
+  const entries: ArtEntry[] = [];
+  for (const [id, palettes] of Object.entries(CHALLENGE_LOOKS)) {
+    palettes.forEach((look, pi) => {
+      const pal = palette({ id, palettes: [look] }, 0, SKINS[(pi + id.length) % SKINS.length] as Color);
+      const frames = [frame([...UPPER, ...LEGS.stand], pal, 0), frame([...UPPER, ...LEGS.walkA], pal, 0), frame([...UPPER, ...LEGS.walkB], pal, 0)];
+      frames.forEach((canvas, fi) => entries.push({ key: customerTextureKey(id, pi, fi), art: { canvas, anchorX: 6.5, anchorY: 20 } }));
+    });
+  }
+  return entries;
+}
+
+/** Kucing 12×9: frame 0 duduk, 1 & 2 berlari. Varian 'liar' (abu kusam) dan 'belang' (peliharaan). */
+export const catKey = (variant: 'liar' | 'belang', frameIndex: number): string => `cat_${variant}_${frameIndex}`;
+
+export function paintCats(): ArtEntry[] {
+  const SIT = ['.k......k.', '.kk....kk.', '.kKKKKKKk.', '.KeKKKKeK.', '..KKnKKK..', '...KKKK..t', '..KKwwKK.t', '..KKwwKKtt', '..KK..KK..'];
+  const RUN_A = ['k.k.......', 'kKk.......', 'KeKKKKKK..', 'KKKKKKKKKt', '.KKwwKKKK.t', '.K.K..K.K.', 'K..K..K..K', '..........', '..........'];
+  const RUN_B = ['k.k.......', 'kKk.......', 'KeKKKKKK.t', 'KKKKKKKKKt', '.KKwwKKKK.', '..KK..KK..', '..K.K.K.K.', '..........', '..........'];
+  const looks: Record<'liar' | 'belang', Record<string, Color>> = {
+    liar: { k: 0x5a5048, K: 0x7d7268, e: 0xe8d84a, n: 0xd08a8a, w: 0xa89c90, t: 0x5a5048 },
+    belang: { k: 0xd07a2a, K: 0xf0a24a, e: 0x3a8a3a, n: 0xe89a9a, w: 0xfdf8ee, t: 0xd07a2a },
+  };
+  const entries: ArtEntry[] = [];
+  for (const [variant, pal] of Object.entries(looks) as ['liar' | 'belang', Record<string, Color>][]) {
+    [SIT, RUN_A, RUN_B].forEach((rows, fi) => {
+      const c = new PixelCanvas(13, 11);
+      c.drawPattern(1, 1, rows.map((r) => r.padEnd(11, '.').slice(0, 11)), pal);
+      c.outline(0x1b1220, 235);
+      entries.push({ key: catKey(variant, fi), art: { canvas: c, anchorX: 6.5, anchorY: 10 } });
+    });
+  }
+  return entries;
 }
 
 /** Potret pelanggan bernama untuk panel dialog (sprite berdiri). */
@@ -119,6 +166,7 @@ export function paintBubblesAndEmotes(): ArtEntry[] {
     happy: { rows: ['.rr...rr.', 'rRrr.rrrr', 'rRrrrrrrr', 'rrrrrrrrr', '.rrrrrrr.', '..rrrrr..', '...rrr...', '....r....'], pal: { r: 0xe0485a, R: 0xff9aa8 } },
     ok: { rows: ['..yyyyy..', '.yyyyyyy.', 'yyoyyyoyy', 'yyyyyyyyy', 'yoyyyyyoy', 'yyoooooyy', '.yyyyyyy.', '..yyyyy..'], pal: { y: 0xf6c453, o: 0x5a3a10 } },
     talk: { rows: ['.........', '.........', 'oo.oo.oo.', 'oo.oo.oo.', 'oo.oo.oo.', '.........'], pal: { o: 0x1d6f8a } },
+    alert: { rows: ['r..r..r..', 'r..r..r..', 'r..r..r..', 'r..r..r..', '.........', 'r..r..r..', '.........'], pal: { r: 0xe0302a } },
     angry: { rows: ['r..r.r..r', '.r.r.r.r.', '..rrrrr..', 'rrr...rrr', '..rrrrr..', '.r.r.r.r.', 'r..r.r..r'], pal: { r: 0xd6382a } },
   };
   const entries: ArtEntry[] = [{ key: BUBBLE_KEY, art: { canvas: bubble, anchorX: 12, anchorY: 23 } }];

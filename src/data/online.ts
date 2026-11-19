@@ -1,8 +1,17 @@
-import modesRaw from './deliveryModes.json';
-import eventsRaw from './onlineEvents.json';
-import ordersRaw from './onlineOrders.json';
+import modesRawBase from './deliveryModes.json';
+import modesRawEn from '../i18n/en/data/deliveryModes.json';
+import eventsRawBase from './onlineEvents.json';
+import eventsRawEn from '../i18n/en/data/onlineEvents.json';
+import ordersRawBase from './onlineOrders.json';
+import ordersRawEn from '../i18n/en/data/onlineOrders.json';
 import type { DeliveryMode } from '../core/GameState';
 import type { RecipeCategory } from './catalog';
+import { localizeData } from '../i18n/i18n';
+
+// Teks data dalam bahasa aktif (tumpangan terjemahan Inggris di src/i18n/en/data/).
+const modesRaw = localizeData(modesRawBase, modesRawEn);
+const eventsRaw = localizeData(eventsRawBase, eventsRawEn);
+const ordersRaw = localizeData(ordersRawBase, ordersRawEn);
 
 /** Data pesanan online (0.13.0): cara mengantar, profil pembeli, catatan, dan event online. */
 

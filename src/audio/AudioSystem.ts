@@ -123,6 +123,22 @@ export class AudioSystem {
     }
   }
 
+  /** Senandung lembut satu nada (minigame Ikuti iramanya). Tidak berbunyi jika suara dimatikan. */
+  hum(freq: number, dur = 0.35): void {
+    const ctx = this.ctx;
+    if (!ctx || !this.busSfx || this.settings.muted || this.settings.sfx <= 0) return;
+    const now = ctx.currentTime;
+    this.tone(freq, dur, 'triangle', 0.12, now);
+    this.tone(freq / 2, dur * 1.2, 'sine', 0.06, now);
+  }
+
+  /** Ketukan pemain: klik kayu pendek. */
+  tick(good: boolean): void {
+    const ctx = this.ctx;
+    if (!ctx || !this.busSfx || this.settings.muted || this.settings.sfx <= 0) return;
+    this.tone(good ? 1200 : 300, 0.06, 'square', 0.05, ctx.currentTime);
+  }
+
   private tone(freq: number, dur: number, type: OscillatorType, vel: number, at: number, opts: { to?: number; out?: AudioNode } = {}): void {
     const ctx = this.ctx!;
     const osc = ctx.createOscillator();

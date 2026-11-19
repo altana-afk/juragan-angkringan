@@ -1,5 +1,10 @@
-import customersJson from './customers.json';
+import customersJsonBase from './customers.json';
+import customersJsonEn from '../i18n/en/data/customers.json';
 import type { RecipeCategory } from './catalog';
+import { localizeData } from '../i18n/i18n';
+
+// Teks data dalam bahasa aktif (tumpangan terjemahan Inggris di src/i18n/en/data/).
+const customersJson = localizeData(customersJsonBase, customersJsonEn);
 
 export interface CustomerPalette {
   readonly hair: string;
