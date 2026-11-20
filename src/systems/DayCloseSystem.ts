@@ -9,7 +9,7 @@ import { totalQty } from './InventorySystem';
 import { clampPopularity, nextLoyalty, popularityDelta } from './PopularitySystem';
 import { closeOnlineDay, finishOnlineDay } from './OnlineOrderSystem';
 import { closeBranches } from './BranchSystem';
-import { challengeReport, odgjLeaves, ormasPay, ormasPresent } from './ChallengeEventSystem';
+import { challengeReport, odgjLeaves, ormasCollect, ormasPresent } from './ChallengeEventSystem';
 
 /** Stok yang akan basi malam ini (kedaluwarsa sebelum hari berikutnya). */
 function expiringTonight(group: Record<string, StockBatch[]>, day: number): { list: [string, number][]; cost: number } {
@@ -39,8 +39,8 @@ export function closeDay(draft: GameState, catalog: Catalog): DayReport {
   finishOnlineDay(draft, catalog);
   // ODGJ yang masih di dekat gerobak saat tutup dianggap pergi sendiri.
   odgjLeaves(draft);
-  // Ormas yang belum dijawab saat tutup tetap menagih uang keamanan.
-  if (ormasPresent(draft)) ormasPay(draft);
+  // Ormas yang belum dijawab saat tutup menagih sendiri 15–20%.
+  if (ormasPresent(draft)) ormasCollect(draft);
   const l = draft.ledger;
   const day = draft.calendar.day;
   // Sewa/operasional tergantung lokasi (Jalan Kampung Rp10.000, Dekat Kampus Rp15.000).

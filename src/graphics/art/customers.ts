@@ -120,6 +120,14 @@ export function paintChallengeFolk(): ArtEntry[] {
   return entries;
 }
 
+/** Potret tokoh tantangan untuk panel obrolan (mis. ketua ormas yang menagih). */
+export function challengePortrait(id: string, paletteIndex = 0): PixelCanvas {
+  const look = CHALLENGE_LOOKS[id]?.[paletteIndex] ?? CHALLENGE_LOOKS.ormas?.[0];
+  if (!look) throw new Error(`Tokoh tantangan ${id} tidak ada`);
+  const pal = palette({ id, palettes: [look] }, 0, SKINS[(paletteIndex + id.length) % SKINS.length] as Color);
+  return frame([...UPPER, ...LEGS.stand], pal, 0);
+}
+
 /** Kucing 12×9: frame 0 duduk, 1 & 2 berlari. Varian 'liar' (abu kusam) dan 'belang' (peliharaan). */
 export const catKey = (variant: 'liar' | 'belang', frameIndex: number): string => `cat_${variant}_${frameIndex}`;
 

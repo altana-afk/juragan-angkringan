@@ -37,6 +37,9 @@ export interface ChallengeConfig {
     readonly rateMin: number;
     readonly rateMax: number;
     readonly failRate: number;
+    /** Dibiarkan menunggu terlalu lama: ormas menagih sendiri 15–20% (0.18.2). */
+    readonly lateRateMin: number;
+    readonly lateRateMax: number;
     readonly minAmount: number;
     readonly patienceMinutes: number;
   };

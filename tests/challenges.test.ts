@@ -16,7 +16,9 @@ import {
   odgjCalmed,
   odgjNeighbors,
   ormasAmount,
+  ormasCollect,
   ormasDuel,
+  ormasLateRate,
   ormasPay,
   planAllyVisits,
   planChallengeDay,
@@ -236,11 +238,25 @@ describe('ormas', () => {
     expect(b.player.money).toBe(m - 40_000);
   });
 
-  it('belum dijawab saat tutup: tetap menagih', () => {
-    const s = selling();
+  it('belum dijawab saat tutup: menagih sendiri 15–20%', () => {
+    const s = selling(10, 50, 200_000);
     markArrived(s, 'ormas');
     const report = closeDay(s, CATALOG);
-    expect(report.challenges?.log.at(-1)?.result).toBe('bayar');
+    const last = report.challenges?.log.at(-1);
+    expect(last?.result).toBe('tagih');
+    expect(last?.cost).toBeGreaterThanOrEqual(30_000);
+    expect(last?.cost).toBeLessThanOrEqual(40_000);
+  });
+
+  it('menagih sendiri: 15–20% dari hasil kemarin, lebih mahal dari permintaan awal', () => {
+    for (let day = 10; day < 60; day++) {
+      const s = selling(day, 50, 200_000);
+      markArrived(s, 'ormas');
+      const r = ormasLateRate(s);
+      expect(r).toBeGreaterThanOrEqual(0.15);
+      expect(r).toBeLessThanOrEqual(0.2);
+      expect(ormasCollect(s).cost).toBe(Math.round((200_000 * r) / 500) * 500);
+    }
   });
 
   it('keuntungan bersih ikut dipotong uang keamanan', () => {
@@ -400,4 +416,20 @@ describe('uji bot', () => {
     const revenue = log.reduce((n, d) => n + d.revenue, 0);
     expect(total.totalPaid).toBeLessThan(revenue * 0.08);
   }, 120_000);
+});
+
+describe('hati di panel obrolan', () => {
+  it('5 hati dari poin hubungan, selaras dengan tahap', async () => {
+    const { storyHearts, namedHearts, STAGE_POINTS } = await import('../src/systems/StorySystem');
+    expect(storyHearts(0)).toBe(0);
+    expect(storyHearts(STAGE_POINTS[1]!)).toBe(2);
+    expect(storyHearts(STAGE_POINTS[2]!)).toBe(4);
+    expect(storyHearts(STAGE_POINTS[3]!)).toBe(5);
+    expect(storyHearts(999)).toBe(5);
+    const s = selling();
+    s.story.relations.gito = { points: 8, stage: 2, talks: 0, lastTalkDay: 0, lastVisitDay: 0 };
+    s.challenges.allies.ratna = { heart: 3, talks: 3, lastTalkDay: 0, lastVisitDay: 0 };
+    expect(namedHearts(s, 'gito')).toBe(4);
+    expect(namedHearts(s, 'ratna')).toBe(3);
+  });
 });

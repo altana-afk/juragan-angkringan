@@ -7,12 +7,16 @@ import { SalesSimulation, SIM_CONFIG } from '../systems/SalesSimulation';
 import type { UIManager } from '../ui/UIManager';
 import { RiderLayer } from './RiderLayer';
 import { CustomerLayer, type TalkMark } from './CustomerLayer';
-import { canTalkToday, planVisits, talkContent } from '../systems/StorySystem';
+import { canTalkToday, namedHearts, planVisits, talkContent } from '../systems/StorySystem';
 import { closeDialogue, isDialogueOpen, openDialogue } from '../ui/DialoguePanel';
 import type { Group } from '../systems/SalesSimulation';
 import { getAudio } from '../scenes/sceneKeys';
 import type { MapData } from './MapData';
 import { tr } from '../i18n/i18n';
+import { GAME_CONFIG } from '../config/gameConfig';
+import { challengePortrait } from '../graphics/art/customers';
+import { pixelDataUrl } from '../ui/pixelImage';
+import { el } from '../ui/dom';
 import { NAMED_CUSTOMERS, namedById } from '../data/story';
 import { contactOnlineChance, favoriteRound, type PhoneContact } from '../systems/MinigameSystem';
 import { openFavoriteQuiz } from '../ui/FavoriteQuiz';
@@ -26,6 +30,8 @@ import {
   describeLog,
   hasPetCat,
   odgjPresent,
+  ormasAmount,
+  ormasLateRate,
   ormasPresent,
   planAllyVisits,
   tierOf,
@@ -49,6 +55,8 @@ export class SalesController {
   private challengeMinute = -1;
   private ormasSince = -1;
   private rescuing = new Set<'odgj' | 'ormas'>();
+  /** Panel penagihan ormas sedang tampil (uang belum tentu sudah diambil). */
+  private collecting = false;
   private speed: SimSpeed = 1;
   private readonly offs: (() => void)[] = [];
   private statusTimer = 0;
@@ -226,6 +234,7 @@ export class SalesController {
       getAudio(this.scene)?.play('click');
       openDialogue(this.ui, {
         who,
+        hearts: { value: namedHearts(this.ctx.store.get(), who), max: 5 },
         lines: allyTalkLines(this.ctx.store.get(), ally),
         onDone: () => {
           const state = this.ctx.store.get();
@@ -257,6 +266,7 @@ export class SalesController {
     getAudio(this.scene)?.play('click');
     openDialogue(this.ui, {
       who,
+      hearts: { value: namedHearts(this.ctx.store.get(), who), max: 5 },
       title: content.title,
       lines: content.lines,
       onDone: () => {
@@ -311,11 +321,19 @@ export class SalesController {
       this.challenges.dismiss('odgj');
       if (entry) this.ctx.notify(this.logText(entry), 'info', 3500);
     }
-    // Ormas yang dibiarkan terlalu lama mengambil uangnya sendiri.
-    if (ormasPresent(state) && this.ormasSince >= 0 && now - this.ormasSince >= CHALLENGE_CONFIG.ormas.patienceMinutes && !this.rescuing.has('ormas') && !isChallengeOpen()) {
-      const res = this.ctx.actions.ormasPay();
-      this.challenges.dismiss('ormas');
-      if (res.ok) this.ctx.notify(tr('🧥 Ormas menunggu terlalu lama dan menagih {cost}.', { cost: formatRupiah(res.value.cost) }), 'warning', 5000);
+    // Ormas yang dibiarkan terlalu lama (atau sampai jelang tutup) menagih sendiri lewat panel obrolan.
+    const close = GAME_CONFIG.dayCycle.closeMinutes;
+    if (
+      ormasPresent(state) &&
+      this.ormasSince >= 0 &&
+      (now - this.ormasSince >= CHALLENGE_CONFIG.ormas.patienceMinutes || now >= close - 2) &&
+      !this.rescuing.has('ormas') &&
+      !isChallengeOpen() &&
+      !isDialogueOpen() &&
+      !this.ui.hasOpenModal() &&
+      !this.collecting
+    ) {
+      this.ormasCollects();
     }
   }
 
@@ -366,6 +384,51 @@ export class SalesController {
     if (sim.hasNamedGroup(who)) return tr('{name} sudah ada di angkringan.', { name });
     sim.addNamedVisit({ who, minute: Math.floor(this.ctx.store.get().calendar.clockMinutes) + 1, newsId: null });
     return tr('{name} sedang berjalan ke angkringan.', { name });
+  }
+
+  /** Panel obrolan ketua ormas yang mengambil uang sendiri (15–20% hasil kemarin). */
+  private ormasCollects(): void {
+    const before = this.ctx.store.get();
+    const base = yesterdayRevenue(before);
+    // Jumlahnya sudah pasti (persen ditentukan hari); uang diambil saat baris terakhir tampil.
+    const cost = ormasAmount(before, ormasLateRate(before));
+    let taken = false;
+    const take = (): void => {
+      if (taken) return;
+      taken = true;
+      this.ctx.actions.ormasCollect();
+    };
+    this.collecting = true;
+    const pct = base > 0 ? Math.round((cost / base) * 100) : null;
+    const sets = [
+      [tr('"Lama amat. Kami nggak bisa nunggu terus."'), tr('"Karena bikin kami nunggu, tarifnya naik. Kami ambil sendiri dari laci."'), tr('"Makasih, Juragan. Sampai ketemu lagi."')],
+      [tr('"Dikira kami patung, ya? Dari tadi berdiri di sini."'), tr('"Ya sudah, biar kami yang hitung sendiri."'), tr('"Lain kali jangan pura-pura sibuk."')],
+      [tr('"Waktu kami mahal, Juragan."'), tr('"Ongkos menunggu kami tambahkan. Laci sudah kami buka."'), tr('"Begini kan lebih cepat. Permisi."')],
+    ];
+    const lines = sets[before.calendar.day % sets.length] as string[];
+    const finale = el('div', {
+      className: 'dialogue-take',
+      children: [
+        el('strong', { text: `−${formatRupiah(cost)}` }),
+        el('span', {
+          text: pct !== null ? tr('{pct}% dari hasil dagang kemarin ({base})', { pct, base: formatRupiah(base) }) : tr('Uang keamanan minimal'),
+        }),
+      ],
+    });
+    if (this.speed > 1) this.setSpeed(1);
+    getAudio(this.scene)?.play('chime');
+    openDialogue(this.ui, {
+      speaker: { name: tr('Ketua ormas'), portrait: pixelDataUrl('portrait-ormas', () => challengePortrait('ormas', 0)), tag: tr('Uang keamanan') },
+      tone: 'danger',
+      lines,
+      finale,
+      onLastLine: take,
+      onDone: () => {
+        take();
+        this.collecting = false;
+        this.challenges.dismiss('ormas');
+      },
+    });
   }
 
   /** Kenalan berhati penuh yang sedang makan menangani tamu (minigame dilewati). */
@@ -513,6 +576,7 @@ export class SalesController {
     closeChallenge();
     this.challenges.clear();
     this.rescuing.clear();
+    this.collecting = false;
     this.layer.clear();
     this.riders.clear();
     this.ctx.actions.finishSelling();

@@ -59,6 +59,7 @@ import {
   odgjCalmed,
   odgjLeaves,
   odgjNeighbors,
+  ormasCollect,
   ormasDuel,
   ormasAmount,
   ormasPay,
@@ -397,6 +398,11 @@ export class GameActions {
 
   ormasPay(): ActionResult<ChallengeLogEntry> {
     return this.run('ormas-bayar', (draft) => ormasPay(draft), (e) => tr('Uang keamanan {cost} dibayar.', { cost: formatRupiah(e.cost) }));
+  }
+
+  /** Ormas dibiarkan menunggu terlalu lama: menagih sendiri 15–20% dari hasil kemarin. */
+  ormasCollect(): ActionResult<ChallengeLogEntry> {
+    return this.run('ormas-tagih', (draft) => ormasCollect(draft), () => '');
   }
 
   ormasDuel(won: boolean): ActionResult<ChallengeLogEntry> {

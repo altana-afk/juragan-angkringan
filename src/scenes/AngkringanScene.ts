@@ -44,6 +44,7 @@ import { terrainAt } from '../world/MapData';
 import { buildWorld, type WorldView } from '../world/WorldBuilder';
 import { getAudio, getContext, getUI, SCENES } from './sceneKeys';
 import { tr } from '../i18n/i18n';
+import { namedHearts } from '../systems/StorySystem';
 import { openDebugPanel } from '../ui/DebugPanel';
 
 /**
@@ -289,6 +290,7 @@ export class AngkringanScene extends Phaser.Scene {
     const ending = endingById(s.story.ending);
     openDialogue(ui, {
       who: ending.speaker,
+      hearts: { value: namedHearts(s, ending.speaker), max: 5 },
       title: ending.title,
       lines: ending.lines,
       onDone: () => {

@@ -265,6 +265,23 @@ export function ormasDuel(draft: GameState, won: boolean): ChallengeLogEntry {
   return log(draft, { kind: 'ormas', result: 'kalah', cost: amount });
 }
 
+/**
+ * Ormas dibiarkan menunggu terlalu lama (atau sampai tutup): mereka mengambil sendiri 15–20%
+ * dari hasil dagang kemarin. Persen ditentukan hari (seed) supaya sama walau dimuat ulang.
+ */
+export function ormasLateRate(state: Readonly<GameState>): number {
+  const rng = new SeededRandom(`tagih-${state.calendar.day}`);
+  return Math.round(rng.range(CFG.ormas.lateRateMin, CFG.ormas.lateRateMax) * 100) / 100;
+}
+
+export function ormasCollect(draft: GameState): ChallengeLogEntry {
+  finish(draft, 'ormas');
+  const amount = ormasAmount(draft, ormasLateRate(draft));
+  pay(draft, amount);
+  draft.challenges.stats.ormasPaid += 1;
+  return log(draft, { kind: 'ormas', result: 'tagih', cost: amount });
+}
+
 // ---------- kenalan nakes & polisi ----------
 
 export function allyState(state: Readonly<GameState>, id: string): AllyState {
@@ -376,6 +393,8 @@ export function describeLog(e: ChallengeLogEntry, recipeName: (id: string) => st
       return tr('{icon} Membayar uang keamanan', { icon });
     case 'ormas:usir':
       return tr('{icon} Ormas berhasil diusir', { icon });
+    case 'ormas:tagih':
+      return tr('{icon} Ormas menagih sendiri karena dibiarkan menunggu', { icon });
     case 'ormas:kalah':
       return tr('{icon} Kalah adu gertak, membayar 20%', { icon });
     case 'ormas:ditangani':

@@ -24,6 +24,8 @@
     "rateMin": 0.1,
     "rateMax": 0.15,
     "failRate": 0.2,
+    "lateRateMin": 0.15,
+    "lateRateMax": 0.2,
     "minAmount": 2000,
     "patienceMinutes": 30
   },

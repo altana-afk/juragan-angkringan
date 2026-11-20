@@ -586,7 +586,7 @@ function tabTantangan(state: Readonly<GameState> | null): HTMLElement[] {
       icon: '🧥',
       title: tr('Ormas'),
       lines: [
-        tr('Ormas meminta uang keamanan 10–15% dari hasil dagang kemarin, paling sering sekali dalam 3 hari. Dibiarkan {0} menit, mereka menagih sendiri.', { 0: CHALLENGE_CONFIG.ormas.patienceMinutes }),
+        tr('Ormas meminta uang keamanan 10–15% dari hasil dagang kemarin, paling sering sekali dalam 3 hari. Dibiarkan {0} menit atau sampai tutup, mereka mengambil sendiri 15–20%.', { 0: CHALLENGE_CONFIG.ormas.patienceMinutes }),
         tr('Usir (Kumpulkan warga): ketuk tangan kuning warga dalam 10 detik sampai cukup orang berdiri di belakangmu. Tangan merah = anggota ormas yang menyamar (−1). Pelanggan bernama tahap 2+ yang sedang di angkringan langsung membela. Gagal: bayar 20%.'),
         tr('Solusi jangka panjang: berjualan di {location}, berkenalan dengan {name} sampai hati penuh. Jika dia sedang ngopi saat ormas datang, polisi membawa mereka ke mobil patroli.', { location: locationById(polisi.homeLocation).name, name: polisi.name }),
         heart('polisi'),

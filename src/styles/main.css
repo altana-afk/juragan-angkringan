@@ -1880,7 +1880,7 @@ button.hud-pill { font: inherit; color: inherit; cursor: pointer; text-align: le
 }
 .dialogue-portrait img { width: 52px; height: 84px; image-rendering: pixelated; }
 .dialogue-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
-.dialogue-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+.dialogue-head { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; }
 .dialogue-name { color: #5fd4f0; font-size: 17px; letter-spacing: 0.02em; }
 .dialogue-title { color: var(--c-accent); font-size: 12px; font-weight: 700; }
 .dialogue-text { margin: 0; color: #ffffff; font-size: 16px; line-height: 1.5; min-height: 3em; }
@@ -2716,3 +2716,22 @@ button.hud-pill { font: inherit; color: inherit; cursor: pointer; text-align: le
   .rhythm-target.is-pulse, .phone-contact[data-status='ring'] .phone-dot, .gather-person.is-shake { animation: none; }
 }
 .challenge-row > .challenge-label { width: auto; min-width: 56px; white-space: nowrap; }
+
+/* Hati hubungan di panel obrolan & panel ancaman (0.18.2). */
+.dialogue-hearts { display: flex; gap: 3px; align-items: center; margin-left: auto; }
+.dialogue-heart { width: 18px; height: 16px; display: block; }
+.dialogue-heart path { stroke-width: 1.4; stroke-linejoin: round; }
+.dialogue-heart.is-full path { fill: #e0302a; stroke: #7a1010; }
+.dialogue-heart.is-empty path { fill: #141016; stroke: #6d6470; }
+.dialogue-tag { font-size: 11px; font-weight: 700; color: #ffb3aa; background: rgba(224, 69, 58, 0.18); padding: 2px 8px; border-radius: 9px; }
+.dialogue-panel.is-danger { border-color: #e0453a; }
+.dialogue-panel.is-danger .dialogue-name { color: #ff7a6e; }
+.dialogue-panel.is-danger .dialogue-portrait { background: radial-gradient(circle at 50% 40%, #3a1a1e, #1a0e12); border-color: rgba(224, 69, 58, 0.5); }
+.dialogue-take { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; padding: 6px 10px; border-radius: 8px; background: rgba(224, 69, 58, 0.16); border: 1px solid rgba(224, 69, 58, 0.5); }
+.dialogue-take strong { color: #ff7a6e; font-size: 16px; }
+.dialogue-take span { font-size: 12px; color: #d8b4ae; }
+.dialogue-take.is-in { animation: dialogue-in 220ms ease-out; }
+.dialogue-take[hidden] { display: none; }
+@media (max-width: 640px), (max-height: 480px) {
+  .dialogue-heart { width: 15px; height: 13px; }
+}

@@ -12,7 +12,18 @@ import { tr } from '../i18n/i18n';
  */
 
 export interface DialogueOptions {
-  readonly who: NamedId;
+  /** Pelanggan bernama yang bicara. Boleh kosong jika `speaker` diisi (mis. ketua ormas). */
+  readonly who?: NamedId;
+  /** Pembicara di luar pelanggan bernama: nama, potret (data URL), label kecil di samping nama. */
+  readonly speaker?: { readonly name: string; readonly portrait: string; readonly tag?: string };
+  /** Gaya panel: 'danger' = garis & nama merah (ancaman, mis. ormas menagih). */
+  readonly tone?: 'danger';
+  /** Hati hubungan di kanan atas (merah = terisi, hitam = belum). */
+  readonly hearts?: { readonly value: number; readonly max: number } | null;
+  /** Elemen tambahan yang muncul di bawah teks pada baris terakhir (mis. jumlah uang yang diambil). */
+  readonly finale?: HTMLElement | null;
+  /** Dipanggil sekali saat baris terakhir pertama kali tampil (mis. uang benar-benar diambil saat itu). */
+  readonly onLastLine?: () => void;
   readonly lines: readonly string[];
   /** Judul kabar (opsional), tampil kecil di atas teks. */
   readonly title?: string | null;
@@ -32,19 +43,23 @@ export function portraitUrl(who: NamedId): string {
 
 export function openDialogue(ui: UIManager, options: DialogueOptions): void {
   if (current) return;
-  const def = namedById(options.who);
+  const def = options.speaker ?? (options.who ? { name: namedById(options.who).name, portrait: portraitUrl(options.who), tag: undefined } : null);
+  if (!def) return;
   let index = 0;
+  let lastShown = false;
   const release = ui.holdTime();
   const text = el('p', { className: 'dialogue-text' });
   const counter = el('span', { className: 'dialogue-counter' });
   const next = el('button', { className: 'btn btn-primary dialogue-next', attrs: { type: 'button' } });
+  const finale = options.finale ?? null;
+  if (finale) finale.hidden = true;
   const root = el('section', {
-    className: 'dialogue-panel',
+    className: `dialogue-panel${options.tone === 'danger' ? ' is-danger' : ''}`,
     attrs: { role: 'dialog', 'aria-label': tr('Obrolan dengan {name}', { name: def.name }), 'aria-live': 'polite' },
     children: [
       el('div', {
         className: 'dialogue-portrait',
-        children: [el('img', { attrs: { src: portraitUrl(options.who), alt: '' } })],
+        children: [el('img', { attrs: { src: def.portrait, alt: '' } })],
       }),
       el('div', {
         className: 'dialogue-body',
@@ -53,10 +68,13 @@ export function openDialogue(ui: UIManager, options: DialogueOptions): void {
             className: 'dialogue-head',
             children: [
               el('strong', { className: 'dialogue-name', text: def.name }),
+              def.tag ? el('span', { className: 'dialogue-tag', text: def.tag }) : null,
               options.title ? el('span', { className: 'dialogue-title', text: tr('📰 {title}', { title: options.title }) }) : null,
+              options.hearts ? heartRow(options.hearts.value, options.hearts.max) : null,
             ],
           }),
           text,
+          finale,
           el('div', { className: 'dialogue-foot', children: [counter, next] }),
         ],
       }),
@@ -66,6 +84,18 @@ export function openDialogue(ui: UIManager, options: DialogueOptions): void {
   const render = (): void => {
     setText(text, options.lines[index] ?? '');
     const last = index >= options.lines.length - 1;
+    if (last && !lastShown) {
+      lastShown = true;
+      options.onLastLine?.();
+    }
+    if (finale) {
+      finale.hidden = !last;
+      if (last) {
+        finale.classList.remove('is-in');
+        void finale.offsetWidth;
+        finale.classList.add('is-in');
+      }
+    }
     setText(next, last ? tr('Tutup') : tr('Lanjut ▸'));
     setText(counter, options.lines.length > 1 ? tr('{0}/{length}', { 0: index + 1, length: options.lines.length }) : '');
     text.classList.remove('is-in');
@@ -120,6 +150,25 @@ export function openDialogue(ui: UIManager, options: DialogueOptions): void {
     root.classList.add('is-visible');
     next.focus({ preventScroll: true });
   });
+}
+
+const HEART_PATH = 'M8 14.5 1.6 8.3A3.7 3.7 0 0 1 8 3.4a3.7 3.7 0 0 1 6.4 4.9z';
+
+/** Deretan hati: merah = terisi, hitam bergaris tepi = belum. */
+export function heartRow(value: number, max: number): HTMLElement {
+  const row = el('div', { className: 'dialogue-hearts', attrs: { role: 'img', 'aria-label': tr('Hati {value} dari {max}', { value, max }) } });
+  const ns = 'http://www.w3.org/2000/svg';
+  for (let i = 0; i < max; i++) {
+    const svg = document.createElementNS(ns, 'svg');
+    svg.setAttribute('viewBox', '0 0 16 16');
+    svg.setAttribute('aria-hidden', 'true');
+    svg.classList.add('dialogue-heart', i < value ? 'is-full' : 'is-empty');
+    const path = document.createElementNS(ns, 'path');
+    path.setAttribute('d', HEART_PATH);
+    svg.append(path);
+    row.append(svg);
+  }
+  return row;
 }
 
 /** Tutup paksa (mis. saat scene dihancurkan). */

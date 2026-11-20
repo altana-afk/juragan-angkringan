@@ -3,6 +3,13 @@
  * `src/data/changelog.ts` (dicek oleh tests/i18n.test.ts). Tambah entri di sini setiap naik versi.
  */
 export const CHANGELOG_EN: Readonly<Record<string, { title: string; items: readonly string[] }>> = {
+  '0.18.2': {
+    title: 'Hearts in the chat panel',
+    items: [
+      'When you chat with a named customer, their hearts now show in the top right of the panel. Red is filled, black is not yet. Every character now has 5 hearts.',
+      "A gang left waiting too long no longer takes the money quietly. Their leader talks to you in the chat panel, then takes 15–20% of yesterday's sales.",
+    ],
+  },
   '0.18.1': {
     title: 'New minigames for neighborhood challenges',
     items: [

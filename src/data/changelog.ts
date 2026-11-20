@@ -13,6 +13,14 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: readonly ChangelogEntry[] = [
   {
+    version: '0.18.2',
+    title: 'Hati di panel obrolan',
+    items: [
+      'Saat mengobrol dengan pelanggan bernama, hatinya tampil di kanan atas panel. Merah sudah terisi, hitam belum. Semua tokoh kini punya 5 hati.',
+      'Ormas yang didiamkan terlalu lama tidak lagi menagih diam-diam. Ketuanya bicara langsung di panel obrolan, lalu mengambil 15–20% dari hasil dagang kemarin.',
+    ],
+  },
+  {
     version: '0.18.1',
     title: 'Minigame baru untuk tantangan kampung',
     items: [

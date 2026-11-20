@@ -31,6 +31,22 @@ import { tr } from '../i18n/i18n';
 export const SUMMARY_AFTER_DAYS = 5;
 /** Poin minimal untuk tahap 0, 1, 2, 3. */
 export const STAGE_POINTS: readonly number[] = [0, 3, 8, 15];
+
+/**
+ * Hati di panel obrolan (0.18.2): 5 hati untuk semua pelanggan bernama, dihitung dari poin hubungan.
+ * Selaras dengan tahap: tahap 1 = 2 hati, tahap 2 = 4 hati, tahap 3 = 5 hati.
+ */
+export const HEART_POINTS: readonly number[] = [1, 3, 5, 8, 15];
+
+export function storyHearts(points: number): number {
+  return HEART_POINTS.filter((min) => points >= min).length;
+}
+
+/** Hati pelanggan bernama (tokoh cerita atau kenalan nakes/polisi) untuk ditampilkan, 0–5. */
+export function namedHearts(state: Readonly<GameState>, who: string): number {
+  if (isAlly(who)) return state.challenges.allies[who]?.heart ?? 0;
+  return storyHearts(state.story.relations[who]?.points ?? 0);
+}
 /** Akhir cerita muncul beberapa hari setelah keputusan (Babak 4). */
 export const ENDING_AFTER_DAYS = 3;
 export const SELL_PRICE = 3_000_000;
